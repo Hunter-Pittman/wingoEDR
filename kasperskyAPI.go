@@ -40,6 +40,7 @@ type HashLookup struct {
 func getHashStatus(hash string, hashType string) string {
 	var isValidHash bool
 
+	// Investigate to see if ToLower is needed for the hash switch case
 	switch {
 	case hashType == "md5":
 		isValidHash = verifyMD5Hash(hash)
@@ -70,9 +71,9 @@ func getHashStatus(hash string, hashType string) string {
 	case "401 Unauthorized" == response.Status:
 		log.Fatalln("Your API key is not working!")
 	case "403 Forbidden" == response.Status:
-		log.Fatalln("You may have been blocked or your quote with kapersky reached")
+		log.Fatalln("You may have been blocked or your quote with kapersky reached: ", response.Status)
 	case "404 Not Found" == response.Status:
-		log.Fatalln("Resource not found, check your endpoint address")
+		log.Fatalln("Resource not found, check your endpoint address: ", response.Status)
 	}
 
 	body, err := ioutil.ReadAll(response.Body)
@@ -86,7 +87,7 @@ func getHashStatus(hash string, hashType string) string {
 	log.Printf(sb)
 
 	if err := json.Unmarshal(body, &result); err != nil { // Parse []byte to go struct pointer
-		fmt.Println("Can not unmarshal JSON")
+		fmt.Println("Cannot unmarshal JSON")
 	}
 
 	return result.FileGeneralInfo.FileStatus
