@@ -6,5 +6,9 @@ import (
 )
 
 func main() {
-	fmt.Printf("%v", processes.GetAllProcesses())
+	thing := processes.GetAllProcesses()
+
+	thingNetworkConnections := thing[0].NetworkConnections
+
+	fmt.Printf("%+v", thingNetworkConnections[0].NetType)
 }

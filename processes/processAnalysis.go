@@ -1,18 +1,29 @@
 package processes
 
 import (
+	"errors"
 	"log"
 
 	"github.com/shirou/gopsutil/v3/process"
 )
 
 type ProcessInfo struct {
-	name string
-	ppid *process.Process
-	pid  int32
-	exe  []string
-	cwd  string
-	user string
+	Name               string `default:"no name"`
+	Ppid               *process.Process
+	Pid                int32
+	Exe                []string
+	Cwd                string
+	User               string
+	NetworkConnections []ConnectionInfo
+}
+
+type ConnectionInfo struct {
+	NetType       uint32
+	LocalAddress  string
+	LocalPort     uint32
+	RemoteAddress string
+	RemotePort    uint32
+	Status        string
 }
 
 func GetAllProcesses() []ProcessInfo {
@@ -26,7 +37,10 @@ func GetAllProcesses() []ProcessInfo {
 
 		ppid, err := processList[i].Parent()
 		if err != nil {
-			log.Println("Error getting parent process: ", err)
+			if err.Error() == "process does not exist" {
+			} else {
+				log.Println("Error getting parent process: ", err)
+			}
 		}
 
 		exe, err := processList[i].CmdlineSlice()
@@ -49,15 +63,62 @@ func GetAllProcesses() []ProcessInfo {
 			log.Println("Error getting username: ", err)
 		}
 
+		connections, err := GetProcessConnections(processList[i])
+		if err != nil {
+			if err.Error() == "There are no connections for this process" {
+			} else {
+				log.Println("Error getting process netowrk connections: ", err)
+			}
+		}
+
 		result[i] = ProcessInfo{
-			name: name,
-			ppid: ppid,
-			pid:  processList[i].Pid,
-			exe:  exe,
-			cwd:  cwd,
-			user: user,
+			Name:               name,
+			Ppid:               ppid,
+			Pid:                processList[i].Pid,
+			Exe:                exe,
+			Cwd:                cwd,
+			User:               user,
+			NetworkConnections: connections,
 		}
 	}
 
 	return result
 }
+
+func GetProcessConnections(process *process.Process) ([]ConnectionInfo, error) {
+	connections, err := process.Connections()
+	var currentConnection []ConnectionInfo
+	if err != nil {
+		return currentConnection, errors.New("Error getting connections for this process")
+	}
+	numberOfConnections := len(connections)
+	currentConnections := make([]ConnectionInfo, numberOfConnections)
+
+	if numberOfConnections == 0 {
+		return currentConnection, errors.New("There are no connections for this process")
+	}
+
+	for i := range connections {
+
+		currentConnections[i] = ConnectionInfo{
+			NetType:       connections[i].Type,
+			LocalAddress:  connections[i].Laddr.IP,
+			LocalPort:     connections[i].Laddr.Port,
+			RemoteAddress: connections[i].Raddr.IP,
+			RemotePort:    connections[i].Raddr.Port,
+			Status:        connections[i].Status,
+		}
+	}
+
+	return currentConnections, nil
+}
+
+func processCharateristicsAnalysis(processList *[]ProcessInfo) {
+
+}
+
+// Additoanl data functions needed:
+// 1. Get name via PID
+// 2. Get PID via name
+// 3. Actual content analysis
+// Handle network analysis from seperate module
