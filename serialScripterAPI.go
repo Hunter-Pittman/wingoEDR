@@ -28,3 +28,11 @@ func HeartBeat() {
 
 	defer resp.Body.Close()
 }
+
+func IncidentAlert() {
+
+}
+
+func UpdateConfig() {
+
+}

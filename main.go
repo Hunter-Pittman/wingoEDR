@@ -1,29 +1,24 @@
 package main
 
 import (
-	"fmt"
+	"time"
+	"wingoEDR/frontend"
 	"wingoEDR/logger"
 	"wingoEDR/processes"
 )
 
 func main() {
 	logger.InitLogger()
+	for {
+		//Interface
+		go frontend.QuickInterface()
+		// Process Analysis
+		go getHashStatus("7a2278a9a74f49852a5d75c745ae56b80d5b4c16f3f6a7fdfd48cb4e2431c688", "sha256")
+		go processes.GetAllProcesses()
 
-	/*
-		for {
-			go frontend.QuickInterface()
+		// Heartbeat
 
-			thing := processes.GetAllProcesses()
-
-			thingNetworkConnections := thing[0].NetworkConnections
-
-			fmt.Printf("%+v", thingNetworkConnections[0].NetType)
-
-			select {}
-		}
-	*/
-	//time.Sleep(1 * time.Minute)
-
-	thing := processes.GetAllProcesses()
-	fmt.Printf("%+v", thing)
+		time.Sleep(1 * time.Minute)
+		select {}
+	}
 }

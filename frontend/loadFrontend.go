@@ -6,6 +6,7 @@ import (
 
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
+	"go.uber.org/zap"
 )
 
 func (m model) Init() tea.Cmd {
@@ -90,6 +91,7 @@ var (
 )
 
 func QuickInterface() {
+	zap.S().Info("Quick interface has started")
 	tabs := []string{"Status", "wingoEDR Log", "Process Snapshot", "Honey token", "Kasperky Quick Hash Lookup"}
 	tabContent := []string{"STATUS STUFF", "LOG STUFF", "PROCESSES", "HONEY TOKENS IN USE", "KASPERKY LOOKUP"}
 
