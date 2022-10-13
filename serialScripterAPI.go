@@ -3,8 +3,6 @@ package main
 import (
 	"bytes"
 	"encoding/json"
-	"log"
-	"net"
 	"net/http"
 )
 
@@ -13,7 +11,7 @@ type Beat struct {
 }
 
 func HeartBeat() {
-	m := Beat{IP: getIP()}
+	m := Beat{IP: GetIP()}
 	jsonStr, err := json.Marshal(m)
 	if err != nil {
 		panic(err)
@@ -27,17 +25,4 @@ func HeartBeat() {
 	}
 
 	defer resp.Body.Close()
-}
-
-func getIP() string {
-	conn, err := net.Dial("udp", "8.8.8.8:80")
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer conn.Close()
-
-	localAddr := conn.LocalAddr().(*net.UDPAddr)
-
-	ipaddr := localAddr.IP
-	return ipaddr.String()
 }
