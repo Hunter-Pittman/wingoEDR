@@ -102,7 +102,3 @@ func getSystemHealth() SystemStats {
 	cpuUsageStats := getCpuUsage()
 	return SystemStats{memoryStats, diskUsageStats, networkStats, uptime, cpuUsageStats}
 }
-
-func main() {
-	fmt.Println(getSystemHealth())
-}
