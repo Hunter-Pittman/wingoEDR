@@ -4,6 +4,8 @@ import (
 	"bytes"
 	"encoding/json"
 	"net/http"
+
+	"go.uber.org/zap"
 )
 
 type Beat struct {
@@ -14,7 +16,7 @@ func HeartBeat() {
 	m := Beat{IP: GetIP()}
 	jsonStr, err := json.Marshal(m)
 	if err != nil {
-		panic(err)
+		zap.S().Warn(err)
 	}
 	resp, err := http.Post("http://localhost:80/heartbeat", "application/json", bytes.NewBuffer(jsonStr))
 
@@ -25,4 +27,12 @@ func HeartBeat() {
 	}
 
 	defer resp.Body.Close()
+}
+
+func IncidentAlert() {
+
+}
+
+func UpdateConfig() {
+
 }
