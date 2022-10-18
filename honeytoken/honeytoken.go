@@ -45,8 +45,6 @@ func monitorHoneyFile(filepath string) {
 		honeyAttribs1 := getFileAttribs(filepath)
 		time.Sleep(2 * time.Second)
 		honeyAttribs2 := getFileAttribs(filepath)
-		fmt.Println(honeyAttribs1.accessTime)
-		fmt.Println(honeyAttribs2.accessTime)
 		if honeyAttribs1.modTime != honeyAttribs2.modTime || honeyAttribs1.accessTime != honeyAttribs2.accessTime {
 			log.Fatal("[!] File has been accessed and/or modified! Sending alert!")
 		} else {
