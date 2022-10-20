@@ -5,8 +5,9 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
-	"regexp"
 	"time"
+
+	"wingoEDR/common"
 
 	"go.uber.org/zap"
 )
@@ -38,17 +39,17 @@ type HashLookup struct {
 //getHashStatus("27dfb7631807c7bd185f57cd6de0628c6e9c47ed9b390a9b8544fdf12a323e04") // No results
 //getHashStatus("98E07EDE313BAB4D2B659F4AF09804DB554287308EC1882D3D4036BEAE0D126E") // Clean
 
-func getHashStatus(hash string, hashType string) string {
+func GetHashStatus(hash string, hashType string) string {
 	var isValidHash bool
 
 	// Investigate to see if ToLower is needed for the hash switch case
 	switch {
 	case hashType == "md5":
-		isValidHash = verifyMD5Hash(hash)
+		isValidHash = common.VerifyMD5Hash(hash)
 	case hashType == "sha1":
-		isValidHash = verifySHA1Hash(hash)
+		isValidHash = common.VerifySHA1Hash(hash)
 	case hashType == "sha256":
-		isValidHash = verifySHA256Hash(hash)
+		isValidHash = common.VerifySHA256Hash(hash)
 	default:
 		zap.S().Error("Supported hash types are: md5, sha1, sha256")
 	}
@@ -92,19 +93,4 @@ func getHashStatus(hash string, hashType string) string {
 	}
 
 	return result.FileGeneralInfo.FileStatus
-}
-
-func verifySHA256Hash(hash string) bool {
-	match, _ := regexp.MatchString("[A-Fa-f0-9]{64}", hash)
-	return match
-}
-
-func verifySHA1Hash(hash string) bool {
-	match, _ := regexp.MatchString("[a-fA-F0-9]{40}$", hash)
-	return match
-}
-
-func verifyMD5Hash(hash string) bool {
-	match, _ := regexp.MatchString("/^[a-f0-9]{32}$/i", hash)
-	return match
 }

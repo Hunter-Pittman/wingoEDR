@@ -30,11 +30,12 @@ type ConnectionInfo struct {
 	Status        string
 }
 
-func GetAllProcesses() []ProcessInfo {
-
+func GetAllProcesses() ([]ProcessInfo, error) {
+	var emptyProcessInfo []ProcessInfo
 	processList, err := process.Processes()
 	if err != nil {
 		zap.S().Error("Getting processes failed!")
+		return emptyProcessInfo, err
 	}
 	result := make([]ProcessInfo, len(processList))
 	for i := range processList {
@@ -86,7 +87,7 @@ func GetAllProcesses() []ProcessInfo {
 		}
 	}
 
-	return result
+	return result, nil
 }
 
 func GetProcessConnections(process *process.Process) ([]ConnectionInfo, error) {
