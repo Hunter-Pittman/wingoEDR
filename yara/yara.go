@@ -49,8 +49,11 @@ func DirYaraScan() {
 		if outStr != "" {
 			line := strings.SplitAfter(outStr, "\n")
 			for x := range line {
-				rule := strings.SplitAfterN(line[x], " ", 2)
-				fmt.Printf("%v\n", rule[0])
+				if line[x] != "" {
+					rule := strings.SplitAfterN(line[x], " ", 2)
+					fmt.Printf("%v\n", rule[0])
+				}
+
 			}
 		}
 
