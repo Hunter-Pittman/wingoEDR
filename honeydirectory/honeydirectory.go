@@ -45,7 +45,7 @@ func enumerateFiles(path string) []string {
 }
 
 
-//create & return DirAttribs structure for 1 file
+//create & return fileAttribs structure for 1 file
 func getFileAttribs(filePath string) fileAttribs {
 	data, err := times.Stat(filePath)
 	if err != nil {
@@ -80,7 +80,7 @@ func getTimes(fileList []string) []fileAttribs {
 	return files
 }
 
-// Example: monitorDirectory("C:\\Users\\User\\Desktop\\honeydickin", 2) to monitor honeydickin & sleep for 2 seconds
+// Example: monitorDirectory("C:\\Users\\User\\Desktop\\honeytoken", 2) to monitor honeytoken & sleep for 2 seconds
 func monitorDirectory(directory string, secondsToSleep time.Duration) {
 	fileList := enumerateFiles(directory)
 	origTimes := getTimes(fileList)
@@ -95,7 +95,7 @@ func monitorDirectory(directory string, secondsToSleep time.Duration) {
 				if file.modTime != newTimes[index].modTime || file.accessTime != newTimes[index].accessTime {
 					zap.S().Warn("Honey file accessed/modified! Sending alert!")
 				} else {
-					fmt.Println("[+] Files untouched. Sleeping...")
+					zap.S().Info("[+] Files untouched. Sleeping...")
 				}
 			}
 		}
