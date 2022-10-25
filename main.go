@@ -1,14 +1,24 @@
 package main
 
 import (
-	"fmt"
-	"wingoEDR/processes"
+	"time"
+	"wingoEDR/logger"
+	"wingoEDR/yara"
 )
 
 func main() {
-	thing := processes.GetAllProcesses()
+	logger.InitLogger()
+	for {
+		//Interface
+		//go frontend.QuickInterface()
+		yara.DirYaraScan()
+		// Process Analysis
 
-	thingNetworkConnections := thing[0].NetworkConnections
+		// Heartbeat
 
-	fmt.Printf("%+v", thingNetworkConnections[0].NetType)
+		// yara scan
+
+		time.Sleep(1 * time.Minute)
+		select {}
+	}
 }

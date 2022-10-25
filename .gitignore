@@ -15,3 +15,5 @@
 # vendor/
 
 config.json
+logs
+.fleet

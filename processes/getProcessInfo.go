@@ -2,9 +2,9 @@ package processes
 
 import (
 	"errors"
-	"log"
 
 	"github.com/shirou/gopsutil/v3/process"
+	"go.uber.org/zap"
 )
 
 // Additoanl data functions needed:
@@ -30,11 +30,12 @@ type ConnectionInfo struct {
 	Status        string
 }
 
-func GetAllProcesses() []ProcessInfo {
-
+func GetAllProcesses() ([]ProcessInfo, error) {
+	var emptyProcessInfo []ProcessInfo
 	processList, err := process.Processes()
 	if err != nil {
-		log.Println("Getting processes failed!")
+		zap.S().Error("Getting processes failed!")
+		return emptyProcessInfo, err
 	}
 	result := make([]ProcessInfo, len(processList))
 	for i := range processList {
@@ -43,35 +44,35 @@ func GetAllProcesses() []ProcessInfo {
 		if err != nil {
 			if err.Error() == "process does not exist" {
 			} else {
-				log.Println("Error getting parent process: ", err)
+				zap.S().Warn("Error getting parent process: ", err)
 			}
 		}
 
 		exe, err := processList[i].CmdlineSlice()
 		if err != nil {
-			log.Println("Error getting command line arguments: ", err)
+			zap.S().Warn("Error getting command line arguments: ", err)
 		}
 
 		cwd, err := processList[i].Cwd()
 		if err != nil {
-			log.Println("Error getting process current working directory: ", err)
+			zap.S().Warn("Error getting process current working directory: ", err)
 		}
 
 		name, err := processList[i].Name()
 		if err != nil {
-			log.Println("Error getting process name: ", err)
+			zap.S().Warn("Error getting process name: ", err)
 		}
 
 		user, err := processList[i].Username()
 		if err != nil {
-			log.Println("Error getting username: ", err)
+			zap.S().Warn("Error getting username: ", err)
 		}
 
 		connections, err := GetProcessConnections(processList[i])
 		if err != nil {
 			if err.Error() == "There are no connections for this process" {
 			} else {
-				log.Println("Error getting process netowrk connections: ", err)
+				zap.S().Warn("Error getting process netowrk connections: ", err)
 			}
 		}
 
@@ -86,7 +87,7 @@ func GetAllProcesses() []ProcessInfo {
 		}
 	}
 
-	return result
+	return result, nil
 }
 
 func GetProcessConnections(process *process.Process) ([]ConnectionInfo, error) {
