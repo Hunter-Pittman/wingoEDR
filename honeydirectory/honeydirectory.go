@@ -1,7 +1,6 @@
 package honeydirectory
 
 import (
-	"fmt"
 	"time"
 	"strings"
 	"wingoEDR/logger"
