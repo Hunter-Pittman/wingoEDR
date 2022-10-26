@@ -1,7 +1,11 @@
 package common
 
 import (
+	"crypto/sha256"
+	"encoding/base64"
+	"io"
 	"net"
+	"os"
 	"regexp"
 
 	"go.uber.org/zap"
@@ -49,4 +53,60 @@ func FirstWords(value string, count int) string {
 	}
 	// Return the entire string.
 	return value
+}
+
+type finfo struct {
+	Name string
+	Size int64
+	Time string
+	Hash string
+}
+
+func CheckFile(name string) finfo {
+	fileInfo, err := os.Stat(name)
+	if err != nil {
+		panic(err)
+	}
+	println(name)
+	if fileInfo.IsDir() {
+
+		t := fileInfo.ModTime().String()
+		b := fileInfo.Size()
+
+		i := finfo{
+			Name: name,
+			Size: b,
+			Time: t,
+			Hash: "directory",
+		}
+
+		return i
+	} else {
+		f, err := os.Open(name)
+		if err != nil {
+			zap.S().Error(err)
+		}
+		if err != nil {
+			if os.IsNotExist(err) {
+				println("file not found:", fileInfo.Name())
+			}
+		}
+		h := sha256.New()
+		if _, err := io.Copy(h, f); err != nil {
+			zap.S().Warn(err)
+		}
+		hash := h.Sum(nil)
+		Enc := base64.StdEncoding.EncodeToString(hash)
+
+		t := fileInfo.ModTime().String()
+		b := fileInfo.Size()
+
+		i := finfo{
+			Name: name,
+			Size: b,
+			Time: t,
+			Hash: Enc,
+		}
+		return i
+	}
 }
