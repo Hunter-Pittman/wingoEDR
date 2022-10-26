@@ -6,6 +6,7 @@ import (
 	"time"
 	"github.com/djherbis/times"
 	"go.uber.org/zap"
+	"strings"
 )
 
 type fileAttribs struct {
@@ -33,7 +34,7 @@ func VerifySHA256Hash(hash string) bool {
 }
 
 func getFileAttribs(filepath string) fileAttribs {
-	data, err := times.Stat(filePath)
+	data, err := times.Stat(filepath)
 	if err != nil {
 		if strings.Contains(err.Error(), "cannot find the file") {
 			// sign that the file was deleted
@@ -41,7 +42,7 @@ func getFileAttribs(filepath string) fileAttribs {
 		}
 	} else {
 		// create file struct
-		var honeyDirAttribs = fileAttribs{filePath, data.ModTime(), data.AccessTime()}
+		var honeyDirAttribs = fileAttribs{filepath, data.ModTime(), data.AccessTime()}
 		return honeyDirAttribs
 	}
 	var honeyFileAttribs = fileAttribs{"", time.Now(), time.Now()}
