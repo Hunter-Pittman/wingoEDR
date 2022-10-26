@@ -11,7 +11,7 @@ import (
 	"encoding/hex"
 )
 
-type fileAttribs struct {
+type FileAttribs struct {
 	filename	string
 	modTime		time.Time
 	accessTime	time.Time
@@ -41,7 +41,7 @@ func VerifySHA256Hash(hash string) bool {
 	return match
 }
 
-func getFileAttribs(filepath string) fileAttribs {
+func GetFileAttribs(filepath string) fileAttribs {
 	data, err := times.Stat(filepath)
 	if err != nil {
 		if strings.Contains(err.Error(), "cannot find the file") {
