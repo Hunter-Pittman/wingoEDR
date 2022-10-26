@@ -7,6 +7,8 @@ import (
 	"github.com/djherbis/times"
 	"go.uber.org/zap"
 	"strings"
+	"crypto/sha1"
+	"encoding/hex"
 )
 
 type fileAttribs struct {
@@ -26,6 +28,12 @@ func GetIP() string {
 
 	ipaddr := localAddr.IP
 	return ipaddr.String()
+}
+
+func GenerateSha1Hash(data string) string {
+	dataHashByte := sha1.Sum([]byte(data))
+	dataHashStr := hex.EncodeToString(dataHashByte[:])
+	return dataHashStr
 }
 
 func VerifySHA256Hash(hash string) bool {
