@@ -8,6 +8,12 @@ import (
 	"go.uber.org/zap"
 )
 
+type fileAttribs struct {
+	filename	string
+	modTime		time.Time
+	accessTime	time.Time
+}
+
 func GetIP() string {
 	conn, err := net.Dial("udp", "8.8.8.8:80")
 	if err != nil {
