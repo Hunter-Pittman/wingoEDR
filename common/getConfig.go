@@ -22,8 +22,10 @@ type Configuration struct {
 	} `json:"exe_paths"`
 }
 
+const CONFIG_LOC string = "C:\\Users\\hunte\\Documents\\repos\\wingoEDR\\config.json"
+
 func GetKaperskyKey() string {
-	file, _ := os.Open("config.json")
+	file, _ := os.Open(CONFIG_LOC)
 	defer file.Close()
 	decoder := json.NewDecoder(file)
 	configuration := Configuration{}
@@ -35,7 +37,7 @@ func GetKaperskyKey() string {
 }
 
 func GetSerialScripterUserAgent() string {
-	file, _ := os.Open("config.json")
+	file, _ := os.Open(CONFIG_LOC)
 	defer file.Close()
 	decoder := json.NewDecoder(file)
 	configuration := Configuration{}
@@ -47,7 +49,7 @@ func GetSerialScripterUserAgent() string {
 }
 
 func GetYaraExePath() string {
-	file, _ := os.Open("config.json")
+	file, _ := os.Open(CONFIG_LOC)
 	defer file.Close()
 	decoder := json.NewDecoder(file)
 	configuration := Configuration{}

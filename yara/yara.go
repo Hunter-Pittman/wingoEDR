@@ -2,10 +2,10 @@ package yara
 
 import (
 	"bytes"
-	"errors"
 	"io/ioutil"
 	"os/exec"
 	"strings"
+	"wingoEDR/common"
 
 	"go.uber.org/zap"
 )
@@ -17,13 +17,15 @@ type YaraMatch struct {
 
 // WARNING this will accpet directories of unlimited size. Directorires that are <= 1000 objects is recommended. Time estimate for a 1400 object directory would be 1 hour+
 func YaraScan(rules string, dir string) ([]YaraMatch, error) {
-	var thing []YaraMatch
+	//var thing []YaraMatch
 	ruleList := make([]string, 1)
 	rulePath := rules
 
+	yaraExePath := common.GetYaraExePath()
+
 	files, err := ioutil.ReadDir(rulePath)
 	if err != nil {
-		zap.S().Fatal(err)
+		zap.S().Warn(err)
 	}
 
 	for _, f := range files {
@@ -33,7 +35,7 @@ func YaraScan(rules string, dir string) ([]YaraMatch, error) {
 	matches := make([]YaraMatch, 0)
 	ruleList = ruleList[1:]
 	for i := range ruleList {
-		cmd := exec.Command("C:\\Users\\hunte\\Documents\\repos\\wingoEDR\\yara_exe\\yara64.exe", "-r", rulePath+ruleList[i], dir)
+		cmd := exec.Command(yaraExePath, "-r", rulePath+ruleList[i], dir)
 
 		var stdout, stderr bytes.Buffer
 		cmd.Stdout = &stdout
@@ -44,8 +46,7 @@ func YaraScan(rules string, dir string) ([]YaraMatch, error) {
 		}
 		outStr, errStr := string(stdout.Bytes()), string(stderr.Bytes())
 		if errStr != "" {
-			zap.S().Error("There is an error", errStr)
-			return thing, errors.New(errStr)
+			zap.S().Warn(errStr)
 		}
 
 		if outStr != "" {
