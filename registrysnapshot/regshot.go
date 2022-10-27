@@ -36,3 +36,7 @@ func GetRegistryValue(registryPathSlice []string, registryKeySlice []string) []R
 	return regValues
 }
 
+func GetLastWriteTime(keyHandle registry.Key) time.Time {
+	keyInfo, _ := keyHandle.Stat()
+	return keyInfo.ModTime()
+}
