@@ -2,9 +2,8 @@ package yara
 
 import (
 	"bytes"
-	"fmt"
+	"errors"
 	"io/ioutil"
-	"log"
 	"os/exec"
 	"strings"
 
@@ -12,27 +11,29 @@ import (
 )
 
 type YaraMatch struct {
-	rule string
-	file string
+	Rule string
+	File string
 }
 
-func DirYaraScan() {
+// WARNING this will accpet directories of unlimited size. Directorires that are <= 1000 objects is recommended. Time estimate for a 1400 object directory would be 1 hour+
+func YaraScan(rules string, dir string) ([]YaraMatch, error) {
+	var thing []YaraMatch
 	ruleList := make([]string, 1)
-	rulePath := "C:\\Users\\hunte\\Documents\\repos\\wingoEDR\\yara_rules\\fileID\\"
+	rulePath := rules
 
 	files, err := ioutil.ReadDir(rulePath)
 	if err != nil {
-		log.Fatal(err)
+		zap.S().Fatal(err)
 	}
 
 	for _, f := range files {
 		ruleList = append(ruleList, f.Name())
 	}
 
-	//var yaraMatches []YaraMatch
+	matches := make([]YaraMatch, 0)
 	ruleList = ruleList[1:]
 	for i := range ruleList {
-		cmd := exec.Command("C:\\Users\\hunte\\Documents\\repos\\wingoEDR\\yara_exe\\yara64.exe", "-r", rulePath+ruleList[i], "C:\\Users\\hunte\\Pictures")
+		cmd := exec.Command("C:\\Users\\hunte\\Documents\\repos\\wingoEDR\\yara_exe\\yara64.exe", "-r", rulePath+ruleList[i], dir)
 
 		var stdout, stderr bytes.Buffer
 		cmd.Stdout = &stdout
@@ -43,7 +44,8 @@ func DirYaraScan() {
 		}
 		outStr, errStr := string(stdout.Bytes()), string(stderr.Bytes())
 		if errStr != "" {
-			zap.S().Warn("There is an error", errStr)
+			zap.S().Error("There is an error", errStr)
+			return thing, errors.New(errStr)
 		}
 
 		if outStr != "" {
@@ -51,15 +53,15 @@ func DirYaraScan() {
 			for x := range line {
 				if line[x] != "" {
 					rule := strings.SplitAfterN(line[x], " ", 2)
-					fmt.Printf("%v\n", rule[0])
+					match := YaraMatch{
+						Rule: rule[0],
+						File: rule[1],
+					}
+					matches = append(matches, match)
 				}
-
 			}
 		}
 
 	}
-}
-
-func FileYaraScan() {
-
+	return matches, nil
 }

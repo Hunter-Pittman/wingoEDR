@@ -17,7 +17,7 @@ type Beat struct {
 }
 
 func HeartBeat() {
-	ssUserAgent := getSerialScripterUserAgent()
+	ssUserAgent := common.GetSerialScripterUserAgent()
 
 	m := Beat{IP: common.GetIP()}
 	jsonStr, err := json.Marshal(m)
@@ -52,7 +52,7 @@ func HeartBeat() {
 }
 
 func Inventory() {
-	ssUserAgent := getSerialScripterUserAgent()
+	ssUserAgent := common.GetSerialScripterUserAgent()
 	inventoryItems := GetInventory()
 
 	jsonStr, err := json.Marshal(inventoryItems)
@@ -86,7 +86,7 @@ func Inventory() {
 }
 
 func IncidentAlert() {
-	ssUserAgent := getSerialScripterUserAgent()
+	ssUserAgent := common.GetSerialScripterUserAgent()
 
 	m := Beat{IP: common.GetIP()}
 	jsonStr, err := json.Marshal(m)
