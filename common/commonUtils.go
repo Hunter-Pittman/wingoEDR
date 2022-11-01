@@ -7,9 +7,19 @@ import (
 	"net"
 	"os"
 	"regexp"
-
+	"time"
+	"github.com/djherbis/times"
 	"go.uber.org/zap"
+	"strings"
+	"crypto/sha1"
+	"encoding/hex"
 )
+
+type FileAttribs struct {
+	filename	string
+	modTime		time.Time
+	accessTime	time.Time
+}
 
 func GetIP() string {
 	conn, err := net.Dial("udp", "8.8.8.8:80")
@@ -24,10 +34,34 @@ func GetIP() string {
 	return ipaddr.String()
 }
 
+func GenerateSha1Hash(data string) string {
+	dataHashByte := sha1.Sum([]byte(data))
+	dataHashStr := hex.EncodeToString(dataHashByte[:])
+	return dataHashStr
+}
+
 func VerifySHA256Hash(hash string) bool {
 	match, _ := regexp.MatchString("[A-Fa-f0-9]{64}", hash)
 	return match
 }
+
+func GetFileAttribs(filepath string) fileAttribs {
+	data, err := times.Stat(filepath)
+	if err != nil {
+		if strings.Contains(err.Error(), "cannot find the file") {
+			// sign that the file was deleted
+			zap.S().Warn("1 honey file was likely deleted! Sending alert:", err)
+		}
+	} else {
+		// create file struct
+		var honeyDirAttribs = fileAttribs{filepath, data.ModTime(), data.AccessTime()}
+		return honeyDirAttribs
+	}
+	var honeyFileAttribs = fileAttribs{"", time.Now(), time.Now()}
+	return honeyFileAttribs
+
+}
+
 
 func VerifySHA1Hash(hash string) bool {
 	match, _ := regexp.MatchString("[a-fA-F0-9]{40}$", hash)
