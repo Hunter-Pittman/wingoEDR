@@ -10,6 +10,7 @@ import (
 )
 
 func main() {
+
 	logger.InitLogger()
 	for {
 		//Interface
