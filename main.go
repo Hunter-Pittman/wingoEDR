@@ -6,10 +6,13 @@ import (
 	"wingoEDR/logger"
 	"wingoEDR/yara"
 
+	//"wingoEDR/servicemanager"
+
 	"go.uber.org/zap"
 )
 
 func main() {
+	//servicemanager.servicelister()
 
 	logger.InitLogger()
 	for {

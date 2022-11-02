@@ -2,33 +2,25 @@ package servicemanager
 
 import (
 	"fmt"
-	"unsafe"
-	"golang.org/x/sys/windows"
-)
-
-// intializing the variables, calling the win32 apps dll ... helium is it's name
-var (
-	
-	helium   = windows.NewLazyDLL("user32.dll")
-    // how we can call functions
-    accessSCM = helium.NewProc("GENERIC_READ")
-	accessSrv = helium.NewProc("SC_MANAGER_ALL_ACCESS")
-
-
-	hscm = helium.NewProc("OpenSCManager(None, None, accessSCM)")	
-
-
-
-	serviceall = helium.NewProc("SERVICE_STATE_ALL")
-	servicetype = helium.NewProc("SERVICE_WIN32")
-	servicelist = helium.NewProc("EnumServicesStatusEx(hscm, servicetype, serviceall)")
-
-
+	//windows api from github
+	wapi "github.com/iamacarpet/go-win64api"
 )
 
 func servicelister() {
-	
-	for (short_name, desc, status) in servicelist:
-	print(short_name, desc, status) 
-}
 
+	// sets the service and error varibles
+
+	svc, err := wapi.GetServices()
+	//checks for an error in the code
+	if err != nil {
+		//if there is one it prints it out
+		fmt.Print("%s\r\n", err.Error())
+	}
+
+	//enumerates through the list of services
+	for _, v := range svc {
+		//prints each service with varibles attached
+		fmt.Printf("%-50s - %-75s - Status: %-20s - Accept Stop: %-5t, Running Pid: %d\r\n", v.SCName, v.DisplayName, v.StatusText, v.AcceptStop, v.RunningPid)
+	}
+
+}
