@@ -2,10 +2,11 @@ package shares
 
 import (
 	"os/exec"
-	"log"
+	//"log"
 	"fmt"
 	"github.com/StackExchange/wmi"
 	"strings"
+	"go.uber.org/zap"
 )
 
 type Win32_Share struct {
@@ -19,7 +20,9 @@ type shareAttributes struct {
 	Permissions string
 }
 
-
+var (
+	logger, _ = zap.NewProduction()
+)
 
 //return string with permissions for specified share path
 func getSharePermissions(sharePath string) string {
@@ -29,7 +32,8 @@ func getSharePermissions(sharePath string) string {
 		toExecute := "Get-Acl -Path '" + sharePath + "' | Select-Object -ExpandProperty Access | Select-Object -Property FileSystemRights, AccessControlType, Identityreference | ConvertTo-CSV"
 		unformattedPerms, err := exec.Command("powershell.exe", toExecute).Output()
 		if err != nil {
-			fmt.Println(err)
+			logger.Info(err.Error())
+			//fmt.Println(err)
 		}
 		//replacing ints with respective permissions
 		formattedPerms1 := strings.Replace(string(unformattedPerms), "\"268435456\"", "\"FullControl\"",-1)
@@ -45,13 +49,14 @@ func getSharePermissions(sharePath string) string {
 
 
 //return slice/list of share names
-func listSharesWMI() []shareAttributes {
+func ListSharesWMI() []shareAttributes {
 	var dst []Win32_Share
 	shares := []shareAttributes{}
 	q := wmi.CreateQuery(&dst, "")
 	err := wmi.Query(q, &dst)
 	if err != nil {
-		log.Fatal(err)
+		logger.Error(err.Error())
+		//log.Fatal(err)
 	}
 	// can get each name of a share & query for its permissions
 	for _, shareAttrib := range dst {

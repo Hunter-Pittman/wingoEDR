@@ -1,17 +1,14 @@
 package main
 
 import (
-	"fmt"
-	"time"
-	"wingoEDR/logger"
-	"wingoEDR/yara"
-
 	"go.uber.org/zap"
 )
 
 func main() {
-	logger.InitLogger()
-	for {
+	//logger.InitLogger()
+	logger, _ := zap.NewProduction()
+	logger.Warn("log message test")
+	/*for {
 		//Interface
 		//go frontend.QuickInterface()
 
@@ -38,5 +35,5 @@ func main() {
 
 		time.Sleep(1 * time.Minute)
 		select {}
-	}
+	}*/
 }
