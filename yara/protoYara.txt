@@ -1,0 +1,62 @@
+package yara
+
+import (
+	"errors"
+	"os"
+	"path/filepath"
+
+	"github.com/hillu/go-yara/v4"
+	"go.uber.org/zap"
+)
+
+func memoryDumpYaraScan[T any](data T) {
+
+}
+
+func loadYaraRules(path []string) (compiler *yara.Compiler, err error) {
+	compiler, err = yara.NewCompiler()
+	if err != nil {
+		return nil, errors.New("Failed to initialize YARA compiler")
+	}
+	for _, dir := range path {
+		f, err := os.Open(dir)
+		if err != nil {
+			zap.S().Error("Could not open rule file ", dir, err)
+		}
+
+		namespace := filepath.Base(dir)[:len(filepath.Base(dir))-4]
+		if err = compiler.AddFile(f, namespace); err != nil {
+			zap.S().Error("Could not load rule file ", dir, err)
+		}
+		f.Close()
+	}
+
+	return compiler, nil
+}
+
+func yaraFileID() {
+
+}
+
+func compileRules(compiler *yara.Compiler) (rules *yara.Rules, err error) {
+
+	rules, err = compiler.GetRules()
+	if err != nil {
+		return nil, errors.New("Failed to compile rules")
+	}
+
+	return rules, err
+}
+
+func yaraScan(data []byte) (match yara.MatchRules, err error) {
+	path := []string{"C:\\Users\\hunte\\Documents\\repos\\wingoEDR\\yararules\\fileID"}
+	compiler, _ := loadYaraRules(path)
+	rules, _ := compileRules(compiler)
+	scanner, _ := yara.NewScanner(rules)
+
+	var m yara.MatchRules
+	err = scanner.SetCallback(&m).ScanMem(data)
+
+	return m, err
+
+}
