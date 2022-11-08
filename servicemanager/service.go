@@ -6,21 +6,34 @@ import (
 	wapi "github.com/iamacarpet/go-win64api"
 )
 
+type WindowService struct {
+	scn string
+	dn  string
+	st  string
+	as  bool
+	rp  uint32
+}
+
 func servicelister() {
-
-	// sets the service and error varibles
-
+	servslice := make([]WindowService, 0)
 	svc, err := wapi.GetServices()
-	//checks for an error in the code
 	if err != nil {
-		//if there is one it prints it out
-		fmt.Print("%s\r\n", err.Error())
+		fmt.Printf("%s\r\n", err.Error())
 	}
 
-	//enumerates through the list of services
 	for _, v := range svc {
-		//prints each service with varibles attached
+
+		helium := WindowService{
+			scn: v.SCName,
+			dn:  v.DisplayName,
+			st:  v.StatusText,
+			as:  v.AcceptStop,
+			rp:  v.RunningPid}
+
+		servslice = append(servslice, helium)
+
 		fmt.Printf("%-50s - %-75s - Status: %-20s - Accept Stop: %-5t, Running Pid: %d\r\n", v.SCName, v.DisplayName, v.StatusText, v.AcceptStop, v.RunningPid)
 	}
+	return servslice
 
 }
