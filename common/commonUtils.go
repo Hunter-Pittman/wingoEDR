@@ -45,7 +45,7 @@ func VerifySHA256Hash(hash string) bool {
 	return match
 }
 
-func GetFileAttribs(filepath string) fileAttribs {
+func GetFileAttribs(filepath string) FileAttribs {
 	data, err := times.Stat(filepath)
 	if err != nil {
 		if strings.Contains(err.Error(), "cannot find the file") {
@@ -54,10 +54,10 @@ func GetFileAttribs(filepath string) fileAttribs {
 		}
 	} else {
 		// create file struct
-		var honeyDirAttribs = fileAttribs{filepath, data.ModTime(), data.AccessTime()}
+		var honeyDirAttribs = FileAttribs{filepath, data.ModTime(), data.AccessTime()}
 		return honeyDirAttribs
 	}
-	var honeyFileAttribs = fileAttribs{"", time.Now(), time.Now()}
+	var honeyFileAttribs = FileAttribs{"", time.Now(), time.Now()}
 	return honeyFileAttribs
 
 }

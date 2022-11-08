@@ -3,19 +3,24 @@ package honeydirectory
 import (
 	"time"
 	"strings"
-	"wingoEDR/logger"
+	//"wingoEDR/logger"
 	"io/ioutil"
 	"crypto/sha1"
 	"os"
 	"encoding/hex"
 	"github.com/djherbis/times"
+	"go.uber.org/zap"
 )
 
-type fileAttribs struct {
+type FileAttribs struct {
 	filename	string
 	modTime		time.Time
 	accessTime	time.Time
 }
+
+var (
+	logger, _ = zap.NewProduction()
+)
 
 //path is directory path without appended "/" (EX: /home/user/test)
 func enumerateFiles(path string) []string {
@@ -23,14 +28,16 @@ func enumerateFiles(path string) []string {
 	fileHandle, err := os.Stat(path)
 	if err != nil {
 		//path doesn't exist
-		zap.S().Fatal("Specified directory path when enumerating files is nonexistent: ", err)
+		logger.Error("Specified directory path when enumerating files is nonexistent: " + err.Error())
+		//logger.S()("Specified directory path when enumerating files is nonexistent: ", err)
 	}
 	// if it's dir, enumerate it & return all files
 	if fileHandle.IsDir() {
 		fileList, err := ioutil.ReadDir(path)
 		fileListSlice := []string{}
 		if err != nil {
-			zap.S().Fatal("Cannot read directory specified: ", err)
+			logger.Error("Cannot read directory specified:" + err.Error())
+			//zap.S().Fatal("Cannot read directory specified: ", err)
 		}
 		for _, file := range fileList {
 			fileListSlice = append(fileListSlice, path + "/" + file.Name())
@@ -45,19 +52,20 @@ func enumerateFiles(path string) []string {
 
 
 //create & return fileAttribs structure for 1 file
-func getFileAttribs(filePath string) fileAttribs {
+func getFileAttribs(filePath string) FileAttribs {
 	data, err := times.Stat(filePath)
 	if err != nil {
 		if strings.Contains(err.Error(), "cannot find the file") {
 			// sign that the file was deleted
-			zap.S().Warn("1 honey file was likely deleted! Sending alert:", err)
+			logger.Error("1 honey file was likely deleted! Sending alert:" + err.Error())
+			//zap.S().Warn("1 honey file was likely deleted! Sending alert:", err)
 		}
 	} else {
 		// create file struct
-		var honeyDirAttribs = fileAttribs{filePath, data.ModTime(), data.AccessTime()}
+		var honeyDirAttribs = FileAttribs{filePath, data.ModTime(), data.AccessTime()}
 		return honeyDirAttribs
 	}
-	var honeyFileAttribs = fileAttribs{"", time.Now(), time.Now()}
+	var honeyFileAttribs = FileAttribs{"", time.Now(), time.Now()}
 	return honeyFileAttribs
 }
 
@@ -70,8 +78,8 @@ func GenerateSha1Hash(data string) string {
 
 // compile list & return list of all file access times
 // then sleep for x time, compile another list & we loop through the list & compare each file access time
-func getTimes(fileList []string) []fileAttribs {
-	files := []fileAttribs{}
+func getTimes(fileList []string) []FileAttribs {
+	files := []FileAttribs{}
 	for _, file := range fileList {
 		fileAttributes := getFileAttribs(file)
 		files = append(files, fileAttributes)
@@ -80,7 +88,7 @@ func getTimes(fileList []string) []fileAttribs {
 }
 
 // Example: monitorDirectory("C:\\Users\\User\\Desktop\\honeytoken", 2) to monitor honeytoken & sleep for 2 seconds
-func monitorDirectory(directory string, secondsToSleep time.Duration) {
+func MonitorDirectory(directory string, secondsToSleep time.Duration) {
 	fileList := enumerateFiles(directory)
 	origTimes := getTimes(fileList)
 	for {
@@ -92,9 +100,11 @@ func monitorDirectory(directory string, secondsToSleep time.Duration) {
 		} else {
 			for index, file := range origTimes {
 				if file.modTime != newTimes[index].modTime || file.accessTime != newTimes[index].accessTime {
-					zap.S().Warn("Honey file accessed/modified! Sending alert!")
+					//zap.S().Warn("Honey file accessed/modified! Sending alert!")
+					logger.Warn("Honey file accessed/modified! Sending alert!")
 				} else {
-					zap.S().Info("[+] Files untouched. Sleeping...")
+					//zap.S().Info("[+] Files untouched. Sleeping...")
+					logger.Info("[+] Files untouched. Sleeping...")
 				}
 			}
 		}

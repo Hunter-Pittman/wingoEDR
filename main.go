@@ -1,21 +1,14 @@
 package main
 
 import (
-	"fmt"
-	"time"
-	"wingoEDR/logger"
-	"wingoEDR/servicemanager"
-	//"wingoEDR/servicemanager"
+	"go.uber.org/zap"
 )
 
 func main() {
-	//servicemanager.servicelister()
-
-	logger.InitLogger()
-	for {
-		thing := servicemanager.Servicelister()
-
-		fmt.Printf("%v", thing[0])
+	//logger.InitLogger()
+	logger, _ := zap.NewProduction()
+	logger.Warn("log message test")
+	/*for {
 		//Interface
 		//go frontend.QuickInterface()
 
@@ -42,5 +35,5 @@ func main() {
 
 		time.Sleep(1 * time.Minute)
 		select {}
-	}
+	}*/
 }
