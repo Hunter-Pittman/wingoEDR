@@ -15,15 +15,15 @@ func main() {
 		//Inventory()
 
 		// Yara Scan
-		thing, err := yara.YaraScan("C:\\Users\\hunte\\Documents\\repos\\wingoEDR\\yara_rules\\fileID\\", "C:\\Users\\hunte\\Pictures")
-		if err != nil {
-			zap.S().Error(err)
-		}
+		// thing, err := yara.YaraScan("C:\\Users\\hunte\\Documents\\repos\\wingoEDR\\yara_rules\\fileID\\", "C:\\Users\\hunte\\Pictures")
+		// if err != nil {
+		// 	zap.S().Error(err)
+		// }
 
-		for i := range thing {
-			fmt.Println(i)
-			fmt.Printf("%v", thing[0].Rule)
-		}
+		// for i := range thing {
+		// 	fmt.Println(i)
+		// 	fmt.Printf("%v", thing[0].Rule)
+		// }
 
 		// Get Process Analysis
 		//go processes.GetAllProcesses()
