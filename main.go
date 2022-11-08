@@ -1,24 +1,18 @@
 package main
 
 import (
-	"fmt"
 	"time"
-
-	"go.uber.org/zap"
+	"wingoEDR/logger"
 )
 
 func main() {
-	//logger.InitLogger()
-	logger, _ := zap.NewProduction()
-	logger.Warn("log message test")
+	logger.InitLogger()
 	for {
 		//Interface
 		//go frontend.QuickInterface()
 
 		//Inventory
-		thing := GetInventory()
-
-		fmt.Printf("%v", thing)
+		PostInventory()
 
 		// Yara Scan
 		// thing, err := yara.YaraScan("C:\\Users\\hunte\\Documents\\repos\\wingoEDR\\yara_rules\\fileID\\", "C:\\Users\\hunte\\Pictures")

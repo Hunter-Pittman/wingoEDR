@@ -4,45 +4,31 @@ import (
 	"runtime"
 	"strings"
 	"wingoEDR/common"
+	"wingoEDR/servicemanager"
 	"wingoEDR/shares"
 )
 
 type InventoryObject struct {
-	Name     string        `json:"name"`
-	IP       string        `json:"ip"`
-	Os       string        `json:"OS"`
-	Services []Services    `json:"services"`
-	IsOn     bool          `json:"isOn"`
-	Docker   []interface{} `json:"docker"`
-	Tasks    []interface{} `json:"tasks"`
-	Firewall []interface{} `json:"firewall"`
-	Shares   []Share       `json:"shares"`
-}
-
-type Services struct {
-	Port    uint   `json:"port"`
-	Service string `json:"service"`
-}
-
-type shareAttributes struct {
-	Name        string
-	Path        string
-	Permissions string
-}
-type SharePermissions struct {
+	Name     string                          `json:"name"`
+	IP       string                          `json:"ip"`
+	Os       string                          `json:"OS"`
+	Services []servicemanager.WindowsService `json:"services"`
+	IsOn     bool                            `json:"isOn"`
+	Docker   []interface{}                   `json:"docker"`
+	Tasks    []interface{}                   `json:"tasks"`
+	Firewall []interface{}                   `json:"firewall"`
+	Shares   []shares.ShareAttributes        `json:"shares"`
 }
 
 func GetInventory() InventoryObject {
-
-	lastOctets := strings.Split(common.GetIP(), ".", 2)
-	serialScripterHostName := "host-" + lastOctets[2]
+	lastOctets := strings.Split(common.GetIP(), ".")
+	serialScripterHostName := "host-" + lastOctets[3]
 
 	inv := InventoryObject{
 		Name:     serialScripterHostName,
 		IP:       common.GetIP(),
 		Os:       runtime.GOOS,
-		Services: nil,
-		IsOn:     true,
+		Services: servicemanager.Servicelister(),
 		Docker:   nil,
 		Tasks:    nil,
 		Firewall: nil,

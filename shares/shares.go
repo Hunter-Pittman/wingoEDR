@@ -13,7 +13,7 @@ type Win32_Share struct {
 	Path string
 }
 
-type shareAttributes struct {
+type ShareAttributes struct {
 	Name        string
 	Path        string
 	Permissions string
@@ -46,9 +46,9 @@ func getSharePermissions(sharePath string) string {
 }
 
 // return slice/list of share names
-func ListSharesWMI() []shareAttributes {
+func ListSharesWMI() []ShareAttributes {
 	var dst []Win32_Share
-	shares := []shareAttributes{}
+	shares := []ShareAttributes{}
 	q := wmi.CreateQuery(&dst, "")
 	err := wmi.Query(q, &dst)
 	if err != nil {
@@ -58,7 +58,7 @@ func ListSharesWMI() []shareAttributes {
 	// can get each name of a share & query for its permissions
 	for _, shareAttrib := range dst {
 		permissions := getSharePermissions(shareAttrib.Path)
-		var share = shareAttributes{shareAttrib.Name, shareAttrib.Path, permissions}
+		var share = ShareAttributes{shareAttrib.Name, shareAttrib.Path, permissions}
 		shares = append(shares, share)
 
 	}

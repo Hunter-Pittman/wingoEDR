@@ -6,7 +6,7 @@ import (
 	"go.uber.org/zap"
 )
 
-type WindowService struct {
+type WindowsService struct {
 	SCname      string
 	displayName string
 	statusText  string
@@ -14,8 +14,8 @@ type WindowService struct {
 	runningPID  uint32
 }
 
-func Servicelister() []WindowService {
-	servslice := make([]WindowService, 0)
+func Servicelister() []WindowsService {
+	servslice := make([]WindowsService, 0)
 	svc, err := wapi.GetServices()
 	if err != nil {
 		zap.S().Error("Getting services failed!")
@@ -23,7 +23,7 @@ func Servicelister() []WindowService {
 
 	for _, v := range svc {
 
-		helium := WindowService{
+		helium := WindowsService{
 			SCname:      v.SCName,
 			displayName: v.DisplayName,
 			statusText:  v.StatusText,

@@ -63,7 +63,7 @@ func HeartBeat() {
 
 }
 
-func Inventory() {
+func PostInventory() {
 	ssUserAgent := common.GetSerialScripterUserAgent()
 	inventoryItems := GetInventory()
 
