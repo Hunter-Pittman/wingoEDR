@@ -1,15 +1,20 @@
 package systemhealth
 
 import (
-	"fmt"
+	//"fmt"
 	"time"
 	"github.com/mackerelio/go-osstat/memory"
 	"github.com/mackerelio/go-osstat/uptime"
 	"github.com/shirou/gopsutil/v3/net"
 	"github.com/shirou/gopsutil/v3/disk"
 	"github.com/shirou/gopsutil/v3/cpu"
-	"log"
+	//"log"
+	"go.uber.org/zap"
 	"math"
+)
+
+var (
+	logger, _ = zap.NewProduction()
 )
 
 type MemInfo struct {
@@ -37,7 +42,8 @@ type SystemStats struct {
 func getMemoryStats() MemInfo {
 	memStats, err := memory.Get()	
 	if err != nil {
-		log.Fatal(err)
+		//log.Fatal(err)
+		logger.Error(err.Error())
 	}
 	totalFloat64 := ConvertBytesToGigabytes(memStats.Total)
 	usedFloat64 := ConvertBytesToGigabytes(memStats.Used)
@@ -50,7 +56,8 @@ func getMemoryStats() MemInfo {
 func getSystemUptime() time.Duration {
 	uptime, err := uptime.Get()
 	if err != nil {
-		log.Fatal(err)
+		//log.Fatal(err)
+		logger.Error(err.Error())
 	}
 	return uptime
 }
@@ -65,7 +72,8 @@ https://pkg.go.dev/github.com/shirou/gopsutil/v3@v3.22.9/net#IOCountersStat
 func getNetworkData() net.IOCountersStat {
 	networkData, err := net.IOCounters(false) //Change to true if you want to separate network data for each interface
 	if err != nil {
-		fmt.Println(err)
+		logger.Info(err.Error())
+		//fmt.Println(err)
 	}
 	return networkData[0]
 }
@@ -73,7 +81,8 @@ func getNetworkData() net.IOCountersStat {
 func getDiskUsageData() DiskData {
 	out, err := disk.Usage("/")
 	if err != nil {
-		log.Fatal(err)
+		logger.Error(err.Error())
+		//log.Fatal(err)
 	}
 	return DiskData{ConvertBytesToGigabytes(out.Total), ConvertBytesToGigabytes(out.Used), out.UsedPercent, ConvertBytesToGigabytes(out.Free)}
 }
@@ -87,14 +96,15 @@ func ConvertBytesToGigabytes(bytes uint64) float64 {
 func getCpuUsage() []float64 {
 	out, err := cpu.Percent(0, false)
 	if err != nil {
-		log.Fatal(err)
+		logger.Error(err.Error())
+		//log.Fatal(err)
 	}
 	return out
 }
 
 // compiles all functions & returns struct with all necessary data
 // refer to SystemStats for what it returns
-func getSystemHealth() SystemStats {
+func GetSystemHealth() SystemStats {
 	memoryStats := getMemoryStats()
 	uptime := getSystemUptime()
 	networkStats := getNetworkData()
