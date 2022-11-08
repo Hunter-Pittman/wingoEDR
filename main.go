@@ -1,6 +1,9 @@
 package main
 
 import (
+	"fmt"
+	"time"
+
 	"go.uber.org/zap"
 )
 
@@ -8,22 +11,17 @@ func main() {
 	//logger.InitLogger()
 	logger, _ := zap.NewProduction()
 	logger.Warn("log message test")
-	/*for {
+	for {
 		//Interface
 		//go frontend.QuickInterface()
 
-		//Inventory()
+		//Inventory
+		thing := GetInventory()
+
+		fmt.Printf("%v", thing)
 
 		// Yara Scan
-		thing, err := yara.YaraScan("C:\\Users\\hunte\\Documents\\repos\\wingoEDR\\yara_rules\\fileID\\", "C:\\Users\\hunte\\Pictures")
-		if err != nil {
-			zap.S().Error(err)
-		}
-
-		for i := range thing {
-			fmt.Println(i)
-			fmt.Printf("%v", thing[0].Rule)
-		}
+		//thing, err := yara.YaraScan("C:\\Users\\hunte\\Documents\\repos\\wingoEDR\\yara_rules\\fileID\\", "C:\\Users\\hunte\\Pictures")
 
 		// Get Process Analysis
 		//go processes.GetAllProcesses()
@@ -35,5 +33,5 @@ func main() {
 
 		time.Sleep(1 * time.Minute)
 		select {}
-	}*/
+	}
 }

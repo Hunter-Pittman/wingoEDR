@@ -15,6 +15,18 @@ import (
 type Beat struct {
 	IP string
 }
+type Incident struct {
+	Name     string
+	User     string
+	Process  string
+	RemoteIP string
+	Cmd      string
+}
+
+type Alert struct {
+	Host     string
+	Incident Incident
+}
 
 func HeartBeat() {
 	ssUserAgent := common.GetSerialScripterUserAgent()
@@ -85,11 +97,10 @@ func Inventory() {
 	defer resp.Body.Close()
 }
 
-func IncidentAlert() {
+func IncidentAlert(alert Alert) {
 	ssUserAgent := common.GetSerialScripterUserAgent()
 
-	m := Beat{IP: common.GetIP()}
-	jsonStr, err := json.Marshal(m)
+	jsonStr, err := json.Marshal(alert)
 	if err != nil {
 		zap.S().Warn(err)
 	}

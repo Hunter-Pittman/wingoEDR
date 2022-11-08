@@ -1,7 +1,10 @@
 package main
 
 import (
+	"runtime"
+	"strings"
 	"wingoEDR/common"
+	"wingoEDR/shares"
 )
 
 type InventoryObject struct {
@@ -21,44 +24,30 @@ type Services struct {
 	Service string `json:"service"`
 }
 
-type Share struct {
+type shareAttributes struct {
 	Name        string
-	Fullpath    string
+	Path        string
 	Permissions string
 }
-
 type SharePermissions struct {
 }
 
 func GetInventory() InventoryObject {
-	var services []Services
 
-	services = append(services, Services{
-		Port:    22,
-		Service: "SSH",
-	})
+	lastOctets := strings.Split(common.GetIP(), ".", 2)
+	serialScripterHostName := "host-" + lastOctets[2]
 
-	var shares []Share
-
-	shares = append(shares, Share{
-		Name:        "My share",
-		Fullpath:    "C:\\Users\\hunte",
-		Permissions: "My permissions",
-	})
-
-	//newName := strings.SplitAfterN(3)
-
-	temp := InventoryObject{
-		Name:     "host-299",
+	inv := InventoryObject{
+		Name:     serialScripterHostName,
 		IP:       common.GetIP(),
-		Os:       "Windows 11",
-		Services: services,
+		Os:       runtime.GOOS,
+		Services: nil,
 		IsOn:     true,
 		Docker:   nil,
 		Tasks:    nil,
 		Firewall: nil,
-		Shares:   shares,
+		Shares:   shares.ListSharesWMI(),
 	}
 
-	return temp
+	return inv
 }
