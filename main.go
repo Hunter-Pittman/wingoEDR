@@ -12,7 +12,10 @@ func main() {
 		//go frontend.QuickInterface()
 
 		//Inventory
-		PostInventory()
+
+		go inventoryLoop()
+
+		//go PostInventory()
 
 		// Yara Scan
 		// thing, err := yara.YaraScan("C:\\Users\\hunte\\Documents\\repos\\wingoEDR\\yara_rules\\fileID\\", "C:\\Users\\hunte\\Pictures")
@@ -35,5 +38,13 @@ func main() {
 
 		time.Sleep(1 * time.Minute)
 		select {}
+	}
+}
+
+func inventoryLoop() {
+	ticker := time.NewTicker(10 * time.Second)
+
+	for _ = range ticker.C {
+		PostInventory()
 	}
 }
