@@ -14,6 +14,7 @@ type FirewallList struct {
 	remoteports string
 	localaddr   string
 	remoteaddr  string
+	profile     int32
 }
 
 func Firewalllister() []FirewallList {
@@ -24,7 +25,7 @@ func Firewalllister() []FirewallList {
 	}
 	for _, v := range svc {
 
-		hydrogen := FirewallList{
+		helium := FirewallList{
 			name:        v.Name,
 			desc:        v.Description,
 			accname:     v.ApplicationName,
@@ -32,11 +33,50 @@ func Firewalllister() []FirewallList {
 			localports:  v.LocalPorts,
 			remoteports: v.RemotePorts,
 			localaddr:   v.LocalAddresses,
-			remoteaddr:  v.RemoteAddresses}
+			remoteaddr:  v.RemoteAddresses,
+			profile:     v.Profiles}
 
-		fireslice = append(fireslice, hydrogen)
+		fireslice = append(fireslice, helium)
 
 	}
 	return fireslice
 
+}
+
+func FWruleadd(apprulename string, appPath string, portString string, profile32 int32) bool {
+
+	added, err := wapi.FirewallRuleAddApplication(
+		apprulename,
+		"App Rule Long Description.",
+		appPath,
+		portString,
+		profile32,
+	)
+
+	if err != nil {
+		zap.S().Error("Getting services failed!")
+	}
+
+	return added
+
+}
+
+func FWruleremove(remrulename string) bool {
+	removed, err := wapi.FirewallRuleDelete(remrulename)
+
+	if err != nil {
+		zap.S().Error("Getting services failed!")
+	}
+
+	return removed
+}
+
+func FWDisable(profile32 int32) bool {
+	disabled, err := wapi.FirewallDisable(profile32)
+
+	if err != nil {
+		zap.S().Error("Getting services failed!")
+	}
+
+	return disabled
 }
