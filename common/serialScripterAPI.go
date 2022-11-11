@@ -1,13 +1,11 @@
-package main
+package common
 
 import (
 	"bytes"
 	"crypto/tls"
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"net/http"
-	"wingoEDR/common"
 
 	"go.uber.org/zap"
 )
@@ -29,9 +27,9 @@ type Alert struct {
 }
 
 func HeartBeat() {
-	ssUserAgent := common.GetSerialScripterUserAgent()
+	ssUserAgent := GetSerialScripterUserAgent()
 
-	m := Beat{IP: common.GetIP()}
+	m := Beat{IP: GetIP()}
 	jsonStr, err := json.Marshal(m)
 	if err != nil {
 		zap.S().Warn(err)
@@ -53,10 +51,10 @@ func HeartBeat() {
 	req.Header.Set("User-Agent", ssUserAgent)
 	resp, err := client.Do(req)
 	if err != nil {
-		panic(err)
+		zap.S().Error(err)
 	} else {
-		data, _ := ioutil.ReadAll(resp.Body)
-		println(string(data))
+		//data, _ := ioutil.ReadAll(resp.Body)
+		//println(string(data))
 	}
 
 	defer resp.Body.Close()
@@ -64,7 +62,7 @@ func HeartBeat() {
 }
 
 func PostInventory() {
-	ssUserAgent := common.GetSerialScripterUserAgent()
+	ssUserAgent := GetSerialScripterUserAgent()
 	inventoryItems := GetInventory()
 
 	jsonStr, err := json.Marshal(inventoryItems)
@@ -88,17 +86,17 @@ func PostInventory() {
 	req.Header.Set("User-Agent", ssUserAgent)
 	resp, err := client.Do(req)
 	if err != nil {
-		panic(err)
+		zap.S().Error(err)
 	} else {
-		data, _ := ioutil.ReadAll(resp.Body)
-		println(string(data))
+		//data, _ := ioutil.ReadAll(resp.Body)
+		//println(string(data))
 	}
 
 	defer resp.Body.Close()
 }
 
 func IncidentAlert(alert Alert) {
-	ssUserAgent := common.GetSerialScripterUserAgent()
+	ssUserAgent := GetSerialScripterUserAgent()
 
 	jsonStr, err := json.Marshal(alert)
 	if err != nil {
@@ -121,10 +119,10 @@ func IncidentAlert(alert Alert) {
 	req.Header.Set("User-Agent", ssUserAgent)
 	resp, err := client.Do(req)
 	if err != nil {
-		panic(err)
+		zap.S().Error(err)
 	} else {
-		data, _ := ioutil.ReadAll(resp.Body)
-		println(string(data))
+		//data, _ := ioutil.ReadAll(resp.Body)
+		//println(string(data))
 	}
 
 	defer resp.Body.Close()

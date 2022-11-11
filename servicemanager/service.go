@@ -8,10 +8,10 @@ import (
 
 type WindowsService struct {
 	SCname      string
-	displayName string
-	statusText  string
-	acceptStop  bool
-	runningPID  uint32
+	DisplayName string
+	StatusText  string
+	AcceptStop  bool
+	RunningPID  uint32
 }
 
 func Servicelister() []WindowsService {
@@ -25,14 +25,13 @@ func Servicelister() []WindowsService {
 
 		helium := WindowsService{
 			SCname:      v.SCName,
-			displayName: v.DisplayName,
-			statusText:  v.StatusText,
-			acceptStop:  v.AcceptStop,
-			runningPID:  v.RunningPid}
+			DisplayName: v.DisplayName,
+			StatusText:  v.StatusText,
+			AcceptStop:  v.AcceptStop,
+			RunningPID:  v.RunningPid}
 
 		servslice = append(servslice, helium)
 
 	}
 	return servslice
-
 }

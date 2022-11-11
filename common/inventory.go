@@ -1,9 +1,7 @@
-package main
+package common
 
 import (
 	"runtime"
-	"strings"
-	"wingoEDR/common"
 	"wingoEDR/servicemanager"
 	"wingoEDR/shares"
 )
@@ -21,12 +19,10 @@ type InventoryObject struct {
 }
 
 func GetInventory() InventoryObject {
-	lastOctets := strings.Split(common.GetIP(), ".")
-	serialScripterHostName := "host-" + lastOctets[3]
 
 	inv := InventoryObject{
-		Name:     serialScripterHostName,
-		IP:       common.GetIP(),
+		Name:     GetSerialScripterHostName(),
+		IP:       GetIP(),
 		Os:       runtime.GOOS,
 		Services: servicemanager.Servicelister(),
 		Docker:   nil,

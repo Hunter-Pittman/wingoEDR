@@ -2,39 +2,21 @@ package main
 
 import (
 	"time"
+	"wingoEDR/common"
+	"wingoEDR/honeydirectory"
+	"wingoEDR/honeytoken"
 	"wingoEDR/logger"
 )
 
 func main() {
 	logger.InitLogger()
 	for {
-		//Interface
-		//go frontend.QuickInterface()
 
-		//Inventory
+		//go inventoryLoop()
+		//go honeytokenLoop()
+		//go honeydirectoryLoop()
 
-		go inventoryLoop()
-
-		//go PostInventory()
-
-		// Yara Scan
-		// thing, err := yara.YaraScan("C:\\Users\\hunte\\Documents\\repos\\wingoEDR\\yara_rules\\fileID\\", "C:\\Users\\hunte\\Pictures")
-		// if err != nil {
-		// 	zap.S().Error(err)
-		// }
-
-		// for i := range thing {
-		// 	fmt.Println(i)
-		// 	fmt.Printf("%v", thing[0].Rule)
-		// }
-
-		// Get Process Analysis
-		//go processes.GetAllProcesses()
-
-		// Kapersky API Hash check
-		//go GetHashStatus("7a2278a9a74f49852a5d75c745ae56b80d5b4c16f3f6a7fdfd48cb4e2431c688", "sha256")
-
-		// Heartbeat
+		//processes.WindowsFindDeviousCmdParams2()
 
 		time.Sleep(1 * time.Minute)
 		select {}
@@ -45,6 +27,22 @@ func inventoryLoop() {
 	ticker := time.NewTicker(10 * time.Second)
 
 	for _ = range ticker.C {
-		PostInventory()
+		common.PostInventory()
+	}
+}
+
+func honeytokenLoop() {
+	ticker := time.NewTicker(10 * time.Second)
+
+	for _ = range ticker.C {
+		honeytoken.MonitorHoneyFile("C:\\Windows\\setupact.log")
+	}
+}
+
+func honeydirectoryLoop() {
+	ticker := time.NewTicker(10 * time.Second)
+
+	for _ = range ticker.C {
+		honeydirectory.MonitorHoneyDirectory("C:\\Windows\\setupact.log")
 	}
 }

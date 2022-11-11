@@ -1,24 +1,26 @@
 package common
 
 import (
+	"crypto/sha1"
 	"crypto/sha256"
 	"encoding/base64"
+	"encoding/hex"
 	"io"
 	"net"
 	"os"
+	"os/exec"
 	"regexp"
+	"strings"
 	"time"
+
 	"github.com/djherbis/times"
 	"go.uber.org/zap"
-	"strings"
-	"crypto/sha1"
-	"encoding/hex"
 )
 
 type FileAttribs struct {
-	filename	string
-	modTime		time.Time
-	accessTime	time.Time
+	filename   string
+	modTime    time.Time
+	accessTime time.Time
 }
 
 func GetIP() string {
@@ -61,7 +63,6 @@ func GetFileAttribs(filepath string) FileAttribs {
 	return honeyFileAttribs
 
 }
-
 
 func VerifySHA1Hash(hash string) bool {
 	match, _ := regexp.MatchString("[a-fA-F0-9]{40}$", hash)
@@ -143,4 +144,23 @@ func CheckFile(name string) finfo {
 		}
 		return i
 	}
+}
+
+func GetSerialScripterHostName() string {
+	lastOctets := strings.Split(GetIP(), ".")
+	serialScripterHostName := "host-" + lastOctets[3]
+
+	return serialScripterHostName
+}
+
+// Repalce with a DC query????
+func GetCurrentlyLoggedInUsers() string {
+	toExecute := "query user /server:$SERVER | ConvertTo-Json"
+	output, err := exec.Command("powershell.exe", toExecute).Output()
+	if err != nil {
+		zap.S().Error(err.Error())
+		//fmt.Println(err)
+	}
+
+	return string(output)
 }
