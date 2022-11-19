@@ -3,10 +3,9 @@ package honeymonitor
 import (
 	"strings"
 	"time"
+	"wingoEDR/common"
 
 	//"wingoEDR/common"
-
-	//"wingoEDR/logger"
 
 	"io/ioutil"
 	"os"
@@ -125,6 +124,20 @@ func CreateDirMonitor(directories []string) {
 			zap.S().Info("Honeypot files untouched.")
 		} else {
 			zap.S().Fatal("Honeypot files touched! Potential intrusion!")
+			incident := common.Incident{
+				Name:     "Honey monitor access violation",
+				User:     "person",
+				Process:  "",
+				RemoteIP: common.GetIP(),
+				Cmd:      "",
+			}
+
+			alert := common.Alert{
+				Host:     common.GetSerialScripterHostName(),
+				Incident: incident,
+			}
+
+			common.IncidentAlert(alert)
 		}
 	}
 }

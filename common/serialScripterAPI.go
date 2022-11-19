@@ -10,6 +10,8 @@ import (
 	"go.uber.org/zap"
 )
 
+const API_ROOT = "https://ec2-18-246-47-205.us-west-2.compute.amazonaws.com:10000"
+
 type Beat struct {
 	IP string
 }
@@ -27,7 +29,8 @@ type Alert struct {
 }
 
 func HeartBeat() {
-	ssUserAgent := GetSerialScripterUserAgent()
+	//ssUserAgent := GetSerialScripterUserAgent()
+	ssUserAgent := "nestler-code"
 
 	m := Beat{IP: GetIP()}
 	jsonStr, err := json.Marshal(m)
@@ -42,7 +45,7 @@ func HeartBeat() {
 
 	bodyReader := bytes.NewReader(jsonStr)
 
-	requestURL := fmt.Sprintf("https://10.123.80.115:10000/api/v1/common/heartbeat")
+	requestURL := fmt.Sprintf("%v/api/v1/common/heartbeat", API_ROOT)
 	req, err := http.NewRequest(http.MethodPost, requestURL, bodyReader)
 	if err != nil {
 		zap.S().Warn(err)
@@ -77,7 +80,7 @@ func PostInventory() {
 
 	bodyReader := bytes.NewReader(jsonStr)
 
-	requestURL := fmt.Sprintf("https://10.123.80.115:10000/api/v1/common/inventory")
+	requestURL := fmt.Sprintf("%v/api/v1/common/inventory", API_ROOT)
 	req, err := http.NewRequest(http.MethodPost, requestURL, bodyReader)
 	if err != nil {
 		zap.S().Warn(err)
@@ -110,7 +113,7 @@ func IncidentAlert(alert Alert) {
 
 	bodyReader := bytes.NewReader(jsonStr)
 
-	requestURL := fmt.Sprintf("https://10.123.80.115:10000/api/v1/common/incidentalert")
+	requestURL := fmt.Sprintf("%v/api/v1/common/incidentalert", API_ROOT)
 	req, err := http.NewRequest(http.MethodPost, requestURL, bodyReader)
 	if err != nil {
 		zap.S().Warn(err)
