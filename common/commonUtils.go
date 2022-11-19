@@ -1,15 +1,27 @@
 package common
 
 import (
+	"crypto/sha1"
 	"crypto/sha256"
 	"encoding/base64"
+	"encoding/hex"
 	"io"
 	"net"
 	"os"
+	"os/exec"
 	"regexp"
+	"strings"
+	"time"
 
+	"github.com/djherbis/times"
 	"go.uber.org/zap"
 )
+
+type FileAttribs struct {
+	filename   string
+	modTime    time.Time
+	accessTime time.Time
+}
 
 func GetIP() string {
 	conn, err := net.Dial("udp", "8.8.8.8:80")
@@ -24,9 +36,32 @@ func GetIP() string {
 	return ipaddr.String()
 }
 
+func GenerateSha1Hash(data string) string {
+	dataHashByte := sha1.Sum([]byte(data))
+	dataHashStr := hex.EncodeToString(dataHashByte[:])
+	return dataHashStr
+}
+
 func VerifySHA256Hash(hash string) bool {
 	match, _ := regexp.MatchString("[A-Fa-f0-9]{64}", hash)
 	return match
+}
+
+func GetFileAttribs(filepath string) FileAttribs {
+	data, err := times.Stat(filepath)
+	if err != nil {
+		if strings.Contains(err.Error(), "cannot find the file") {
+			// sign that the file was deleted
+			zap.S().Warn("1 honey file was likely deleted! Sending alert:", err)
+		}
+	} else {
+		// create file struct
+		var honeyDirAttribs = FileAttribs{filepath, data.ModTime(), data.AccessTime()}
+		return honeyDirAttribs
+	}
+	var honeyFileAttribs = FileAttribs{"", time.Now(), time.Now()}
+	return honeyFileAttribs
+
 }
 
 func VerifySHA1Hash(hash string) bool {
@@ -109,4 +144,23 @@ func CheckFile(name string) finfo {
 		}
 		return i
 	}
+}
+
+func GetSerialScripterHostName() string {
+	lastOctets := strings.Split(GetIP(), ".")
+	serialScripterHostName := "host-" + lastOctets[3]
+
+	return serialScripterHostName
+}
+
+// Repalce with a DC query????
+func GetCurrentlyLoggedInUsers() string {
+	toExecute := "query user /server:$SERVER | ConvertTo-Json"
+	output, err := exec.Command("powershell.exe", toExecute).Output()
+	if err != nil {
+		zap.S().Error(err.Error())
+		//fmt.Println(err)
+	}
+
+	return string(output)
 }

@@ -1,13 +1,11 @@
-package main
+package common
 
 import (
 	"bytes"
 	"crypto/tls"
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"net/http"
-	"wingoEDR/common"
 
 	"go.uber.org/zap"
 )
@@ -15,11 +13,23 @@ import (
 type Beat struct {
 	IP string
 }
+type Incident struct {
+	Name     string
+	User     string
+	Process  string
+	RemoteIP string
+	Cmd      string
+}
+
+type Alert struct {
+	Host     string
+	Incident Incident
+}
 
 func HeartBeat() {
-	ssUserAgent := common.GetSerialScripterUserAgent()
+	ssUserAgent := GetSerialScripterUserAgent()
 
-	m := Beat{IP: common.GetIP()}
+	m := Beat{IP: GetIP()}
 	jsonStr, err := json.Marshal(m)
 	if err != nil {
 		zap.S().Warn(err)
@@ -41,18 +51,18 @@ func HeartBeat() {
 	req.Header.Set("User-Agent", ssUserAgent)
 	resp, err := client.Do(req)
 	if err != nil {
-		panic(err)
+		zap.S().Error(err)
 	} else {
-		data, _ := ioutil.ReadAll(resp.Body)
-		println(string(data))
+		//data, _ := ioutil.ReadAll(resp.Body)
+		//println(string(data))
 	}
 
 	defer resp.Body.Close()
 
 }
 
-func Inventory() {
-	ssUserAgent := common.GetSerialScripterUserAgent()
+func PostInventory() {
+	ssUserAgent := GetSerialScripterUserAgent()
 	inventoryItems := GetInventory()
 
 	jsonStr, err := json.Marshal(inventoryItems)
@@ -76,20 +86,19 @@ func Inventory() {
 	req.Header.Set("User-Agent", ssUserAgent)
 	resp, err := client.Do(req)
 	if err != nil {
-		panic(err)
+		zap.S().Error(err)
 	} else {
-		data, _ := ioutil.ReadAll(resp.Body)
-		println(string(data))
+		//data, _ := ioutil.ReadAll(resp.Body)
+		//println(string(data))
 	}
 
 	defer resp.Body.Close()
 }
 
-func IncidentAlert() {
-	ssUserAgent := common.GetSerialScripterUserAgent()
+func IncidentAlert(alert Alert) {
+	ssUserAgent := GetSerialScripterUserAgent()
 
-	m := Beat{IP: common.GetIP()}
-	jsonStr, err := json.Marshal(m)
+	jsonStr, err := json.Marshal(alert)
 	if err != nil {
 		zap.S().Warn(err)
 	}
@@ -110,10 +119,10 @@ func IncidentAlert() {
 	req.Header.Set("User-Agent", ssUserAgent)
 	resp, err := client.Do(req)
 	if err != nil {
-		panic(err)
+		zap.S().Error(err)
 	} else {
-		data, _ := ioutil.ReadAll(resp.Body)
-		println(string(data))
+		//data, _ := ioutil.ReadAll(resp.Body)
+		//println(string(data))
 	}
 
 	defer resp.Body.Close()
