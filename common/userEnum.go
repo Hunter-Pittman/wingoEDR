@@ -1,4 +1,4 @@
-package main
+package common
 
 import (
 	"fmt"
@@ -21,7 +21,7 @@ type LocalUser struct {
 	NumofLogons       uint32
 }
 
-func main() {
+func common() {
 	returnUsers()
 }
 
@@ -53,4 +53,73 @@ func returnUsers() []LocalUser {
 	fmt.Printf("%v", userslice[0])
 	return userslice
 
+}
+
+func noAdmin(user string) {
+	_, err := wapi.RevokeAdmin(user)
+	if err != nil {
+		fmt.Println(err)
+	}
+}
+
+func disableUser(user string) {
+	u := true
+	_, err := wapi.UserDisabled(user, u)
+	if err != nil {
+		fmt.Println(err)
+	}
+
+}
+
+func enableUser(user string) {
+	u := false
+	_, err := wapi.UserDisabled(user, u)
+	if err != nil {
+		fmt.Println(err)
+	}
+
+}
+
+func delUser(user string) {
+	_, err := wapi.UserDelete(user)
+	if err != nil {
+		fmt.Println(err)
+	}
+}
+
+func addUser(username, fullname, password string) {
+	_, err := wapi.UserAdd(username, fullname, password)
+	if err != nil {
+		fmt.Println(err)
+	}
+}
+
+func usrNochangepw(user string) {
+	c := true // password doesnt expire
+	_, err := wapi.UserPasswordNoExpires(user, c)
+	if err != nil {
+		fmt.Println(err)
+	}
+}
+
+func usrChangepw(user string) {
+	c := false //password expires
+	_, err := wapi.UserPasswordNoExpires(user, c)
+	if err != nil {
+		fmt.Println(err)
+	}
+}
+
+func forcePasswdchange(user, newpasswd string) {
+	_, err := wapi.ChangePassword(user, newpasswd)
+	if err != nil {
+		fmt.Println(err)
+	}
+}
+
+func setFullNameAttribute(user, fullname string) {
+	_, err := wapi.UserUpdateFullname(user, fullname)
+	if err != nil {
+		fmt.Println(err)
+	}
 }
