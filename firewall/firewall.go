@@ -6,18 +6,18 @@ import (
 )
 
 type FirewallList struct {
-	name        string
-	desc        string
-	accname     string
-	servname    string
-	localports  string
-	remoteports string
-	localaddr   string
-	remoteaddr  string
-	profile     int32
+	Name            string
+	Description     string
+	ApplicationName string
+	ServiceName     string
+	LocalPorts      string
+	RemotePorts     string
+	LocalAddresses  string
+	RemoteAddresses string
+	Profile         int32
 }
 
-func Firewalllister() []FirewallList {
+func FirewallLister() []FirewallList {
 	fireslice := make([]FirewallList, 0)
 	svc, err := wapi.FirewallRulesGet()
 	if err != nil {
@@ -26,15 +26,15 @@ func Firewalllister() []FirewallList {
 	for _, v := range svc {
 
 		helium := FirewallList{
-			name:        v.Name,
-			desc:        v.Description,
-			accname:     v.ApplicationName,
-			servname:    v.ServiceName,
-			localports:  v.LocalPorts,
-			remoteports: v.RemotePorts,
-			localaddr:   v.LocalAddresses,
-			remoteaddr:  v.RemoteAddresses,
-			profile:     v.Profiles}
+			Name:            v.Name,
+			Description:     v.Description,
+			ApplicationName: v.ApplicationName,
+			ServiceName:     v.ServiceName,
+			LocalPorts:      v.LocalPorts,
+			RemotePorts:     v.RemotePorts,
+			LocalAddresses:  v.LocalAddresses,
+			RemoteAddresses: v.RemoteAddresses,
+			Profile:         v.Profiles}
 
 		fireslice = append(fireslice, helium)
 
