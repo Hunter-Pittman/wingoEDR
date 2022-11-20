@@ -80,3 +80,13 @@ func FWDisable(profile32 int32) bool {
 
 	return disabled
 }
+
+func FWEnable(profile32 int32) bool {
+	enabled, err := wapi.FirewallEnable(profile32)
+
+	if err != nil {
+		zap.S().Error("Getting services failed!")
+	}
+
+	return enabled
+}
