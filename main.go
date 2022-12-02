@@ -1,6 +1,7 @@
 package main
 
 import (
+	"sync"
 	"time"
 	"wingoEDR/common"
 	"wingoEDR/honeymonitor"
@@ -9,9 +10,15 @@ import (
 
 func main() {
 	logger.InitLogger()
+
+	var wg sync.WaitGroup
+	wg.Add(3)
+
 	go heartbeatLoop()
 	go inventoryLoop()
 	go objectMonitoring()
+
+	wg.Wait()
 }
 
 func inventoryLoop() {
@@ -26,7 +33,7 @@ func heartbeatLoop() {
 	ticker := time.NewTicker(1 * time.Minute)
 
 	for _ = range ticker.C {
-		common.PostInventory()
+		common.HeartBeat()
 	}
 }
 

@@ -4,6 +4,7 @@ import (
 	"strings"
 	"time"
 	"wingoEDR/common"
+	"wingoEDR/usermanagement"
 
 	//"wingoEDR/common"
 
@@ -37,7 +38,7 @@ func enumerateFiles(directoriesToMonitor []string) []string {
 	for _, filepath := range directoriesToMonitor {
 		handle, err := os.Stat(filepath)
 		if err != nil || os.IsNotExist(err) {
-			zap.S().Fatal("Specified filepath when running enumerateFiles() function is nonexistent: " + err.Error() + filepath)
+			zap.S().Error("Specified filepath when running enumerateFiles() function is nonexistent: " + err.Error() + filepath)
 		}
 		// determine whether or not path is a directory or not
 		if handle.IsDir() {
@@ -96,7 +97,7 @@ func CreateDirMonitor(directories []string) {
 		origTimes := getTimes(fileList)
 		fileHandle, err := os.Create(modTimeOrigFile)
 		if err != nil {
-			zap.S().Fatal("Error creating the original modification time file: + " + err.Error())
+			zap.S().Error("Error creating the original modification time file: + " + err.Error())
 		}
 		for _, line := range origTimes {
 			strToWrite := line.filepath + " " + line.modTime.String() + " " + line.accessTime.String()
@@ -123,10 +124,10 @@ func CreateDirMonitor(directories []string) {
 		if compareFiles(modTimeOrigFile, modTimeNewFile) {
 			zap.S().Info("Honeypot files untouched.")
 		} else {
-			zap.S().Fatal("Honeypot files touched! Potential intrusion!")
+			zap.S().Info("Honeypot files touched! Potential intrusion!")
 			incident := common.Incident{
 				Name:     "Honey monitor access violation",
-				User:     "person",
+				User:     usermanagement.GetLastLoggenOnUser(),
 				Process:  "",
 				RemoteIP: common.GetIP(),
 				Cmd:      "",

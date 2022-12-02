@@ -1,10 +1,13 @@
-package common
+package usermanagement
 
 import (
 	"fmt"
+	"strings"
 	"time"
 
 	wapi "github.com/iamacarpet/go-win64api"
+	"go.uber.org/zap"
+	"golang.org/x/sys/windows/registry"
 )
 
 type LocalUser struct {
@@ -19,10 +22,6 @@ type LocalUser struct {
 	Lastlogon         time.Time
 	BadPasswdAttempts uint32
 	NumofLogons       uint32
-}
-
-func common() {
-	returnUsers()
 }
 
 func returnUsers() []LocalUser {
@@ -55,10 +54,33 @@ func returnUsers() []LocalUser {
 
 }
 
+func GetLastLoggenOnUser() string {
+	registryKey := "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Authentication\\LogonUI"
+
+	var access uint32 = registry.QUERY_VALUE
+	regKey, err := registry.OpenKey(registry.LOCAL_MACHINE, registryKey, access)
+	if err != nil {
+		if err != registry.ErrNotExist {
+			zap.S().Error(err)
+		}
+		return ""
+	}
+
+	user, _, err := regKey.GetStringValue("LastLoggedOnUser")
+	if err != nil {
+		zap.S().Error(err)
+		return ""
+	}
+
+	onlyUser := strings.TrimLeft(user, ".\\")
+
+	return onlyUser
+}
+
 func noAdmin(user string) {
 	_, err := wapi.RevokeAdmin(user)
 	if err != nil {
-		fmt.Println(err)
+		zap.S().Error(err)
 	}
 }
 
@@ -66,7 +88,7 @@ func disableUser(user string) {
 	u := true
 	_, err := wapi.UserDisabled(user, u)
 	if err != nil {
-		fmt.Println(err)
+		zap.S().Error(err)
 	}
 
 }
@@ -75,7 +97,7 @@ func enableUser(user string) {
 	u := false
 	_, err := wapi.UserDisabled(user, u)
 	if err != nil {
-		fmt.Println(err)
+		zap.S().Error(err)
 	}
 
 }
@@ -83,14 +105,14 @@ func enableUser(user string) {
 func delUser(user string) {
 	_, err := wapi.UserDelete(user)
 	if err != nil {
-		fmt.Println(err)
+		zap.S().Error(err)
 	}
 }
 
 func addUser(username, fullname, password string) {
 	_, err := wapi.UserAdd(username, fullname, password)
 	if err != nil {
-		fmt.Println(err)
+		zap.S().Error(err)
 	}
 }
 
@@ -98,7 +120,7 @@ func usrNochangepw(user string) {
 	c := true // password doesnt expire
 	_, err := wapi.UserPasswordNoExpires(user, c)
 	if err != nil {
-		fmt.Println(err)
+		zap.S().Error(err)
 	}
 }
 
@@ -106,20 +128,20 @@ func usrChangepw(user string) {
 	c := false //password expires
 	_, err := wapi.UserPasswordNoExpires(user, c)
 	if err != nil {
-		fmt.Println(err)
+		zap.S().Error(err)
 	}
 }
 
 func forcePasswdchange(user, newpasswd string) {
 	_, err := wapi.ChangePassword(user, newpasswd)
 	if err != nil {
-		fmt.Println(err)
+		zap.S().Error(err)
 	}
 }
 
 func setFullNameAttribute(user, fullname string) {
 	_, err := wapi.UserUpdateFullname(user, fullname)
 	if err != nil {
-		fmt.Println(err)
+		zap.S().Error(err)
 	}
 }
