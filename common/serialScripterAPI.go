@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"wingoEDR/usermanagement"
 
 	"go.uber.org/zap"
 )
@@ -115,6 +116,39 @@ func IncidentAlert(alert Alert) {
 	bodyReader := bytes.NewReader(jsonStr)
 
 	requestURL := fmt.Sprintf("%v/api/v1/common/incidentalert", API_ROOT)
+	req, err := http.NewRequest(http.MethodPost, requestURL, bodyReader)
+	if err != nil {
+		zap.S().Warn(err)
+	}
+
+	req.Header.Set("User-Agent", ssUserAgent)
+	resp, err := client.Do(req)
+	if err != nil {
+		zap.S().Error(err)
+	} else {
+		//data, _ := ioutil.ReadAll(resp.Body)
+		//println(string(data))
+	}
+
+	defer resp.Body.Close()
+}
+
+func PostUsers(users usermanagement.LocalUser) {
+	ssUserAgent := GetSerialScripterUserAgent()
+
+	jsonStr, err := json.Marshal(users)
+	if err != nil {
+		zap.S().Warn(err)
+	}
+
+	tr := &http.Transport{
+		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
+	}
+	client := &http.Client{Transport: tr}
+
+	bodyReader := bytes.NewReader(jsonStr)
+
+	requestURL := fmt.Sprintf("%v/api/v1/common/users", API_ROOT)
 	req, err := http.NewRequest(http.MethodPost, requestURL, bodyReader)
 	if err != nil {
 		zap.S().Warn(err)

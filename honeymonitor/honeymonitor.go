@@ -124,7 +124,7 @@ func CreateDirMonitor(directories []string) {
 		if compareFiles(modTimeOrigFile, modTimeNewFile) {
 			zap.S().Info("Honeypot files untouched.")
 		} else {
-			zap.S().Info("Honeypot files touched! Potential intrusion!")
+			zap.S().Info("Honeypot files touched! Potential intrusion! ")
 			incident := common.Incident{
 				Name:     "Honey monitor access violation",
 				User:     usermanagement.GetLastLoggenOnUser(),

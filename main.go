@@ -41,12 +41,6 @@ func objectMonitoring() {
 	ticker := time.NewTicker(10 * time.Second)
 
 	for _ = range ticker.C {
-		montiorPath := "C:\\Users\\hunte\\Documents\\honey_monitor_test"
-
-		var pathVector []string
-
-		pathVector = append(pathVector, montiorPath)
-
-		honeymonitor.CreateDirMonitor(pathVector)
+		honeymonitor.CreateDirMonitor(common.GetHoneyPaths())
 	}
 }
