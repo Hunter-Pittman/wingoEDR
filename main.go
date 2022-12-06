@@ -12,13 +12,13 @@ func main() {
 	logger.InitLogger()
 	for {
 
-		//go inventoryLoop()
+		go inventoryLoop()
 		//go honeytokenLoop()
 		//go honeydirectoryLoop()
 
-		//processes.WindowsFindDeviousCmdParams2()
-
-		time.Sleep(1 * time.Minute)
+		//processes.DeviousCommandPartialSearchTest()
+		//processes.Test2()
+		//time.Sleep(1 * time.Minute)
 		select {}
 	}
 }
@@ -43,6 +43,6 @@ func honeydirectoryLoop() {
 	ticker := time.NewTicker(10 * time.Second)
 
 	for _ = range ticker.C {
-		honeydirectory.MonitorHoneyDirectory("C:\\Windows\\setupact.log")
+		honeydirectory.MonitorHoneyDirectory("C:\\Users\\hunte\\Documents\\Auto Insurance", 2)
 	}
 }
