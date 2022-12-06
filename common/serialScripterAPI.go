@@ -6,9 +6,12 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"wingoEDR/usermanagement"
 
 	"go.uber.org/zap"
 )
+
+const API_ROOT = "https://ec2-18-246-47-205.us-west-2.compute.amazonaws.com:10000"
 
 type Beat struct {
 	IP string
@@ -27,7 +30,8 @@ type Alert struct {
 }
 
 func HeartBeat() {
-	ssUserAgent := GetSerialScripterUserAgent()
+	//ssUserAgent := GetSerialScripterUserAgent()
+	ssUserAgent := "nestler-code"
 
 	m := Beat{IP: GetIP()}
 	jsonStr, err := json.Marshal(m)
@@ -42,7 +46,7 @@ func HeartBeat() {
 
 	bodyReader := bytes.NewReader(jsonStr)
 
-	requestURL := fmt.Sprintf("https://10.123.80.115:10000/api/v1/common/heartbeat")
+	requestURL := fmt.Sprintf("%v/api/v1/common/heartbeat", API_ROOT)
 	req, err := http.NewRequest(http.MethodPost, requestURL, bodyReader)
 	if err != nil {
 		zap.S().Warn(err)
@@ -62,7 +66,8 @@ func HeartBeat() {
 }
 
 func PostInventory() {
-	ssUserAgent := GetSerialScripterUserAgent()
+	//ssUserAgent := GetSerialScripterUserAgent()
+	ssUserAgent := "nestler-code"
 	inventoryItems := GetInventory()
 
 	jsonStr, err := json.Marshal(inventoryItems)
@@ -77,7 +82,7 @@ func PostInventory() {
 
 	bodyReader := bytes.NewReader(jsonStr)
 
-	requestURL := fmt.Sprintf("https://10.123.80.115:10000/api/v1/common/inventory")
+	requestURL := fmt.Sprintf("%v/api/v1/common/inventory", API_ROOT)
 	req, err := http.NewRequest(http.MethodPost, requestURL, bodyReader)
 	if err != nil {
 		zap.S().Warn(err)
@@ -110,7 +115,40 @@ func IncidentAlert(alert Alert) {
 
 	bodyReader := bytes.NewReader(jsonStr)
 
-	requestURL := fmt.Sprintf("https://10.123.80.115:10000/api/v1/common/incidentalert")
+	requestURL := fmt.Sprintf("%v/api/v1/common/incidentalert", API_ROOT)
+	req, err := http.NewRequest(http.MethodPost, requestURL, bodyReader)
+	if err != nil {
+		zap.S().Warn(err)
+	}
+
+	req.Header.Set("User-Agent", ssUserAgent)
+	resp, err := client.Do(req)
+	if err != nil {
+		zap.S().Error(err)
+	} else {
+		//data, _ := ioutil.ReadAll(resp.Body)
+		//println(string(data))
+	}
+
+	defer resp.Body.Close()
+}
+
+func PostUsers(users usermanagement.LocalUser) {
+	ssUserAgent := GetSerialScripterUserAgent()
+
+	jsonStr, err := json.Marshal(users)
+	if err != nil {
+		zap.S().Warn(err)
+	}
+
+	tr := &http.Transport{
+		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
+	}
+	client := &http.Client{Transport: tr}
+
+	bodyReader := bytes.NewReader(jsonStr)
+
+	requestURL := fmt.Sprintf("%v/api/v1/common/users", API_ROOT)
 	req, err := http.NewRequest(http.MethodPost, requestURL, bodyReader)
 	if err != nil {
 		zap.S().Warn(err)

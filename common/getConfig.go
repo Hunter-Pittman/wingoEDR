@@ -20,6 +20,9 @@ type Configuration struct {
 		Yara string `json:"yara"`
 		Pd   string `json:"pd"`
 	} `json:"exe_paths"`
+	Honeypaths struct {
+		Paths []string `json:"paths"`
+	} `json:"honeypaths"`
 }
 
 const CONFIG_LOC string = "C:\\Users\\hunte\\Documents\\repos\\wingoEDR\\config.json"
@@ -58,4 +61,16 @@ func GetYaraExePath() string {
 		fmt.Println("error:", err)
 	}
 	return configuration.ExePaths.Yara
+}
+
+func GetHoneyPaths() []string {
+	file, _ := os.Open(CONFIG_LOC)
+	defer file.Close()
+	decoder := json.NewDecoder(file)
+	configuration := Configuration{}
+	err := decoder.Decode(&configuration)
+	if err != nil {
+		fmt.Println("error:", err)
+	}
+	return configuration.Honeypaths.Paths
 }

@@ -1,48 +1,46 @@
 package main
 
 import (
+	"sync"
 	"time"
 	"wingoEDR/common"
-	"wingoEDR/honeydirectory"
-	"wingoEDR/honeytoken"
+	"wingoEDR/honeymonitor"
 	"wingoEDR/logger"
 )
 
 func main() {
 	logger.InitLogger()
-	for {
 
-		go inventoryLoop()
-		//go honeytokenLoop()
-		//go honeydirectoryLoop()
+	var wg sync.WaitGroup
+	wg.Add(3)
 
-		//processes.DeviousCommandPartialSearchTest()
-		//processes.Test2()
-		//time.Sleep(1 * time.Minute)
-		select {}
-	}
+	go heartbeatLoop()
+	go inventoryLoop()
+	go objectMonitoring()
+
+	wg.Wait()
 }
 
 func inventoryLoop() {
-	ticker := time.NewTicker(10 * time.Second)
+	ticker := time.NewTicker(20 * time.Second)
 
 	for _ = range ticker.C {
 		common.PostInventory()
 	}
 }
 
-func honeytokenLoop() {
-	ticker := time.NewTicker(10 * time.Second)
+func heartbeatLoop() {
+	ticker := time.NewTicker(1 * time.Minute)
 
 	for _ = range ticker.C {
-		honeytoken.MonitorHoneyFile("C:\\Windows\\setupact.log")
+		common.HeartBeat()
 	}
 }
 
-func honeydirectoryLoop() {
+func objectMonitoring() {
 	ticker := time.NewTicker(10 * time.Second)
 
 	for _ = range ticker.C {
-		honeydirectory.MonitorHoneyDirectory("C:\\Users\\hunte\\Documents\\Auto Insurance", 2)
+		honeymonitor.CreateDirMonitor(common.GetHoneyPaths())
 	}
 }

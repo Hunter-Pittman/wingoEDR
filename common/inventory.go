@@ -29,6 +29,7 @@ func GetInventory() InventoryObject {
 		Tasks:    nil,
 		Firewall: nil,
 		Shares:   shares.ListSharesWMI(),
+		//Shares: nil,
 	}
 
 	return inv

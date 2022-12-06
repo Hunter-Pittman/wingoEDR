@@ -8,7 +8,6 @@ import (
 	"io"
 	"net"
 	"os"
-	"os/exec"
 	"regexp"
 	"strings"
 	"time"
@@ -151,16 +150,4 @@ func GetSerialScripterHostName() string {
 	serialScripterHostName := "host-" + lastOctets[3]
 
 	return serialScripterHostName
-}
-
-// Repalce with a DC query????
-func GetCurrentlyLoggedInUsers() string {
-	toExecute := "query user /server:$SERVER | ConvertTo-Json"
-	output, err := exec.Command("powershell.exe", toExecute).Output()
-	if err != nil {
-		zap.S().Error(err.Error())
-		//fmt.Println(err)
-	}
-
-	return string(output)
 }

@@ -1,12 +1,10 @@
 package filesnap
 
-
 import (
-	"wingoEDR/honeytoken"
+	"wingoEDR/honeymonitor"
 )
 
-
-func GatherAttributes(filepath string) honeytoken.FileAttribs {
-	attribs := honeytoken.GetFileAttribs(filepath)
+func GatherAttributes(filepath string) honeymonitor.FileAttribs {
+	attribs := honeymonitor.GetFileAttribs(filepath)
 	return attribs
 }
