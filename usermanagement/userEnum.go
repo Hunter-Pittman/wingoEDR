@@ -49,7 +49,7 @@ func returnUsers() []LocalUser {
 
 	}
 
-	fmt.Printf("%v", userslice[0])
+	fmt.Printf("%v", userslice[0]) // Add api call to serial scripter api to compare original user list with current user list
 	return userslice
 
 }
