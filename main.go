@@ -1,8 +1,8 @@
 package main
 
 import (
+	"sync"
 	"time"
-	"wingoEDR/autoruns"
 	"wingoEDR/common"
 	"wingoEDR/honeymonitor"
 	"wingoEDR/logger"
@@ -11,19 +11,18 @@ import (
 func main() {
 	logger.InitLogger()
 
-	// var wg sync.WaitGroup
-	// wg.Add(3)
+	var wg sync.WaitGroup
+	wg.Add(3)
 
-	// go heartbeatLoop()
-	// go inventoryLoop()
-	// go objectMonitoring()
-	// go
+	go heartbeatLoop()
+	go inventoryLoop()
+	go objectMonitoring()
 
-	// wg.Wait()
+	wg.Wait()
 
-	autoruns.FullAutorunsDump()
+	//autoruns.FullAutorunsDump()
 
-	// select {}
+	select {}
 }
 
 func inventoryLoop() {
