@@ -19,6 +19,10 @@ func main() {
 	go objectMonitoring()
 
 	wg.Wait()
+
+	//autoruns.FullAutorunsDump()
+
+	select {}
 }
 
 func inventoryLoop() {

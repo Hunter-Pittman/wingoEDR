@@ -2,8 +2,9 @@ package common
 
 import (
 	"encoding/json"
-	"fmt"
 	"os"
+
+	"go.uber.org/zap"
 )
 
 type Configuration struct {
@@ -14,6 +15,7 @@ type Configuration struct {
 		SerialScripter struct {
 			APIKey    string `json:"api_key"`
 			UserAgent string `json:"user_agent"`
+			URL       string `json:"url"`
 		} `json:"serial_scripter"`
 	} `json:"apis"`
 	ExePaths struct {
@@ -25,7 +27,8 @@ type Configuration struct {
 	} `json:"honeypaths"`
 }
 
-const CONFIG_LOC string = "C:\\Users\\hunte\\Documents\\repos\\wingoEDR\\config.json"
+// const CONFIG_LOC string = "C:\\Users\\hunte\\Documents\\repos\\wingoEDR\\config.json"
+const CONFIG_LOC string = "C:\\Users\\Administrator\\Downloads\\config.json"
 
 func GetKaperskyKey() string {
 	file, _ := os.Open(CONFIG_LOC)
@@ -34,7 +37,7 @@ func GetKaperskyKey() string {
 	configuration := Configuration{}
 	err := decoder.Decode(&configuration)
 	if err != nil {
-		fmt.Println("error:", err)
+		zap.S().Error("error:", err)
 	}
 	return configuration.Apis.Kaspersky.APIKey
 }
@@ -46,7 +49,7 @@ func GetSerialScripterUserAgent() string {
 	configuration := Configuration{}
 	err := decoder.Decode(&configuration)
 	if err != nil {
-		fmt.Println("error:", err)
+		zap.S().Error("error:", err)
 	}
 	return configuration.Apis.SerialScripter.UserAgent
 }
@@ -58,7 +61,7 @@ func GetYaraExePath() string {
 	configuration := Configuration{}
 	err := decoder.Decode(&configuration)
 	if err != nil {
-		fmt.Println("error:", err)
+		zap.S().Error("error:", err)
 	}
 	return configuration.ExePaths.Yara
 }
@@ -70,7 +73,19 @@ func GetHoneyPaths() []string {
 	configuration := Configuration{}
 	err := decoder.Decode(&configuration)
 	if err != nil {
-		fmt.Println("error:", err)
+		zap.S().Error("error:", err)
 	}
 	return configuration.Honeypaths.Paths
+}
+
+func GetSerialScripterURL() string {
+	file, _ := os.Open(CONFIG_LOC)
+	defer file.Close()
+	decoder := json.NewDecoder(file)
+	configuration := Configuration{}
+	err := decoder.Decode(&configuration)
+	if err != nil {
+		zap.S().Error("error:", err)
+	}
+	return configuration.Apis.SerialScripter.URL
 }

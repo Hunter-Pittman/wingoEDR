@@ -11,7 +11,11 @@ import (
 	"go.uber.org/zap"
 )
 
-const API_ROOT = "https://ec2-18-246-47-205.us-west-2.compute.amazonaws.com:10000"
+//https://ec2-18-246-47-205.us-west-2.compute.amazonaws.com:10000
+
+var (
+	api_root = GetSerialScripterURL()
+)
 
 type Beat struct {
 	IP string
@@ -30,8 +34,8 @@ type Alert struct {
 }
 
 func HeartBeat() {
-	//ssUserAgent := GetSerialScripterUserAgent()
-	ssUserAgent := "nestler-code"
+	ssUserAgent := GetSerialScripterUserAgent()
+	//ssUserAgent := "nestler-code"
 
 	m := Beat{IP: GetIP()}
 	jsonStr, err := json.Marshal(m)
@@ -46,7 +50,7 @@ func HeartBeat() {
 
 	bodyReader := bytes.NewReader(jsonStr)
 
-	requestURL := fmt.Sprintf("%v/api/v1/common/heartbeat", API_ROOT)
+	requestURL := fmt.Sprintf("%v/api/v1/common/heartbeat", api_root)
 	req, err := http.NewRequest(http.MethodPost, requestURL, bodyReader)
 	if err != nil {
 		zap.S().Warn(err)
@@ -66,14 +70,16 @@ func HeartBeat() {
 }
 
 func PostInventory() {
-	//ssUserAgent := GetSerialScripterUserAgent()
-	ssUserAgent := "nestler-code"
+	ssUserAgent := GetSerialScripterUserAgent()
+	//ssUserAgent := "nestler-code"
 	inventoryItems := GetInventory()
 
 	jsonStr, err := json.Marshal(inventoryItems)
 	if err != nil {
 		zap.S().Warn(err)
 	}
+
+	fmt.Println(string(jsonStr))
 
 	tr := &http.Transport{
 		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
@@ -82,7 +88,7 @@ func PostInventory() {
 
 	bodyReader := bytes.NewReader(jsonStr)
 
-	requestURL := fmt.Sprintf("%v/api/v1/common/inventory", API_ROOT)
+	requestURL := fmt.Sprintf("%v/api/v1/common/inventory", api_root)
 	req, err := http.NewRequest(http.MethodPost, requestURL, bodyReader)
 	if err != nil {
 		zap.S().Warn(err)
@@ -115,7 +121,7 @@ func IncidentAlert(alert Alert) {
 
 	bodyReader := bytes.NewReader(jsonStr)
 
-	requestURL := fmt.Sprintf("%v/api/v1/common/incidentalert", API_ROOT)
+	requestURL := fmt.Sprintf("%v/api/v1/common/incidentalert", api_root)
 	req, err := http.NewRequest(http.MethodPost, requestURL, bodyReader)
 	if err != nil {
 		zap.S().Warn(err)
@@ -148,7 +154,7 @@ func PostUsers(users usermanagement.LocalUser) {
 
 	bodyReader := bytes.NewReader(jsonStr)
 
-	requestURL := fmt.Sprintf("%v/api/v1/common/users", API_ROOT)
+	requestURL := fmt.Sprintf("%v/api/v1/common/users", api_root)
 	req, err := http.NewRequest(http.MethodPost, requestURL, bodyReader)
 	if err != nil {
 		zap.S().Warn(err)
