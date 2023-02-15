@@ -28,7 +28,7 @@ func returnUsers() []LocalUser {
 	userslice := make([]LocalUser, 0)
 	users1, err := wapi.ListLocalUsers()
 	if err != nil {
-		fmt.Printf("Error fetching user list, %s.\r\n", err.Error())
+		zap.S().Error("Error fetching user list, %s.\r\n", err.Error())
 
 	}
 	for _, u := range users1 {

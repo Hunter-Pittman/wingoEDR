@@ -27,7 +27,8 @@ type Configuration struct {
 	} `json:"honeypaths"`
 }
 
-const CONFIG_LOC string = "C:\\Users\\hunte\\Documents\\repos\\wingoEDR\\config.json"
+// const CONFIG_LOC string = "C:\\Users\\hunte\\Documents\\repos\\wingoEDR\\config.json"
+const CONFIG_LOC string = "C:\\Users\\Administrator\\Downloads\\config.json"
 
 func GetKaperskyKey() string {
 	file, _ := os.Open(CONFIG_LOC)

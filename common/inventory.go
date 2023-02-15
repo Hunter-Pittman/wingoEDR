@@ -12,9 +12,7 @@ type InventoryObject struct {
 	Name      string                          `json:"name"`
 	IP        string                          `json:"ip"`
 	Os        string                          `json:"OS"`
-	Services  []servicemanager.WindowsService `json:"services"`
-	IsOn      bool                            `json:"isOn"`
-	Docker    []interface{}                   `json:"docker"`
+	Services  []servicemanager.WindowsService `json:"windowsservices"`
 	Tasks     []interface{}                   `json:"tasks"`
 	Firewall  []firewall.FirewallList         `json:"firewall"`
 	Shares    []shares.ShareAttributes        `json:"shares"`
@@ -29,9 +27,9 @@ func GetInventory() InventoryObject {
 		Name:      GetSerialScripterHostName(),
 		IP:        GetIP(),
 		Os:        runtime.GOOS,
-		Services:  servicemanager.Servicelister(), // Maybe move this
+		Services:  servicemanager.Servicelister(),
 		Tasks:     nil,
-		Firewall:  firewall.FirewallLister(), // Maybe seperate this
+		Firewall:  firewall.FirewallLister(),
 		Shares:    shares.ListSharesWMI(),
 		Processes: processes,
 	}

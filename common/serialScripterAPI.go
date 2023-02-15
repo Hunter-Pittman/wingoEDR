@@ -11,6 +11,8 @@ import (
 	"go.uber.org/zap"
 )
 
+//https://ec2-18-246-47-205.us-west-2.compute.amazonaws.com:10000
+
 var (
 	api_root = GetSerialScripterURL()
 )
@@ -76,6 +78,8 @@ func PostInventory() {
 	if err != nil {
 		zap.S().Warn(err)
 	}
+
+	fmt.Println(string(jsonStr))
 
 	tr := &http.Transport{
 		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
