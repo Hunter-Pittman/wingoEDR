@@ -68,6 +68,14 @@ func VerifySHA1Hash(hash string) bool {
 	return match
 }
 
+func VerifyWindowsPath(path string) bool {
+	match, _ := regexp.MatchString(`[a-zA-Z]:[\\\/](?:[a-zA-Z0-9]+[\\\/])*([a-zA-Z0-9]+\.*)`, path)
+
+
+
+	return match
+}
+
 func VerifyMD5Hash(hash string) bool {
 	match, _ := regexp.MatchString("/^[a-f0-9]{32}$/i", hash)
 	return match

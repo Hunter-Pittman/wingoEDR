@@ -19,6 +19,12 @@ type InventoryObject struct {
 	Processes []processes.ProcessInfo         `json:"processes"`
 }
 
+type InventorySummary struct {
+	Name string
+	IP   string
+	Os   string
+}
+
 func GetInventory() InventoryObject {
 
 	processes, _ := processes.GetAllProcesses()
@@ -35,4 +41,8 @@ func GetInventory() InventoryObject {
 	}
 
 	return inv
+}
+
+func GetInventorySummary() {
+
 }

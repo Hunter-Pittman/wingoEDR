@@ -71,7 +71,8 @@ func HeartBeat() {
 
 func PostInventory() {
 	ssUserAgent := GetSerialScripterUserAgent()
-	//ssUserAgent := "nestler-code"
+
+	// Payload
 	inventoryItems := GetInventory()
 
 	jsonStr, err := json.Marshal(inventoryItems)

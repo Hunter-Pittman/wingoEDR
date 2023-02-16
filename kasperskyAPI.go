@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -87,6 +88,7 @@ func GetHashStatus(hash string, hashType string) string {
 
 	sb := string(body)
 	zap.S().Info(sb)
+	fmt.Println("Kaperskey request sent: %v", sb)
 
 	if err := json.Unmarshal(body, &result); err != nil { // Parse []byte to go struct pointer
 		zap.S().Error("Cannot unmarshal JSON")
