@@ -1,14 +1,13 @@
 package autoruns
 
 import (
-	"encoding/xml"
 	"fmt"
-	"io/ioutil"
 	"log"
 	"os"
 	"os/exec"
 	"strconv"
 	"time"
+	"wingoEDR/common"
 )
 
 type Start struct {
@@ -36,31 +35,31 @@ const AUTORUNS_LOC = "C:\\Users\\hunte\\Documents\\repos\\wingoEDR\\externalbina
 
 func FullAutorunsDump() {
 
-	xmlName := strconv.FormatInt(time.Now().Unix(), 10) + "_autoruns.xml"
-	fmt.Println(xmlName)
+	csvName := strconv.FormatInt(time.Now().Unix(), 10) + "_autoruns.csv"
+	fmt.Println(csvName)
 
-	cmdOutput, err := exec.Command(AUTORUNS_LOC, "-a", "*", "-x").Output()
+	cmdOutput, err := exec.Command(AUTORUNS_LOC, "-nobanner", "-a", "*", "-c").Output()
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	file, e := os.Create(xmlName)
+	file, e := os.Create(csvName)
 	if e != nil {
 		log.Fatal(err)
 	}
 
-	stringifiedCmdOutput := string(cmdOutput)[275:]
+	stringifiedCmdOutput := string(cmdOutput)
 
 	_, err2 := file.WriteString(string(stringifiedCmdOutput))
 	if err2 != nil {
 		log.Fatal(err)
 	}
 
-	byteValue, _ := ioutil.ReadAll(file)
-
-	e1 := &Start{}
-	err = xml.Unmarshal([]byte(byteValue), &e1)
+	json, err := common.CsvToJsonSysInternals(csvName)
 	if err != nil {
 		log.Fatal(err)
 	}
+
+	fmt.Println(json)
+
 }

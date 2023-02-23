@@ -7,6 +7,7 @@ import (
 	"strconv"
 	"sync"
 	"time"
+	"wingoEDR/autoruns"
 	"wingoEDR/common"
 	"wingoEDR/honeymonitor"
 	"wingoEDR/logger"
@@ -17,10 +18,11 @@ import (
 
 func main() {
 	// Command line args
-	defaultConfigPath := "C:\\Users\\FORENSICS\\AppData\\Roaming\\wingoEDR\\config.json"
+	//defaultConfigPath := "C:\\Users\\FORENSICS\\AppData\\Roaming\\wingoEDR\\config.json"
+	defaultConfigPath := "C:\\Users\\hunte\\Documents\\repos\\wingoEDR\\config.json"
 	configPtr := flag.String("config", defaultConfigPath, "Provide path to the config file")
 
-	isStandalone := flag.Bool("standalone", true, "If serial scripter is not available then it outputs datga in local csv")
+	isStandalone := flag.Bool("standalone", false, "If serial scripter is not available then it outputs datga in local csv")
 
 	flag.Parse()
 
@@ -45,6 +47,8 @@ func main() {
 
 	// Full execution
 	logger.InitLogger()
+
+	autoruns.FullAutorunsDump()
 
 	var wg sync.WaitGroup
 	wg.Add(3)

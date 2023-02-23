@@ -8,7 +8,7 @@ require (
 	github.com/hillu/go-yara/v4 v4.2.4
 	github.com/shirou/gopsutil/v3 v3.22.9
 	go.uber.org/zap v1.23.0
-	golang.org/x/sys v0.3.0
+	golang.org/x/sys v0.5.0
 )
 
 require (

@@ -1,10 +1,14 @@
 package common
 
 import (
+	"bufio"
 	"crypto/sha1"
 	"crypto/sha256"
 	"encoding/base64"
+	"encoding/csv"
 	"encoding/hex"
+	"encoding/json"
+	"fmt"
 	"io"
 	"net"
 	"os"
@@ -14,6 +18,7 @@ import (
 
 	"github.com/djherbis/times"
 	"go.uber.org/zap"
+	"golang.org/x/text/encoding/unicode"
 )
 
 type FileAttribs struct {
@@ -70,8 +75,6 @@ func VerifySHA1Hash(hash string) bool {
 
 func VerifyWindowsPath(path string) bool {
 	match, _ := regexp.MatchString(`[a-zA-Z]:[\\\/](?:[a-zA-Z0-9]+[\\\/])*([a-zA-Z0-9]+\.*)`, path)
-
-
 
 	return match
 }
@@ -158,4 +161,51 @@ func GetSerialScripterHostName() string {
 	serialScripterHostName := "host-" + lastOctets[3]
 
 	return serialScripterHostName
+}
+
+func CsvToJsonSysInternals(csvFile string) (string, error) {
+	// Open the CSV file
+	f, err := os.Open(csvFile)
+	if err != nil {
+		return "", err
+	}
+	defer f.Close()
+
+	// Decode UTF-16 encoded CSV file
+	utf16Decoder := unicode.UTF16(unicode.LittleEndian, unicode.UseBOM).NewDecoder()
+	reader := utf16Decoder.Reader(f)
+
+	// Read the CSV file
+	r := csv.NewReader(bufio.NewReader(reader))
+	r.Comma = ';'
+	r.LazyQuotes = true
+	r.FieldsPerRecord = -1
+	records, err := r.ReadAll()
+	if err != nil {
+		return "", err
+	}
+
+	// Convert CSV records to a slice of maps
+	var result []map[string]string
+	header := records[0]
+	for _, row := range records[1:] {
+		record := make(map[string]string)
+		for i, v := range row {
+			if i < len(header) {
+				record[header[i]] = v
+			} else {
+				record[fmt.Sprintf("field%d", i+1)] = v
+			}
+		}
+		result = append(result, record)
+	}
+
+	// Convert the slice of maps to JSON
+	jsonData, err := json.Marshal(result)
+	if err != nil {
+		return "", err
+	}
+
+	// Return the JSON as a string
+	return string(jsonData), nil
 }
