@@ -24,6 +24,7 @@ require (
 	github.com/google/cabbie v1.0.2 // indirect
 	github.com/google/glazier v0.0.0-20211029225403-9f766cca891d // indirect
 	github.com/iamacarpet/go-win64api v0.0.0-20220720120512-241a9064deec // indirect
+	github.com/klauspost/compress v1.15.15 // indirect
 	github.com/lucasb-eyer/go-colorful v1.2.0 // indirect
 	github.com/lufia/plan9stats v0.0.0-20211012122336-39d0f177ccd0 // indirect
 	github.com/mackerelio/go-osstat v0.2.3 // indirect

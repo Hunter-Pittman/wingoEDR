@@ -3,11 +3,13 @@ package main
 import (
 	"encoding/json"
 	"flag"
+	"log"
 	"os"
 	"strconv"
 	"sync"
 	"time"
 	"wingoEDR/autoruns"
+	"wingoEDR/backup"
 	"wingoEDR/common"
 	"wingoEDR/honeymonitor"
 	"wingoEDR/logger"
@@ -17,36 +19,89 @@ import (
 )
 
 func main() {
+	logger.InitLogger()
 	// Command line args
-	//defaultConfigPath := "C:\\Users\\FORENSICS\\AppData\\Roaming\\wingoEDR\\config.json"
-	defaultConfigPath := "C:\\Users\\hunte\\Documents\\repos\\wingoEDR\\config.json"
+	defaultConfigPath := "C:\\Users\\FORENSICS\\AppData\\Roaming\\wingoEDR\\config.json"
+	//defaultConfigPath := "C:\\Users\\hunte\\Documents\\repos\\wingoEDR\\config.json"
 	configPtr := flag.String("config", defaultConfigPath, "Provide path to the config file")
-
 	isStandalone := flag.Bool("standalone", false, "If serial scripter is not available then it outputs datga in local csv")
+	mode := flag.String("mode", "default", "List what mode you would like wingoEDR to execute in. The default is to enable continous monitoring.")
+
+	// Backup flags
+	backupDir := flag.String("backupdir", "C:\\backups", "Enter the path where your backups are going to be stored.")
+	backupItem := flag.String("backupitem", "", "Enter the path to the file or directory you wish to backup.")
+
+	// Decompress flags
+	decompressItem := flag.String("decompressitem", "", "Enter the path to the file or directory you wish to decompress")
 
 	flag.Parse()
 
-	isWindowsPath := common.VerifyWindowsPath(*configPtr)
+	common.VerifyWindowsPathFatal(*configPtr)
+	color.Green("[INFO]	Config file loaded %s", *configPtr)
 
-	if !isWindowsPath { // Errors out on a "C:\" path needs to be fixed
-		color.Red("ERROR	The entered output is not a Windows path!")
-		os.Exit(1)
-	} else {
-		if _, err := os.Stat(*configPtr); os.IsNotExist(err) {
-			color.Red("ERROR	Windows path does not exist!")
-			os.Exit(1)
+	color.Yellow("[WARN]	Standalone mode is %t", *isStandalone)
+
+	switch *mode {
+	case "backup":
+		color.Green("[INFO]	Mode is %s", *mode)
+
+		// Required params check
+		if *backupItem == "" {
+			color.Red("[ERROR]	--backupitem is an essential flag for this mode!", *isStandalone)
+			return
 		}
-		color.Green("INFO	Config file loaded at %s", *configPtr)
+
+		common.VerifyWindowsPathFatal(*backupDir)
+		common.VerifyWindowsPathFatal(*backupItem)
+		file, err := os.Open(*backupItem)
+		if err != nil {
+			log.Fatal("Backup item file access failure! Err: %v", err)
+		}
+
+		fileInfo, err := file.Stat()
+		if err != nil {
+			log.Fatal("Backup item file access failure! Err: %v", err)
+		}
+
+		if fileInfo.IsDir() {
+			backup.BackDir(*backupItem, false)
+			color.Green("[INFO]	Backup of %s is complete!", *backupItem)
+		} else {
+			newFileName := "\\compressed_" + fileInfo.Name()
+			backup.BackFile(newFileName, *backupDir)
+			color.Green("[INFO]	Backup of %s is complete!", *backupItem)
+		}
+
+		return
+	case "chainsaw":
+		color.Green("[INFO]	Mode is %s", *mode)
+	case "sessions":
+		color.Green("[INFO]	Mode is %s", *mode)
+	case "decompress":
+		color.Green("[INFO]	Mode is %s", *mode)
+		reader, err := os.Open(*decompressItem)
+		if err != nil {
+			log.Fatal("Backup item file access failure! Err: %v", err)
+		}
+
+		writer, err := os.Create(".\\decompressed_lol.txt")
+		if err != nil {
+			log.Fatal("Backup item file access failure! Err: %v", err)
+		}
+		common.Decompress(reader, writer)
+		return
+
+	default:
+		color.Green("[WARN]	Mode is %s", *mode)
+
 	}
 
-	color.Yellow("WARN	Standalone mode is %t", *isStandalone)
 	// Pre execution checks
 	// Check serial scripter connection
 	// SSH Server Configureation successful setup
 	// Powershell Check
 
 	// Full execution
-	logger.InitLogger()
 
 	autoruns.FullAutorunsDump()
 

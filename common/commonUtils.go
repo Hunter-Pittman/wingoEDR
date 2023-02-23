@@ -3,13 +3,10 @@ package common
 import (
 	"bufio"
 	"crypto/sha1"
-	"crypto/sha256"
-	"encoding/base64"
 	"encoding/csv"
 	"encoding/hex"
 	"encoding/json"
 	"fmt"
-	"io"
 	"net"
 	"os"
 	"regexp"
@@ -17,6 +14,7 @@ import (
 	"time"
 
 	"github.com/djherbis/times"
+	"github.com/fatih/color"
 	"go.uber.org/zap"
 	"golang.org/x/text/encoding/unicode"
 )
@@ -73,10 +71,18 @@ func VerifySHA1Hash(hash string) bool {
 	return match
 }
 
-func VerifyWindowsPath(path string) bool {
+func VerifyWindowsPathFatal(path string) {
 	match, _ := regexp.MatchString(`[a-zA-Z]:[\\\/](?:[a-zA-Z0-9]+[\\\/])*([a-zA-Z0-9]+\.*)`, path)
 
-	return match
+	if !match { // Errors out on a "C:\" path needs to be fixed
+		color.Red("[ERROR]	The entered output is not a Windows path!")
+		os.Exit(1)
+	} else {
+		if _, err := os.Stat(path); os.IsNotExist(err) {
+			color.Red("[ERROR]	Windows path does not exist!")
+			os.Exit(1)
+		}
+	}
 }
 
 func VerifyMD5Hash(hash string) bool {
@@ -105,55 +111,6 @@ type finfo struct {
 	Size int64
 	Time string
 	Hash string
-}
-
-func CheckFile(name string) finfo {
-	fileInfo, err := os.Stat(name)
-	if err != nil {
-		panic(err)
-	}
-	println(name)
-	if fileInfo.IsDir() {
-
-		t := fileInfo.ModTime().String()
-		b := fileInfo.Size()
-
-		i := finfo{
-			Name: name,
-			Size: b,
-			Time: t,
-			Hash: "directory",
-		}
-
-		return i
-	} else {
-		f, err := os.Open(name)
-		if err != nil {
-			zap.S().Error(err)
-		}
-		if err != nil {
-			if os.IsNotExist(err) {
-				println("file not found:", fileInfo.Name())
-			}
-		}
-		h := sha256.New()
-		if _, err := io.Copy(h, f); err != nil {
-			zap.S().Warn(err)
-		}
-		hash := h.Sum(nil)
-		Enc := base64.StdEncoding.EncodeToString(hash)
-
-		t := fileInfo.ModTime().String()
-		b := fileInfo.Size()
-
-		i := finfo{
-			Name: name,
-			Size: b,
-			Time: t,
-			Hash: Enc,
-		}
-		return i
-	}
 }
 
 func GetSerialScripterHostName() string {
