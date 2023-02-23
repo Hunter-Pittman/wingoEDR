@@ -5,6 +5,7 @@ import (
 	"flag"
 	"log"
 	"os"
+	"path/filepath"
 	"strconv"
 	"sync"
 	"time"
@@ -47,7 +48,7 @@ func main() {
 
 		// Required params check
 		if *backupItem == "" {
-			color.Red("[ERROR]	--backupitem is an essential flag for this mode!", *isStandalone)
+			color.Red("[ERROR]	--backupitem is an essential flag for this mode!")
 			return
 		}
 
@@ -63,12 +64,12 @@ func main() {
 			log.Fatal("Backup item file access failure! Err: %v", err)
 		}
 
-		if fileInfo.IsDir() {
+		if fileInfo.IsDir() { // Direcotry backups not quite working consult Ethan
 			backup.BackDir(*backupItem, false)
 			color.Green("[INFO]	Backup of %s is complete!", *backupItem)
 		} else {
 			newFileName := "\\compressed_" + fileInfo.Name()
-			backup.BackFile(newFileName, *backupDir)
+			backup.BackFile(newFileName, *backupItem)
 			color.Green("[INFO]	Backup of %s is complete!", *backupItem)
 		}
 
@@ -79,18 +80,27 @@ func main() {
 		color.Green("[INFO]	Mode is %s", *mode)
 	case "decompress":
 		color.Green("[INFO]	Mode is %s", *mode)
+
+		// Required params check
+		if *decompressItem == "" {
+			color.Red("[ERROR]	--decompressitem is an essential flag for this mode!")
+			return
+		}
+
+		common.VerifyWindowsPathFatal(*decompressItem)
 		reader, err := os.Open(*decompressItem)
 		if err != nil {
 			log.Fatal("Backup item file access failure! Err: %v", err)
 		}
 
-		writer, err := os.Create(".\\decompressed_lol.txt")
+		file := filepath.Base(*decompressItem)
+		newFileName := file[11:]
+		writer, err := os.Create(newFileName)
 		if err != nil {
 			log.Fatal("Backup item file access failure! Err: %v", err)
 		}
 		common.Decompress(reader, writer)
 		return
-
 	default:
 		color.Green("[WARN]	Mode is %s", *mode)
 
