@@ -31,7 +31,7 @@ type AutorunsEntry struct {
 	Time         string `json:"time"`
 }
 
-const AUTORUNS_LOC = "C:\\Users\\FORENSICS\\Documents\\Hunter's Repos\\wingoEDR\\externalbinaries\\autorunsc.exe"
+const AUTORUNS_LOC = "C:\\Users\\FORENSICS\\Documents\\Hunter's Repos\\wingoEDR\\externalresources\\autorunsc.exe"
 
 func FullAutorunsDump() {
 
