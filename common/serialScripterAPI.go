@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"wingoEDR/config"
 	"wingoEDR/usermanagement"
 
 	"go.uber.org/zap"
@@ -14,7 +15,7 @@ import (
 //https://ec2-18-246-47-205.us-west-2.compute.amazonaws.com:10000
 
 var (
-	api_root = GetSerialScripterURL()
+	api_root = config.GetSerialScripterURL()
 )
 
 type Beat struct {
@@ -34,7 +35,7 @@ type Alert struct {
 }
 
 func HeartBeat() {
-	ssUserAgent := GetSerialScripterUserAgent()
+	ssUserAgent := config.GetSerialScripterUserAgent()
 	//ssUserAgent := "nestler-code"
 
 	m := Beat{IP: GetIP()}
@@ -70,7 +71,7 @@ func HeartBeat() {
 }
 
 func PostInventory() {
-	ssUserAgent := GetSerialScripterUserAgent()
+	ssUserAgent := config.GetSerialScripterUserAgent()
 
 	// Payload
 	inventoryItems := GetInventory()
@@ -108,7 +109,7 @@ func PostInventory() {
 }
 
 func IncidentAlert(alert Alert) {
-	ssUserAgent := GetSerialScripterUserAgent()
+	ssUserAgent := config.GetSerialScripterUserAgent()
 
 	jsonStr, err := json.Marshal(alert)
 	if err != nil {
@@ -141,7 +142,7 @@ func IncidentAlert(alert Alert) {
 }
 
 func PostUsers(users usermanagement.LocalUser) {
-	ssUserAgent := GetSerialScripterUserAgent()
+	ssUserAgent := config.GetSerialScripterUserAgent()
 
 	jsonStr, err := json.Marshal(users)
 	if err != nil {

@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"wingoEDR/common"
+	"wingoEDR/config"
 
 	"go.uber.org/zap"
 )
@@ -62,7 +63,7 @@ func GetHashStatus(hash string, hashType string) string {
 	url := "https://opentip.kaspersky.com/api/v1/search/hash?request=" + hash
 
 	request, _ := http.NewRequest("GET", url, nil)
-	request.Header.Add("x-api-key", common.GetKaperskyKey())
+	request.Header.Add("x-api-key", config.GetKaperskyKey())
 	response, err := client.Do(request)
 	if err != nil {
 		zap.S().Error("Kaspersky web request failed: ", err)

@@ -1,4 +1,4 @@
-package common
+package config
 
 import (
 	"encoding/json"
@@ -25,6 +25,9 @@ type Configuration struct {
 	Honeypaths struct {
 		Paths []string `json:"paths"`
 	} `json:"honeypaths"`
+	Sessions struct {
+		whitelist []string `json:"whitelist"`
+	} `json:"sessions"`
 }
 
 const CONFIG_LOC string = "C:\\Users\\hunte\\Documents\\repos\\wingoEDR\\config.json"
@@ -89,4 +92,16 @@ func GetSerialScripterURL() string {
 		zap.S().Error("error:", err)
 	}
 	return configuration.Apis.SerialScripter.URL
+}
+
+func GetWhitelistedUsers() []string {
+	file, _ := os.Open(CONFIG_LOC)
+	defer file.Close()
+	decoder := json.NewDecoder(file)
+	configuration := Configuration{}
+	err := decoder.Decode(&configuration)
+	if err != nil {
+		zap.S().Error("error:", err)
+	}
+	return configuration.Sessions.whitelist
 }

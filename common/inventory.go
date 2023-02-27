@@ -6,6 +6,7 @@ import (
 	"wingoEDR/processes"
 	"wingoEDR/servicemanager"
 	"wingoEDR/shares"
+	"wingoEDR/usermanagement"
 )
 
 type InventoryObject struct {
@@ -16,6 +17,7 @@ type InventoryObject struct {
 	Tasks     []interface{}                   `json:"tasks"`
 	Firewall  []firewall.FirewallList         `json:"firewall"`
 	Shares    []shares.ShareAttributes        `json:"shares"`
+	Users     []usermanagement.LocalUser      `json:"users"`
 	Processes []processes.ProcessInfo         `json:"processes"`
 }
 
@@ -37,6 +39,7 @@ func GetInventory() InventoryObject {
 		Tasks:     nil,
 		Firewall:  firewall.FirewallLister(),
 		Shares:    shares.ListSharesWMI(),
+		Users:     usermanagement.ReturnUsers(),
 		Processes: processes,
 	}
 
