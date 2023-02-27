@@ -1,7 +1,6 @@
 package usermanagement
 
 import (
-	"fmt"
 	"strings"
 	"time"
 
@@ -24,7 +23,7 @@ type LocalUser struct {
 	NumofLogons       uint32
 }
 
-func returnUsers() []LocalUser {
+func ReturnUsers() []LocalUser {
 	userslice := make([]LocalUser, 0)
 	users1, err := wapi.ListLocalUsers()
 	if err != nil {
@@ -49,7 +48,7 @@ func returnUsers() []LocalUser {
 
 	}
 
-	fmt.Printf("%v", userslice[0]) // Add api call to serial scripter api to compare original user list with current user list
+	//fmt.Printf("%v", userslice[0]) // Add api call to serial scripter api to compare original user list with current user list
 	return userslice
 
 }

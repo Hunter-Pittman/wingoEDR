@@ -9,21 +9,24 @@ import (
 	"strconv"
 	"sync"
 	"time"
-	"wingoEDR/autoruns"
 	"wingoEDR/backup"
 	"wingoEDR/common"
+	"wingoEDR/config"
 	"wingoEDR/honeymonitor"
 	"wingoEDR/logger"
+	"wingoEDR/usermanagement"
 
 	"github.com/fatih/color"
+	"github.com/olekukonko/tablewriter"
 	"go.uber.org/zap"
 )
 
 func main() {
 	logger.InitLogger()
 	// Command line args
-	defaultConfigPath := "C:\\Users\\FORENSICS\\AppData\\Roaming\\wingoEDR\\config.json"
-	//defaultConfigPath := "C:\\Users\\hunte\\Documents\\repos\\wingoEDR\\config.json"
+	//defaultConfigPath := "C:\\Users\\FORENSICS\\AppData\\Roaming\\wingoEDR\\config.json"
+	defaultConfigPath := "C:\\Users\\hunte\\Documents\\repos\\wingoEDR\\config.json"
+
 	configPtr := flag.String("config", defaultConfigPath, "Provide path to the config file")
 	isStandalone := flag.Bool("standalone", false, "If serial scripter is not available then it outputs datga in local csv")
 	mode := flag.String("mode", "default", "List what mode you would like wingoEDR to execute in. The default is to enable continous monitoring.")
@@ -78,6 +81,36 @@ func main() {
 		color.Green("[INFO]	Mode is %s", *mode)
 	case "sessions":
 		color.Green("[INFO]	Mode is %s", *mode)
+		sessions := usermanagement.ListSessions()
+
+		table := tablewriter.NewWriter(os.Stdout)
+
+		table.SetHeader([]string{"Username", "Domain", "LocalUser", "LocalAdmin", "LogonType", "LogonTime", "DnsDomainName"})
+
+		for _, s := range sessions {
+			row := []string{s.Username, s.Domain, strconv.FormatBool(s.LocalUser), strconv.FormatBool(s.LocalAdmin), strconv.FormatUint(uint64(s.LogonType), 10), s.LogonTime.String(), s.DnsDomainName}
+			table.Append(row)
+		}
+
+		table.Render()
+
+	case "userenum":
+		color.Green("[INFO]	Mode is %s", *mode)
+
+		users := usermanagement.ReturnUsers()
+
+		table := tablewriter.NewWriter(os.Stdout)
+
+		table.SetHeader([]string{"Username", "Fullname", "Enabled", "Locked", "Admin", "Passwdexpired", "CantChangePasswd", "Passwdage", "Lastlogon", "BadPasswdAttemps", "NumofLogons"})
+
+		for _, u := range users {
+			row := []string{u.Username, u.Fullname, strconv.FormatBool(u.Enabled), strconv.FormatBool(u.Locked), strconv.FormatBool(u.Admin), strconv.FormatBool(u.Passwdexpired), strconv.FormatBool(u.CantChangePasswd), u.Passwdage.String(), u.Lastlogon.String(), strconv.FormatUint(uint64(u.BadPasswdAttempts), 10), strconv.FormatUint(uint64(u.NumofLogons), 10)}
+			table.Append(row)
+		}
+
+		table.Render()
+
+		return
 	case "decompress":
 		color.Green("[INFO]	Mode is %s", *mode)
 
@@ -113,14 +146,12 @@ func main() {
 
 	// Full execution
 
-	autoruns.FullAutorunsDump()
-
 	var wg sync.WaitGroup
 	wg.Add(3)
 
 	go heartbeatLoop(*isStandalone)
 	go inventoryLoop(*isStandalone)
-	go objectMonitoring(*isStandalone)
+	//go objectMonitoring(*isStandalone)
 
 	wg.Wait()
 
@@ -187,7 +218,7 @@ func objectMonitoring(standalone bool) {
 		ticker := time.NewTicker(10 * time.Second)
 
 		for _ = range ticker.C {
-			honeymonitor.CreateDirMonitor(common.GetHoneyPaths())
+			honeymonitor.CreateDirMonitor(config.GetHoneyPaths())
 		}
 	} else {
 		color.Yellow("INFO	Object Monitoring is not supported in stanalone mode ")
