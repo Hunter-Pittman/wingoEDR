@@ -12,6 +12,12 @@ require (
 	github.com/klauspost/compress v1.15.15
 	github.com/mackerelio/go-osstat v0.2.3
 	github.com/olekukonko/tablewriter v0.0.5
+<<<<<<< HEAD
+=======
+	github.com/iamacarpet/go-win64api v0.0.0-20221230174906-cb41e6e774e8
+	github.com/klauspost/compress v1.15.15
+	github.com/mackerelio/go-osstat v0.2.3
+>>>>>>> 944b299cd478378848e1552b6ed53bf3d73054b2
 	github.com/schollz/closestmatch v2.1.0+incompatible
 	github.com/shirou/gopsutil/v3 v3.22.9
 	go.uber.org/zap v1.23.0

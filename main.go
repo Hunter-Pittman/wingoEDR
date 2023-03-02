@@ -3,21 +3,17 @@ package main
 import (
 	"encoding/json"
 	"flag"
-	"log"
 	"os"
-	"path/filepath"
 	"strconv"
 	"sync"
 	"time"
-	"wingoEDR/backup"
 	"wingoEDR/common"
 	"wingoEDR/config"
 	"wingoEDR/honeymonitor"
 	"wingoEDR/logger"
-	"wingoEDR/usermanagement"
+	"wingoEDR/modes"
 
 	"github.com/fatih/color"
-	"github.com/olekukonko/tablewriter"
 	"go.uber.org/zap"
 )
 
@@ -45,100 +41,7 @@ func main() {
 
 	color.Yellow("[WARN]	Standalone mode is %t", *isStandalone)
 
-	switch *mode {
-	case "backup":
-		color.Green("[INFO]	Mode is %s", *mode)
-
-		// Required params check
-		if *backupItem == "" {
-			color.Red("[ERROR]	--backupitem is an essential flag for this mode!")
-			return
-		}
-
-		common.VerifyWindowsPathFatal(*backupDir)
-		common.VerifyWindowsPathFatal(*backupItem)
-		file, err := os.Open(*backupItem)
-		if err != nil {
-			log.Fatal("Backup item file access failure! Err: %v", err)
-		}
-
-		fileInfo, err := file.Stat()
-		if err != nil {
-			log.Fatal("Backup item file access failure! Err: %v", err)
-		}
-
-		if fileInfo.IsDir() { // Direcotry backups not quite working consult Ethan
-			backup.BackDir(*backupItem, false)
-			color.Green("[INFO]	Backup of %s is complete!", *backupItem)
-		} else {
-			newFileName := "\\compressed_" + fileInfo.Name()
-			backup.BackFile(newFileName, *backupItem)
-			color.Green("[INFO]	Backup of %s is complete!", *backupItem)
-		}
-
-		return
-	case "chainsaw":
-		color.Green("[INFO]	Mode is %s", *mode)
-	case "sessions":
-		color.Green("[INFO]	Mode is %s", *mode)
-		sessions := usermanagement.ListSessions()
-
-		table := tablewriter.NewWriter(os.Stdout)
-
-		table.SetHeader([]string{"Username", "Domain", "LocalUser", "LocalAdmin", "LogonType", "LogonTime", "DnsDomainName"})
-
-		for _, s := range sessions {
-			row := []string{s.Username, s.Domain, strconv.FormatBool(s.LocalUser), strconv.FormatBool(s.LocalAdmin), strconv.FormatUint(uint64(s.LogonType), 10), s.LogonTime.String(), s.DnsDomainName}
-			table.Append(row)
-		}
-
-		table.Render()
-		return
-
-	case "userenum":
-		color.Green("[INFO]	Mode is %s", *mode)
-
-		users := usermanagement.ReturnUsers()
-
-		table := tablewriter.NewWriter(os.Stdout)
-
-		table.SetHeader([]string{"Username", "Fullname", "Enabled", "Locked", "Admin", "Passwdexpired", "CantChangePasswd", "Passwdage", "Lastlogon", "BadPasswdAttemps", "NumofLogons"})
-
-		for _, u := range users {
-			row := []string{u.Username, u.Fullname, strconv.FormatBool(u.Enabled), strconv.FormatBool(u.Locked), strconv.FormatBool(u.Admin), strconv.FormatBool(u.Passwdexpired), strconv.FormatBool(u.CantChangePasswd), u.Passwdage.String(), u.Lastlogon.String(), strconv.FormatUint(uint64(u.BadPasswdAttempts), 10), strconv.FormatUint(uint64(u.NumofLogons), 10)}
-			table.Append(row)
-		}
-
-		table.Render()
-
-		return
-	case "decompress":
-		color.Green("[INFO]	Mode is %s", *mode)
-
-		// Required params check
-		if *decompressItem == "" {
-			color.Red("[ERROR]	--decompressitem is an essential flag for this mode!")
-			return
-		}
-
-		common.VerifyWindowsPathFatal(*decompressItem)
-		reader, err := os.Open(*decompressItem)
-		if err != nil {
-			log.Fatal("Backup item file access failure! Err: %v", err)
-		}
-
-		file := filepath.Base(*decompressItem)
-		newFileName := file[11:]
-		writer, err := os.Create(newFileName)
-		if err != nil {
-			log.Fatal("Backup item file access failure! Err: %v", err)
-		}
-		common.Decompress(reader, writer)
-		return
-	default:
-		color.Green("[WARN]	Mode is %s", *mode)
-
-	}
+	modes.ModeHandler(*mode, map[string]string{"backupDir": *backupDir, "backupItem": *backupItem, "decompressItem": *decompressItem})
 
 	// Pre execution checks
 	// Check serial scripter connection
