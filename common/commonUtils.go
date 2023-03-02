@@ -166,3 +166,7 @@ func CsvToJsonSysInternals(csvFile string) (string, error) {
 	// Return the JSON as a string
 	return string(jsonData), nil
 }
+
+func ErrorHandler(err error, loglevel string) {
+	swicth
+}
