@@ -5,7 +5,7 @@ import (
 	"io/ioutil"
 	"os/exec"
 	"strings"
-	"wingoEDR/common"
+	"wingoEDR/config"
 
 	"go.uber.org/zap"
 )
@@ -21,7 +21,7 @@ func YaraScan(rules string, dir string) ([]YaraMatch, error) {
 	ruleList := make([]string, 1)
 	rulePath := rules
 
-	yaraExePath := common.GetYaraExePath()
+	yaraExePath := config.GetYaraExePath()
 
 	files, err := ioutil.ReadDir(rulePath)
 	if err != nil {
