@@ -167,6 +167,11 @@ func CsvToJsonSysInternals(csvFile string) (string, error) {
 	return string(jsonData), nil
 }
 
-func ErrorHandler(err error, loglevel string) {
-	swicth
+func ErrorHandler(err error) {
+	if err != nil {
+		zap.S().Error("Error: ", err.Error())
+		color.Red("[WARN]	An error has been encounterd: ", err.Error())
+	} else {
+		return
+	}
 }

@@ -8,6 +8,7 @@ import (
 	"strconv"
 	"strings"
 	"wingoEDR/backup"
+	"wingoEDR/chainsaw"
 	"wingoEDR/common"
 	"wingoEDR/processes"
 	"wingoEDR/usermanagement"
@@ -24,6 +25,7 @@ func ModeHandler(mode string, otherParams map[string]string) {
 		BackupMode(otherParams)
 	case "chainsaw":
 		color.Green("[INFO]	Mode is %s", mode)
+		Chainsaw()
 	case "sessions":
 		color.Green("[INFO]	Mode is %s", mode)
 		SessionsMode()
@@ -70,7 +72,7 @@ func BackupMode(otherParams map[string]string) {
 }
 
 func Chainsaw() {
-
+	chainsaw.ScanAll()
 }
 
 func SessionsMode() {
