@@ -175,3 +175,25 @@ func ErrorHandler(err error) {
 		return
 	}
 }
+
+func LocalTimeToUTC(timestamp string) string {
+	// Define the timestamp string and layout format
+	layout := "2006-01-02T15:04:05"
+
+	// Parse the timestamp string in local time zone
+	loc, err := time.LoadLocation("Local")
+	if err != nil {
+		panic(err)
+	}
+	t, err := time.ParseInLocation(layout, timestamp, loc)
+	if err != nil {
+		panic(err)
+	}
+	//fmt.Println("Local time:", t)
+
+	// Convert to UTC and format
+	utc := t.UTC()
+	utcString := utc.Format(layout)
+
+	return utcString
+}

@@ -19,8 +19,19 @@ type Configuration struct {
 		} `json:"serial_scripter"`
 	} `json:"apis"`
 	Blacklist struct {
-		Ips []string `json:"ips"`
+		Ips []any `json:"ips"`
 	} `json:"blacklist"`
+	Chainsaw struct {
+		Mapping struct {
+			Path string `json:"path"`
+		} `json:"mapping"`
+		Rules struct {
+			Path struct {
+				Bad    string `json:"bad"`
+				Events string `json:"events"`
+			} `json:"path"`
+		} `json:"rules"`
+	} `json:"chainsaw"`
 	ExePaths struct {
 		Chainsaw string `json:"chainsaw"`
 		Yara     string `json:"yara"`
@@ -117,4 +128,40 @@ func GetWhitelistedUsers() []string {
 		zap.S().Error("error:", err)
 	}
 	return configuration.Whitelist.Users
+}
+
+func GetChainsawPath() string {
+	file, _ := os.Open(CONFIG_LOC)
+	defer file.Close()
+	decoder := json.NewDecoder(file)
+	configuration := Configuration{}
+	err := decoder.Decode(&configuration)
+	if err != nil {
+		zap.S().Error("error:", err)
+	}
+	return configuration.ExePaths.Chainsaw
+}
+
+func GetChainsawMapping() string {
+	file, _ := os.Open(CONFIG_LOC)
+	defer file.Close()
+	decoder := json.NewDecoder(file)
+	configuration := Configuration{}
+	err := decoder.Decode(&configuration)
+	if err != nil {
+		zap.S().Error("error:", err)
+	}
+	return configuration.Chainsaw.Mapping.Path
+}
+
+func GetChainSawRulesBad() string {
+	file, _ := os.Open(CONFIG_LOC)
+	defer file.Close()
+	decoder := json.NewDecoder(file)
+	configuration := Configuration{}
+	err := decoder.Decode(&configuration)
+	if err != nil {
+		zap.S().Error("error:", err)
+	}
+	return configuration.Chainsaw.Rules.Path.Bad
 }

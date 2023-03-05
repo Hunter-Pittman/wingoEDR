@@ -72,7 +72,7 @@ func BackupMode(otherParams map[string]string) {
 }
 
 func Chainsaw() {
-	chainsaw.ScanAll()
+	chainsaw.ScanTimeRange("2023-03-04T00:00:00", "2023-03-05T23:59:59")
 }
 
 func SessionsMode() {
