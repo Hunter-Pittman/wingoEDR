@@ -1,6 +1,8 @@
 package common
 
 import (
+	"fmt"
+	"os"
 	"runtime"
 	"wingoEDR/firewall"
 	"wingoEDR/processes"
@@ -10,10 +12,10 @@ import (
 )
 
 type InventoryObject struct {
-	Name      string                          `json:"name"`
+	Name      string                          `json:"hostname"`
 	IP        string                          `json:"ip"`
 	Os        string                          `json:"OS"`
-	Services  []servicemanager.WindowsService `json:"windowsservices"`
+	Services  []servicemanager.WindowsService `json:"services"`
 	Tasks     []interface{}                   `json:"tasks"`
 	Firewall  []firewall.FirewallList         `json:"firewall"`
 	Shares    []shares.ShareAttributes        `json:"shares"`
@@ -31,8 +33,14 @@ func GetInventory() InventoryObject {
 
 	processes, _ := processes.GetAllProcesses()
 
+	hostname, err := os.Hostname()
+	if err != nil {
+		fmt.Println(err)
+
+	}
+
 	inv := InventoryObject{
-		Name:      GetSerialScripterHostName(),
+		Name:      hostname,
 		IP:        GetIP(),
 		Os:        runtime.GOOS,
 		Services:  servicemanager.Servicelister(),

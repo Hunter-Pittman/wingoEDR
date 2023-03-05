@@ -3,12 +3,13 @@ module wingoEDR
 go 1.19
 
 require (
+	github.com/KnicKnic/go-powershell v0.0.10
 	github.com/StackExchange/wmi v1.2.1
 	github.com/charmbracelet/bubbletea v0.22.1
 	github.com/charmbracelet/lipgloss v0.6.0
 	github.com/djherbis/times v1.5.0
 	github.com/fatih/color v1.14.1
-	github.com/iamacarpet/go-win64api v0.0.0-20220720120512-241a9064deec
+	github.com/iamacarpet/go-win64api v0.0.0-20221230174906-cb41e6e774e8
 	github.com/klauspost/compress v1.15.15
 	github.com/mackerelio/go-osstat v0.2.3
 	github.com/olekukonko/tablewriter v0.0.5
