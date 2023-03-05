@@ -43,23 +43,25 @@ func main() {
 
 	color.Yellow("[WARN]	Standalone mode is %t", *isStandalone)
 
-	thing := "chainsaw"
+	thing := "chainsaw" // Test value
 	mode = &thing
 
 	modes.ModeHandler(*mode, map[string]string{"backupDir": *backupDir, "backupItem": *backupItem, "decompressItem": *decompressItem})
 
 	// Pre execution checks
 	// Check serial scripter connection
-	// SSH Server Configureation successful setup
+	// SSH Server configuration successful setup
 	// Powershell Check
-
-	// Full execution
 
 	var wg sync.WaitGroup
 	wg.Add(3)
 
+	// Serial Scripter routines
 	go heartbeatLoop(*isStandalone)
 	go inventoryLoop(*isStandalone)
+
+	// Internal routines
+
 	//go objectMonitoring(*isStandalone)
 
 	wg.Wait()
