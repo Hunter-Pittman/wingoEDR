@@ -40,6 +40,8 @@ func main() {
 	common.VerifyWindowsPathFatal(*configPtr)
 	color.Green("[INFO]	Config file loaded %s", *configPtr)
 
+	config.InitializeConfigLoc(*configPtr)
+
 	color.Yellow("[WARN]	Standalone mode is %t", *isStandalone)
 
 	thing := "chainsaw"
