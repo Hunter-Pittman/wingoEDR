@@ -75,7 +75,7 @@ func GetHashStatus(hash string, hashType string) string {
 	case "401 Unauthorized" == response.Status:
 		zap.S().Error("Your API key is not working!")
 	case "403 Forbidden" == response.Status:
-		zap.S().Error("You may have been blocked or your quote with kapersky reached: ", response.Status)
+		zap.S().Error("You may have been blocked or your quota with kapersky reached: ", response.Status)
 	case "404 Not Found" == response.Status:
 		zap.S().Error("Resource not found, check your endpoint address: ", response.Status)
 	}

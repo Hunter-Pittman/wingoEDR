@@ -20,9 +20,8 @@ import (
 func main() {
 	logger.InitLogger()
 	// Command line args
-	//defaultConfigPath := "C:\\Users\\FORENSICS\\AppData\\Roaming\\wingoEDR\\config.json"
-	//defaultConfigPath := "C:\\Users\\hunte\\Documents\\repos\\wingoEDR\\config.json"
-	defaultConfigPath := "C:\\Users\\Hunter Pittman\\Documents\\repos\\wingoEDR\\config.json"
+
+	defaultConfigPath := config.GenerateConfig()
 
 	configPtr := flag.String("config", defaultConfigPath, "Provide path to the config file")
 	isStandalone := flag.Bool("standalone", false, "If serial scripter is not available then it outputs datga in local csv")

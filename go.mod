@@ -3,7 +3,7 @@ module wingoEDR
 go 1.19
 
 require (
-	github.com/KnicKnic/go-powershell v0.0.10
+	github.com/Jeffail/gabs v1.4.0
 	github.com/StackExchange/wmi v1.2.1
 	github.com/charmbracelet/bubbletea v0.22.1
 	github.com/charmbracelet/lipgloss v0.6.0

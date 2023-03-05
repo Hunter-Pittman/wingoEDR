@@ -14,20 +14,25 @@ type Configuration struct {
 		} `json:"kaspersky"`
 		SerialScripter struct {
 			APIKey    string `json:"api_key"`
-			UserAgent string `json:"user_agent"`
 			URL       string `json:"url"`
+			UserAgent string `json:"user_agent"`
 		} `json:"serial_scripter"`
 	} `json:"apis"`
+	Blacklist struct {
+		Ips []string `json:"ips"`
+	} `json:"blacklist"`
 	ExePaths struct {
-		Yara string `json:"yara"`
-		Pd   string `json:"pd"`
+		Chainsaw string `json:"chainsaw"`
+		Yara     string `json:"yara"`
 	} `json:"exe_paths"`
 	Honeypaths struct {
 		Paths []string `json:"paths"`
 	} `json:"honeypaths"`
-	Sessions struct {
-		whitelist []string `json:"whitelist"`
-	} `json:"sessions"`
+	Whitelist struct {
+		Ips      []string `json:"ips"`
+		Sessions []string `json:"sessions"`
+		Users    []string `json:"users"`
+	} `json:"whitelist"`
 }
 
 //const CONFIG_LOC string = "C:\\Users\\hunte\\Documents\\repos\\wingoEDR\\config.json"
@@ -111,5 +116,5 @@ func GetWhitelistedUsers() []string {
 	if err != nil {
 		zap.S().Error("error:", err)
 	}
-	return configuration.Sessions.whitelist
+	return configuration.Whitelist.Users
 }

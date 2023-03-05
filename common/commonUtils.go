@@ -170,7 +170,7 @@ func CsvToJsonSysInternals(csvFile string) (string, error) {
 func ErrorHandler(err error) {
 	if err != nil {
 		zap.S().Error("Error: ", err.Error())
-		color.Red("[WARN]	An error has been encounterd: ", err.Error())
+		color.Red("[ERROR]	An error has been encounterd: ", err.Error())
 	} else {
 		return
 	}
