@@ -15,6 +15,7 @@ import (
 
 	"github.com/fatih/color"
 	"github.com/olekukonko/tablewriter"
+	"go.uber.org/zap"
 )
 
 func ModeHandler(mode string, otherParams map[string]string) {
@@ -25,7 +26,7 @@ func ModeHandler(mode string, otherParams map[string]string) {
 		BackupMode(otherParams)
 	case "chainsaw":
 		color.Green("[INFO]	Mode is %s", mode)
-		Chainsaw()
+		Chainsaw(otherParams)
 	case "sessions":
 		color.Green("[INFO]	Mode is %s", mode)
 		SessionsMode()
@@ -71,8 +72,21 @@ func BackupMode(otherParams map[string]string) {
 	os.Exit(0)
 }
 
-func Chainsaw() {
-	chainsaw.ScanTimeRange("2023-03-04T00:00:00", "2023-03-05T23:59:59")
+func Chainsaw(otherParams map[string]string) {
+	// Required params check
+	if otherParams["from"] != "" {
+		if otherParams["to"] != "" {
+			chainsaw.ScanTimeRange(otherParams["from"], otherParams["to"])
+		} else {
+			color.Red("[ERROR]	Missing required param: to")
+			zap.S().Fatal("Missing required param: to")
+		}
+
+	} else {
+		chainsaw.ScanAll()
+	}
+
+	os.Exit(0)
 }
 
 func SessionsMode() {

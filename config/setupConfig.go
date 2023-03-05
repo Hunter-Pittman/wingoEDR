@@ -70,9 +70,9 @@ func generateJSON() {
 	jsonOBJ.Set(externalresourcesPath+"chainsaw\\chainsaw_x86_64-pc-windows-msvc.exe", "exe_paths", "chainsaw")
 
 	// Chainsaw
-	jsonOBJ.Set("chainsaw\\rules\\Bad\\", "chainsaw", "rules", "path", "bad")
-	jsonOBJ.Set("chainsaw\\rules\\Events\\", "chainsaw", "rules", "path", "events")
-	jsonOBJ.Set("chainsaw\\mappings\\sigma-event-logs-all.yml", "chainsaw", "mapping", "path")
+	jsonOBJ.Set(externalresourcesPath+"chainsaw\\rules\\Bad\\", "chainsaw", "rules", "path", "bad")
+	jsonOBJ.Set(externalresourcesPath+"chainsaw\\rules\\Events\\", "chainsaw", "rules", "path", "events")
+	jsonOBJ.Set(externalresourcesPath+"chainsaw\\mappings\\sigma-event-logs-all.yml", "chainsaw", "mapping", "path")
 
 	// Honeypaths
 	jsonOBJ.Array("honeypaths", "paths")

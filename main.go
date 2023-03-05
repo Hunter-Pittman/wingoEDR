@@ -34,6 +34,10 @@ func main() {
 	// Decompress flags
 	decompressItem := flag.String("decompressitem", "", "Enter the path to the file or directory you wish to decompress")
 
+	// Chainsaw flags
+	from := flag.String("from", "", "Enter the start timestamp in the format of YYYY-MM-DDTHH:MM:SS")
+	to := flag.String("to", "", "Enter the end timestamp in the format of YYYY-MM-DDTHH:MM:SS")
+
 	flag.Parse()
 
 	common.VerifyWindowsPathFatal(*configPtr)
@@ -43,10 +47,10 @@ func main() {
 
 	color.Yellow("[WARN]	Standalone mode is %t", *isStandalone)
 
-	thing := "chainsaw" // Test value
-	mode = &thing
+	thing := "chainsaw" // TEST VALUE
+	mode = &thing       // TEST VALUE
 
-	modes.ModeHandler(*mode, map[string]string{"backupDir": *backupDir, "backupItem": *backupItem, "decompressItem": *decompressItem})
+	modes.ModeHandler(*mode, map[string]string{"backupDir": *backupDir, "backupItem": *backupItem, "decompressItem": *decompressItem, "from": *from, "to": *to})
 
 	// Pre execution checks
 	// Check serial scripter connection

@@ -12,13 +12,10 @@ import (
 	"go.uber.org/zap"
 )
 
-var (
-	CHAINSAW_PATH         = config.GetChainsawPath()
-	CHAINSAW_MAPPING_PATH = config.GetChainsawMapping()
-	CHAINSAW_RULES_PATH   = config.GetChainSawRulesBad()
-)
-
 func ScanAll() *gabs.Container {
+	var CHAINSAW_PATH string = config.GetChainsawPath()
+	var CHAINSAW_MAPPING_PATH string = config.GetChainsawMapping()
+	var CHAINSAW_RULES_PATH string = config.GetChainSawRulesBad()
 	//cmdOutput, err := exec.Command("c:\\Users\\Hunter Pittman\\Documents\\repos\\wingoEDR\\externalresources\\chainsaw\\chainsaw.exe", "--no-banner", "hunt", "C:\\Windows\\System32\\winevt\\Logs", "-s", "C:\\Users\\Hunter Pittman\\Documents\\repos\\wingoEDR\\externalresources\\chainsaw\\rules\\bad", "--mapping", "C:\\Users\\Hunter Pittman\\Documents\\repos\\wingoEDR\\externalresources\\chainsaw\\mappings\\sigma-event-logs-all.yml", "--json").Output()
 	cmdOutput, err := exec.Command(CHAINSAW_PATH, "--no-banner", "hunt", "C:\\Windows\\System32\\winevt\\Logs\\", "-s", CHAINSAW_RULES_PATH, "--mapping", CHAINSAW_MAPPING_PATH, "--json").Output()
 	if err != nil {
@@ -26,12 +23,10 @@ func ScanAll() *gabs.Container {
 			zap.S().Error("Error opening evtx log files: ", err.Error())
 			color.Red("[ERROR]	Failed opening evtx log files: ", err.Error())
 			return nil
+		} else {
+			common.ErrorHandler(err)
 		}
-	} else {
-		common.ErrorHandler(err)
 	}
-
-	common.ErrorHandler(err)
 
 	parsedJSON, err := gabs.ParseJSON(cmdOutput)
 
@@ -41,21 +36,24 @@ func ScanAll() *gabs.Container {
 }
 
 func ScanTimeRange(fromTimestamp string, toTimestamp string) *gabs.Container {
+	var CHAINSAW_PATH string = config.GetChainsawPath()
+	var CHAINSAW_MAPPING_PATH string = config.GetChainsawMapping()
+	var CHAINSAW_RULES_PATH string = config.GetChainSawRulesBad()
 	// Example: --from "2023-03-04T00:00:00" --to "2023-03-05T23:59:59"
 
-	timestampPattern := "[0-9]{4}-[0-9]{2}-[0-9]{2}T(0?[0-9]|1[0-9]|2[0-3]):[0-9]+:(0?[0-9]|[1-5][0-9])"
+	timestampPattern := `(0?[1-9]|[1][0-2])-[0-9]+-[0-9]+T[0-9]{2}:[0-9]{2}:[0-9]{2}(\.[0-9]{1,3})?`
 
 	match, _ := regexp.MatchString(timestampPattern, fromTimestamp)
 
 	if match == false {
-		color.Red("[ERROR]	Invalid timestamp format")
+		color.Red("[ERROR]	Invalid timestamp format for: --from")
 		return nil
 	}
 
 	match, _ = regexp.MatchString(timestampPattern, toTimestamp)
 
 	if match == false {
-		color.Red("[ERROR]	Invalid timestamp format")
+		color.Red("[ERROR]	Invalid timestamp format for: --to")
 		return nil
 	}
 
@@ -68,14 +66,14 @@ func ScanTimeRange(fromTimestamp string, toTimestamp string) *gabs.Container {
 			zap.S().Error("Error opening evtx log files: ", err.Error())
 			color.Red("[ERROR]	Failed opening evtx log files: ", err.Error())
 			return nil
+		} else {
+			common.ErrorHandler(err)
 		}
-	} else {
-		common.ErrorHandler(err)
 	}
 
 	parsedJSON, err := gabs.ParseJSON(cmdOutput)
 
-	//println(string(cmdOutput))
+	println(string(cmdOutput))
 
 	return parsedJSON
 }
