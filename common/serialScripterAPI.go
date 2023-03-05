@@ -14,10 +14,6 @@ import (
 
 //https://ec2-18-246-47-205.us-west-2.compute.amazonaws.com:10000
 
-var (
-	api_root = config.GetSerialScripterURL()
-)
-
 type Beat struct {
 	IP string
 }
@@ -51,7 +47,7 @@ func HeartBeat() {
 
 	bodyReader := bytes.NewReader(jsonStr)
 
-	requestURL := fmt.Sprintf("%v/api/v1/common/heartbeat", api_root)
+	requestURL := fmt.Sprintf("%v/api/v1/common/heartbeat", config.GetSerialScripterURL())
 	req, err := http.NewRequest(http.MethodPost, requestURL, bodyReader)
 	if err != nil {
 		zap.S().Warn(err)
@@ -70,7 +66,7 @@ func HeartBeat() {
 
 }
 
-func PostInventory() {
+func PostInventory() (err error) {
 	ssUserAgent := config.GetSerialScripterUserAgent()
 
 	// Payload
@@ -90,7 +86,7 @@ func PostInventory() {
 
 	bodyReader := bytes.NewReader(jsonStr)
 
-	requestURL := fmt.Sprintf("%v/api/v1/common/inventory", api_root)
+	requestURL := fmt.Sprintf("%v/api/v1/common/inventory", config.GetSerialScripterURL())
 	req, err := http.NewRequest(http.MethodPost, requestURL, bodyReader)
 	if err != nil {
 		zap.S().Warn(err)
@@ -100,12 +96,14 @@ func PostInventory() {
 	resp, err := client.Do(req)
 	if err != nil {
 		zap.S().Error(err)
+		return err
 	} else {
-		//data, _ := ioutil.ReadAll(resp.Body)
-		//println(string(data))
+		// data, _ := ioutil.ReadAll(resp.Body)
+		// println(string(data))
 	}
 
 	defer resp.Body.Close()
+	return nil
 }
 
 func IncidentAlert(alert Alert) {
@@ -123,7 +121,7 @@ func IncidentAlert(alert Alert) {
 
 	bodyReader := bytes.NewReader(jsonStr)
 
-	requestURL := fmt.Sprintf("%v/api/v1/common/incidentalert", api_root)
+	requestURL := fmt.Sprintf("%v/api/v1/common/incidentalert", config.GetSerialScripterURL())
 	req, err := http.NewRequest(http.MethodPost, requestURL, bodyReader)
 	if err != nil {
 		zap.S().Warn(err)
@@ -156,7 +154,7 @@ func PostUsers(users usermanagement.LocalUser) {
 
 	bodyReader := bytes.NewReader(jsonStr)
 
-	requestURL := fmt.Sprintf("%v/api/v1/common/users", api_root)
+	requestURL := fmt.Sprintf("%v/api/v1/common/users", config.GetSerialScripterURL())
 	req, err := http.NewRequest(http.MethodPost, requestURL, bodyReader)
 	if err != nil {
 		zap.S().Warn(err)
