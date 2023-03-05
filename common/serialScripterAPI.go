@@ -30,7 +30,7 @@ type Alert struct {
 	Incident Incident
 }
 
-func HeartBeat() {
+func HeartBeat() (err error) {
 	ssUserAgent := config.GetSerialScripterUserAgent()
 	//ssUserAgent := "nestler-code"
 
@@ -57,12 +57,14 @@ func HeartBeat() {
 	resp, err := client.Do(req)
 	if err != nil {
 		zap.S().Error(err)
+		return err
 	} else {
-		//data, _ := ioutil.ReadAll(resp.Body)
-		//println(string(data))
+		// data, _ := ioutil.ReadAll(resp.Body)
+		// println(string(data))
 	}
 
 	defer resp.Body.Close()
+	return nil
 
 }
 
@@ -106,7 +108,7 @@ func PostInventory() (err error) {
 	return nil
 }
 
-func IncidentAlert(alert Alert) {
+func IncidentAlert(alert Alert) (err error) {
 	ssUserAgent := config.GetSerialScripterUserAgent()
 
 	jsonStr, err := json.Marshal(alert)
@@ -131,15 +133,17 @@ func IncidentAlert(alert Alert) {
 	resp, err := client.Do(req)
 	if err != nil {
 		zap.S().Error(err)
+		return err
 	} else {
-		//data, _ := ioutil.ReadAll(resp.Body)
-		//println(string(data))
+		// data, _ := ioutil.ReadAll(resp.Body)
+		// println(string(data))
 	}
 
 	defer resp.Body.Close()
+	return nil
 }
 
-func PostUsers(users usermanagement.LocalUser) {
+func PostUsers(users usermanagement.LocalUser) (err error) {
 	ssUserAgent := config.GetSerialScripterUserAgent()
 
 	jsonStr, err := json.Marshal(users)
@@ -164,10 +168,12 @@ func PostUsers(users usermanagement.LocalUser) {
 	resp, err := client.Do(req)
 	if err != nil {
 		zap.S().Error(err)
+		return err
 	} else {
-		//data, _ := ioutil.ReadAll(resp.Body)
-		//println(string(data))
+		// data, _ := ioutil.ReadAll(resp.Body)
+		// println(string(data))
 	}
 
 	defer resp.Body.Close()
+	return nil
 }
