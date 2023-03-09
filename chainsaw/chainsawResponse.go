@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/Jeffail/gabs"
+	"go.uber.org/zap"
 )
 
 func FullEventCheck() {
@@ -11,12 +12,9 @@ func FullEventCheck() {
 
 	events, err := ScanAll()
 	if err != nil {
-		//log.Error("Error scanning all events: ", err.Error())
+		zap.S().Error("Chainsaw events were not scanned: ", err.Error())
 	}
 
-	childern, _ := events.Children()
+	fmt.Printf("%+v", events[0])
 
-	for _, child := range childern {
-		fmt.Println(child.Data().(string))
-	}
 }

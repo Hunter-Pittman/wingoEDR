@@ -14,12 +14,17 @@ import (
 )
 
 type Event struct {
-	EventID  string
-	RuleName string
-	Payload  []byte
+	ID         string
+	RuleName   string
+	Timestamp  string
+	Tags       []string
+	Authors    []string
+	Level      string
+	References []string
+	Payload    map[string]interface{}
 }
 
-func ScanAll() (*gabs.Container, error) {
+func ScanAll() ([]Event, error) {
 	var CHAINSAW_PATH string = config.GetChainsawPath()
 	var CHAINSAW_MAPPING_PATH string = config.GetChainsawMapping()
 	var CHAINSAW_RULES_PATH string = config.GetChainSawRulesBad()
@@ -36,13 +41,22 @@ func ScanAll() (*gabs.Container, error) {
 	}
 
 	parsedJSON, err := gabs.ParseJSON(cmdOutput)
+	if err != nil {
+		zap.S().Error("Error parsing JSON: ", err.Error())
+		return nil, err
+	}
+	newEvent, err := chainsawToStruct(parsedJSON)
+	if err != nil {
+		zap.S().Error("Error converting chainsaw output to struct: ", err.Error())
+		return nil, err
+	}
 
 	//println(string(cmdOutput))
 
-	return parsedJSON, nil
+	return newEvent, nil
 }
 
-func ScanTimeRange(fromTimestamp string, toTimestamp string) (*gabs.Container, error) {
+func ScanTimeRange(fromTimestamp string, toTimestamp string) ([]Event, error) {
 	var CHAINSAW_PATH string = config.GetChainsawPath()
 	var CHAINSAW_MAPPING_PATH string = config.GetChainsawMapping()
 	var CHAINSAW_RULES_PATH string = config.GetChainSawRulesBad()
@@ -64,8 +78,16 @@ func ScanTimeRange(fromTimestamp string, toTimestamp string) (*gabs.Container, e
 		return nil, errors.New("Invalid timestamp format for from")
 	}
 
-	fromTimestamp = common.LocalTimeToUTC(fromTimestamp)
-	toTimestamp = common.LocalTimeToUTC(toTimestamp)
+	fromTimestamp, err := common.LocalTimeToUTC(fromTimestamp)
+	if err != nil {
+		zap.S().Error("Error converting fromTimestamp to UTC: ", err.Error())
+		return nil, err
+	}
+	toTimestamp, err1 := common.LocalTimeToUTC(toTimestamp)
+	if err1 != nil {
+		zap.S().Error("Error converting toTimestamp to UTC: ", err1.Error())
+		return nil, err1
+	}
 
 	cmdOutput, err := exec.Command(CHAINSAW_PATH, "--no-banner", "hunt", "C:\\Windows\\System32\\winevt\\Logs\\", "-s", CHAINSAW_RULES_PATH, "--mapping", CHAINSAW_MAPPING_PATH, "--from", fromTimestamp, "--to", toTimestamp, "--json").Output()
 	if err != nil {
@@ -79,8 +101,64 @@ func ScanTimeRange(fromTimestamp string, toTimestamp string) (*gabs.Container, e
 	}
 
 	parsedJSON, err := gabs.ParseJSON(cmdOutput)
+	if err != nil {
+		zap.S().Error("Error parsing JSON: ", err.Error())
+		return nil, err
+	}
+	newEvent, err := chainsawToStruct(parsedJSON)
+	if err != nil {
+		zap.S().Error("Error converting chainsaw output to struct: ", err.Error())
+		return nil, err
+	}
 
 	//println(string(cmdOutput))
 
-	return parsedJSON, nil
+	return newEvent, nil
+}
+
+func chainsawToStruct(chainsawOutput *gabs.Container) ([]Event, error) {
+	var events []Event
+
+	children, _ := chainsawOutput.Children()
+
+	for _, child := range children {
+		var event Event
+		event.ID = child.Path("id").Data().(string)
+		event.RuleName = child.Path("name").Data().(string)
+		event.Level = child.Path("level").Data().(string)
+
+		// Convert UTC timestamp to local timestamp and add to struct
+		timestamp := child.Path("timestamp").Data().(string)
+		utcToLocalTimestamp, err := common.UTCToLocalTime(timestamp)
+		if err != nil {
+			zap.S().Error("Error converting UTC timestamp to local timestamp: ", err.Error())
+			return nil, err
+		}
+		event.Timestamp = utcToLocalTimestamp
+
+		// Payload may or may not have a value
+		event.Payload = child.Path("document.data").Data().(map[string]interface{})
+
+		// Tags
+		tags, _ := child.Path("tags").Children()
+		for _, tag := range tags {
+			event.Tags = append(event.Tags, tag.Data().(string))
+		}
+
+		// Authors
+		authors, _ := child.Path("authors").Children()
+		for _, author := range authors {
+			event.Authors = append(event.Authors, author.Data().(string))
+		}
+
+		// References
+		references, _ := child.Path("references").Children()
+		for _, reference := range references {
+			event.References = append(event.References, reference.Data().(string))
+		}
+
+		events = append(events, event)
+	}
+
+	return events, nil
 }

@@ -81,7 +81,25 @@ func Chainsaw(otherParams map[string]string) {
 		}
 
 	} else {
-		chainsaw.ScanAll()
+		events, err := chainsaw.ScanAll()
+		if err != nil {
+			zap.S().Fatal("Chainsaw events were not scanned: ", err.Error())
+		}
+
+		table := tablewriter.NewWriter(os.Stdout)
+
+		table.SetHeader([]string{"Timestamp", "RuleName", "Tags", "Authors"})
+
+		for _, e := range events {
+			row := []string{e.Timestamp, e.RuleName, strings.Join(e.Tags, ","), strings.Join(e.Authors, ",")}
+			table.Append(row)
+		}
+
+		table.SetRowLine(true)
+
+		table.SetRowSeparator("-")
+		table.Render()
+
 	}
 
 	os.Exit(0)

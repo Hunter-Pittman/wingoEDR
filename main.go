@@ -72,12 +72,12 @@ func main() {
 	// Powershell Check
 
 	var wg sync.WaitGroup
-	wg.Add(2)
-	//chainsawMonitor()
+	wg.Add(1)
+	chainsawMonitor()
 
 	// // Serial Scripter routines
-	go heartbeatLoop()
-	go inventoryLoop()
+	// go heartbeatLoop()
+	// go inventoryLoop()
 
 	// //Internal routines
 
@@ -117,10 +117,9 @@ func objectMonitoring(standalone bool) {
 }
 
 func chainsawMonitor() {
-	chainsaw.FullEventCheck()
-	// ticker := time.NewTicker(1 * time.Minute)
+	ticker := time.NewTicker(10 * time.Second)
 
-	// for _ = range ticker.C {
-
-	// }
+	for _ = range ticker.C {
+		chainsaw.FullEventCheck()
+	}
 }

@@ -15,7 +15,7 @@ require (
 	github.com/olekukonko/tablewriter v0.0.5
 	github.com/schollz/closestmatch v2.1.0+incompatible
 	github.com/shirou/gopsutil/v3 v3.22.9
-	go.uber.org/zap v1.23.0
+	go.uber.org/zap v1.24.0
 	golang.org/x/sys v0.5.0
 	golang.org/x/text v0.3.7
 )

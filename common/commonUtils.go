@@ -176,18 +176,20 @@ func ErrorHandler(err error) {
 	}
 }
 
-func LocalTimeToUTC(timestamp string) string {
+func LocalTimeToUTC(timestamp string) (string, error) {
 	// Define the timestamp string and layout format
 	layout := "2006-01-02T15:04:05"
 
 	// Parse the timestamp string in local time zone
 	loc, err := time.LoadLocation("Local")
 	if err != nil {
-		panic(err)
+		zap.S().Error("Local time could not be identified: ", err.Error())
+		return "", err
 	}
 	t, err := time.ParseInLocation(layout, timestamp, loc)
 	if err != nil {
-		panic(err)
+		zap.S().Error("Time layout failed: ", err.Error())
+		return "", err
 	}
 	//fmt.Println("Local time:", t)
 
@@ -195,5 +197,30 @@ func LocalTimeToUTC(timestamp string) string {
 	utc := t.UTC()
 	utcString := utc.Format(layout)
 
-	return utcString
+	return utcString, nil
+}
+
+func UTCToLocalTime(utcTimestamp string) (string, error) {
+	// Define the timestamp string and layout format
+	layout := "2006-01-02T15:04:05-07:00"
+
+	// Parse the UTC timestamp
+	t, err := time.Parse(layout, utcTimestamp)
+	if err != nil {
+		zap.S().Error("Time layout failed: ", err.Error())
+		return "", err
+	}
+
+	// Load the local timezone and convert the UTC timestamp
+	loc, err := time.LoadLocation("Local")
+	if err != nil {
+		zap.S().Error("Local time could not be identified: ", err.Error())
+		return "", err
+	}
+	localTime := t.In(loc)
+
+	// Format the local timestamp string
+	localTimeString := localTime.Format(layout)
+
+	return localTimeString, nil
 }
