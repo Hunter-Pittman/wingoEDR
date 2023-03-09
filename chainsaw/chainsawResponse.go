@@ -1,8 +1,6 @@
 package chainsaw
 
 import (
-	"fmt"
-
 	"github.com/Jeffail/gabs"
 	"go.uber.org/zap"
 )
@@ -15,6 +13,16 @@ func FullEventCheck() {
 		zap.S().Error("Chainsaw events were not scanned: ", err.Error())
 	}
 
-	fmt.Printf("%+v", events[0])
+	println(events)
+}
 
+func RangedEventCheck(fromTimestamp string, toTimestamp string) {
+	_ = gabs.New()
+
+	events, err := ScanTimeRange(fromTimestamp, toTimestamp)
+	if err != nil {
+		zap.S().Error("Chainsaw events were not scanned: ", err.Error())
+	}
+
+	println(events)
 }

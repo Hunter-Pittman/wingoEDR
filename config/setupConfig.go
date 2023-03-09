@@ -62,6 +62,8 @@ func generateJSON() {
 	jsonOBJ.Set("random_placeholder", "apis", "serial_scripter", "api_key")
 	jsonOBJ.Set("secret", "apis", "serial_scripter", "user_agent")
 	jsonOBJ.Set("no_url", "apis", "serial_scripter", "url")
+	jsonOBJ.Set("no_key", "apis", "siem", "api_key")
+	jsonOBJ.Set("no_url", "apis", "siem", "url")
 
 	// EXE Paths
 	jsonOBJ.Set(externalresourcesPath+"yara\\yara.exe", "exe_paths", "yara")

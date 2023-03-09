@@ -3,7 +3,6 @@ package common
 import (
 	"fmt"
 	"os"
-	"runtime"
 	"wingoEDR/firewall"
 	"wingoEDR/processes"
 	"wingoEDR/servicemanager"
@@ -43,7 +42,7 @@ func GetInventory() InventoryObject {
 		SerialScripterName: GetSerialScripterHostName(),
 		HostName:           hostname,
 		IP:                 GetIP(),
-		Os:                 runtime.GOOS,
+		Os:                 OSversion(),
 		Services:           servicemanager.Servicelister(),
 		Tasks:              nil,
 		Firewall:           firewall.FirewallLister(),

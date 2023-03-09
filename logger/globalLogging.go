@@ -1,9 +1,14 @@
 package logger
 
 import (
+	"bytes"
+	"encoding/json"
 	"fmt"
+	"io/ioutil"
+	"net/http"
 	"os"
 	"time"
+	"wingoEDR/config"
 
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
@@ -20,16 +25,47 @@ Logging level reference
     FatalLevel: logs a message, then calls os.Exit(1).
 */
 
+// Add a call to the SIEM if one is available
+type RemoteLogger struct {
+	url string
+}
+
+type logMessage struct {
+	Message string `json:"message"`
+	Level   string `json:"level"`
+}
+
+func (rl *RemoteLogger) Write(p []byte) (n int, err error) {
+	// Marshal the log message as JSON
+	message := &logMessage{Message: string(p), Level: "error"}
+	body, err := json.Marshal(message)
+	if err != nil {
+		return 0, err
+	}
+
+	// Send a POST request to the remote server with the log message as the body
+	resp, err := http.Post(rl.url, "application/json", bytes.NewReader(body))
+	if err != nil {
+		return 0, err
+	}
+	defer resp.Body.Close()
+	// Discard the response body
+	_, _ = ioutil.ReadAll(resp.Body)
+	return len(p), nil
+}
+
 func InitLogger() {
 	createLogDirectory()
 	writerSync := getLogWriter()
 	encoder := getEncoder()
 
 	//core := zapcore.NewCore(encoder, writerSync, zapcore.DebugLevel)
+	siemUrl := config.GetSiemUrl()
 
 	core := zapcore.NewTee(
 		zapcore.NewCore(encoder, writerSync, zapcore.DebugLevel),
 		zapcore.NewCore(encoder, zapcore.AddSync(os.Stdout), zapcore.DebugLevel),
+		zapcore.NewCore(encoder, zapcore.AddSync(&RemoteLogger{url: siemUrl}), zapcore.ErrorLevel),
 	)
 	logg := zap.New(core, zap.AddCaller())
 

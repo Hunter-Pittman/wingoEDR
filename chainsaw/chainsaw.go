@@ -28,7 +28,6 @@ func ScanAll() ([]Event, error) {
 	var CHAINSAW_PATH string = config.GetChainsawPath()
 	var CHAINSAW_MAPPING_PATH string = config.GetChainsawMapping()
 	var CHAINSAW_RULES_PATH string = config.GetChainSawRulesBad()
-	//cmdOutput, err := exec.Command("c:\\Users\\Hunter Pittman\\Documents\\repos\\wingoEDR\\externalresources\\chainsaw\\chainsaw.exe", "--no-banner", "hunt", "C:\\Windows\\System32\\winevt\\Logs", "-s", "C:\\Users\\Hunter Pittman\\Documents\\repos\\wingoEDR\\externalresources\\chainsaw\\rules\\bad", "--mapping", "C:\\Users\\Hunter Pittman\\Documents\\repos\\wingoEDR\\externalresources\\chainsaw\\mappings\\sigma-event-logs-all.yml", "--json").Output()
 	cmdOutput, err := exec.Command(CHAINSAW_PATH, "--no-banner", "hunt", "C:\\Windows\\System32\\winevt\\Logs\\", "-s", CHAINSAW_RULES_PATH, "--mapping", CHAINSAW_MAPPING_PATH, "--json").Output()
 	if err != nil {
 		if strings.Contains(err.Error(), "Specified event log path is invalid") {
