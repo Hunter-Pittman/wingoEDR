@@ -23,6 +23,7 @@ type Incident struct {
 	Process  string
 	RemoteIP string
 	Cmd      string
+	Severity string
 }
 
 type Alert struct {
@@ -79,7 +80,7 @@ func PostInventory() (err error) {
 		zap.S().Warn(err)
 	}
 
-	fmt.Println(string(jsonStr))
+	// fmt.Println(string(jsonStr))
 
 	tr := &http.Transport{
 		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},

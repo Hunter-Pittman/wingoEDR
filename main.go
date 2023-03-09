@@ -1,19 +1,16 @@
 package main
 
 import (
-	"encoding/json"
 	"flag"
-	"os"
-	"strconv"
 	"sync"
 	"time"
+	"wingoEDR/chainsaw"
 	"wingoEDR/common"
 	"wingoEDR/config"
 	"wingoEDR/honeymonitor"
 	"wingoEDR/logger"
 	"wingoEDR/modes"
 
-	"github.com/fatih/color"
 	"go.uber.org/zap"
 )
 
@@ -21,10 +18,28 @@ func main() {
 	logger.InitLogger()
 	// Command line args
 
+	headline := `
+
+	$$\      $$\ $$\            $$$$$$\            $$$$$$$$\ $$$$$$$\  $$$$$$$\  
+	$$ | $\  $$ |\__|          $$  __$$\           $$  _____|$$  __$$\ $$  __$$\ 
+	$$ |$$$\ $$ |$$\ $$$$$$$\  $$ /  \__| $$$$$$\  $$ |      $$ |  $$ |$$ |  $$ |
+	$$ $$ $$\$$ |$$ |$$  __$$\ $$ |$$$$\ $$  __$$\ $$$$$\    $$ |  $$ |$$$$$$$  |
+	$$$$  _$$$$ |$$ |$$ |  $$ |$$ |\_$$ |$$ /  $$ |$$  __|   $$ |  $$ |$$  __$$< 
+	$$$  / \$$$ |$$ |$$ |  $$ |$$ |  $$ |$$ |  $$ |$$ |      $$ |  $$ |$$ |  $$ |
+	$$  /   \$$ |$$ |$$ |  $$ |\$$$$$$  |\$$$$$$  |$$$$$$$$\ $$$$$$$  |$$ |  $$ |
+	\__/     \__|\__|\__|  \__| \______/  \______/ \________|\_______/ \__|  \__|
+																				 
+									Version 0.1.0
+									By: Hunter Pittman and the Keyboard Cowboys						 
+																				 
+	
+	`
+
+	println(headline)
+
 	defaultConfigPath := config.GenerateConfig()
 
 	configPtr := flag.String("config", defaultConfigPath, "Provide path to the config file")
-	isStandalone := flag.Bool("standalone", false, "If serial scripter is not available then it outputs datga in local csv")
 	mode := flag.String("mode", "default", "List what mode you would like wingoEDR to execute in. The default is to enable continous monitoring.")
 
 	// Backup flags
@@ -41,14 +56,13 @@ func main() {
 	flag.Parse()
 
 	common.VerifyWindowsPathFatal(*configPtr)
-	color.Green("[INFO]	Config file loaded %s", *configPtr)
+	//color.Green("[INFO]	Config file loaded %s", *configPtr)
+	zap.S().Infof("Config file loaded %s", *configPtr)
 
 	config.InitializeConfigLoc(*configPtr)
 
-	color.Yellow("[WARN]	Standalone mode is %t", *isStandalone)
-
-	thing := "chainsaw" // TEST VALUE
-	mode = &thing       // TEST VALUE
+	// thing := "chainsaw" // TEST VALUE
+	// mode = &thing       // TEST VALUE
 
 	modes.ModeHandler(*mode, map[string]string{"backupDir": *backupDir, "backupItem": *backupItem, "decompressItem": *decompressItem, "from": *from, "to": *to})
 
@@ -58,15 +72,16 @@ func main() {
 	// Powershell Check
 
 	var wg sync.WaitGroup
-	wg.Add(3)
+	wg.Add(2)
+	//chainsawMonitor()
 
-	// Serial Scripter routines
-	go heartbeatLoop(*isStandalone)
-	go inventoryLoop(*isStandalone)
+	// // Serial Scripter routines
+	go heartbeatLoop()
+	go inventoryLoop()
 
-	// Internal routines
+	// //Internal routines
 
-	//go objectMonitoring(*isStandalone)
+	// go objectMonitoring(*isStandalone)
 
 	wg.Wait()
 
@@ -74,69 +89,38 @@ func main() {
 
 }
 
-func inventoryLoop(standalone bool) {
+func inventoryLoop() {
 
-	if !standalone {
-		ticker := time.NewTicker(20 * time.Second)
+	ticker := time.NewTicker(20 * time.Second)
 
-		for _ = range ticker.C {
-			common.PostInventory()
-		}
-	} else {
-		outputName := strconv.FormatInt(time.Now().Unix(), 10) + "_inventory.json"
-
-		inventoryItems := common.GetInventory()
-
-		jsonStr, err := json.Marshal(inventoryItems)
-		if err != nil {
-			zap.S().Error(err)
-			color.Red("JSON marshall error: %v", err)
-			os.Exit(0)
-		}
-
-		file, err := os.Create(outputName)
-		if err != nil {
-			zap.S().Error(err)
-			color.Red("File creation error: %v", err)
-			os.Exit(0)
-		}
-
-		_, err = file.WriteString(string(jsonStr))
-		if err != nil {
-			zap.S().Error(err)
-			color.Red("File write Error: %v", err)
-			os.Exit(0)
-		}
-
-		color.Green("INFO Inventory executed successfully! Output file: %s", outputName)
+	for _ = range ticker.C {
+		common.PostInventory()
 	}
 
 }
 
-func heartbeatLoop(standalone bool) {
+func heartbeatLoop() {
+	ticker := time.NewTicker(1 * time.Minute)
 
-	if !standalone {
-		ticker := time.NewTicker(1 * time.Minute)
-
-		for _ = range ticker.C {
-			common.HeartBeat()
-		}
-	} else {
-		color.Yellow("INFO	Object Monitoring is not supported in stanalone mode ")
+	for _ = range ticker.C {
+		common.HeartBeat()
 	}
-
 }
 
 func objectMonitoring(standalone bool) {
+	ticker := time.NewTicker(10 * time.Second)
 
-	if !standalone {
-		ticker := time.NewTicker(10 * time.Second)
-
-		for _ = range ticker.C {
-			honeymonitor.CreateDirMonitor(config.GetHoneyPaths())
-		}
-	} else {
-		color.Yellow("INFO	Object Monitoring is not supported in stanalone mode ")
+	for _ = range ticker.C {
+		honeymonitor.CreateDirMonitor(config.GetHoneyPaths())
 	}
 
+}
+
+func chainsawMonitor() {
+	chainsaw.FullEventCheck()
+	// ticker := time.NewTicker(1 * time.Minute)
+
+	// for _ = range ticker.C {
+
+	// }
 }

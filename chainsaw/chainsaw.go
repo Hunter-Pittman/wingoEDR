@@ -1,6 +1,7 @@
 package chainsaw
 
 import (
+	"errors"
 	"os/exec"
 	"regexp"
 	"strings"
@@ -12,7 +13,13 @@ import (
 	"go.uber.org/zap"
 )
 
-func ScanAll() *gabs.Container {
+type Event struct {
+	EventID  string
+	RuleName string
+	Payload  []byte
+}
+
+func ScanAll() (*gabs.Container, error) {
 	var CHAINSAW_PATH string = config.GetChainsawPath()
 	var CHAINSAW_MAPPING_PATH string = config.GetChainsawMapping()
 	var CHAINSAW_RULES_PATH string = config.GetChainSawRulesBad()
@@ -22,7 +29,7 @@ func ScanAll() *gabs.Container {
 		if strings.Contains(err.Error(), "Specified event log path is invalid") {
 			zap.S().Error("Error opening evtx log files: ", err.Error())
 			color.Red("[ERROR]	Failed opening evtx log files: ", err.Error())
-			return nil
+			return nil, err
 		} else {
 			common.ErrorHandler(err)
 		}
@@ -32,10 +39,10 @@ func ScanAll() *gabs.Container {
 
 	//println(string(cmdOutput))
 
-	return parsedJSON
+	return parsedJSON, nil
 }
 
-func ScanTimeRange(fromTimestamp string, toTimestamp string) *gabs.Container {
+func ScanTimeRange(fromTimestamp string, toTimestamp string) (*gabs.Container, error) {
 	var CHAINSAW_PATH string = config.GetChainsawPath()
 	var CHAINSAW_MAPPING_PATH string = config.GetChainsawMapping()
 	var CHAINSAW_RULES_PATH string = config.GetChainSawRulesBad()
@@ -45,16 +52,16 @@ func ScanTimeRange(fromTimestamp string, toTimestamp string) *gabs.Container {
 
 	match, _ := regexp.MatchString(timestampPattern, fromTimestamp)
 
-	if match == false {
+	if !match {
 		color.Red("[ERROR]	Invalid timestamp format for: --from")
-		return nil
+		return nil, errors.New("Invalid timestamp format for from")
 	}
 
 	match, _ = regexp.MatchString(timestampPattern, toTimestamp)
 
-	if match == false {
+	if !match {
 		color.Red("[ERROR]	Invalid timestamp format for: --to")
-		return nil
+		return nil, errors.New("Invalid timestamp format for from")
 	}
 
 	fromTimestamp = common.LocalTimeToUTC(fromTimestamp)
@@ -65,7 +72,7 @@ func ScanTimeRange(fromTimestamp string, toTimestamp string) *gabs.Container {
 		if strings.Contains(err.Error(), "Specified event log path is invalid") {
 			zap.S().Error("Error opening evtx log files: ", err.Error())
 			color.Red("[ERROR]	Failed opening evtx log files: ", err.Error())
-			return nil
+			return nil, err
 		} else {
 			common.ErrorHandler(err)
 		}
@@ -73,7 +80,7 @@ func ScanTimeRange(fromTimestamp string, toTimestamp string) *gabs.Container {
 
 	parsedJSON, err := gabs.ParseJSON(cmdOutput)
 
-	println(string(cmdOutput))
+	//println(string(cmdOutput))
 
-	return parsedJSON
+	return parsedJSON, nil
 }

@@ -2,7 +2,6 @@ package modes
 
 import (
 	"fmt"
-	"log"
 	"os"
 	"path/filepath"
 	"strconv"
@@ -13,7 +12,6 @@ import (
 	"wingoEDR/processes"
 	"wingoEDR/usermanagement"
 
-	"github.com/fatih/color"
 	"github.com/olekukonko/tablewriter"
 	"go.uber.org/zap"
 )
@@ -22,25 +20,26 @@ func ModeHandler(mode string, otherParams map[string]string) {
 
 	switch mode {
 	case "backup":
-		color.Green("[INFO]	Mode is %s", mode)
+		zap.S().Infof("Mode is %s", mode)
 		BackupMode(otherParams)
 	case "chainsaw":
-		color.Green("[INFO]	Mode is %s", mode)
+		zap.S().Infof("Mode is %s", mode)
 		Chainsaw(otherParams)
 	case "sessions":
-		color.Green("[INFO]	Mode is %s", mode)
+		zap.S().Infof("Mode is %s", mode)
 		SessionsMode()
 	case "userenum":
-		color.Green("[INFO]	Mode is %s", mode)
+		zap.S().Infof("Mode is %s", mode)
 		UserEnumMode()
 	case "processexplorer":
-		color.Green("[INFO]	Mode is %s", mode)
+		zap.S().Infof("Mode is %s", mode)
 		ProcessExplorerMode()
 	case "decompress":
-		color.Green("[INFO]	Mode is %s", mode)
+		zap.S().Infof("Mode is %s", mode)
 		DecompressMode(otherParams)
 	default:
-		color.Green("[INFO]	No mode selected defaulting to continious monitoring")
+		zap.S().Infof("No mode selected defaulting to continious monitoring")
+		return
 
 	}
 	os.Exit(0)
@@ -52,21 +51,21 @@ func BackupMode(otherParams map[string]string) {
 
 	file, err := os.Open(otherParams["backupItem"])
 	if err != nil {
-		log.Fatal("Backup item file access failure! Err: %v", err)
+		zap.S().Fatal("Backup item file access failure! Err: %v", err)
 	}
 
 	fileInfo, err := file.Stat()
 	if err != nil {
-		log.Fatal("Backup item file access failure! Err: %v", err)
+		zap.S().Fatal("Backup item file access failure! Err: %v", err)
 	}
 
 	if fileInfo.IsDir() { // Direcotry backups not quite working consult Ethan
 		backup.BackDir(otherParams["backupItem"], false)
-		color.Green("[INFO]	Backup of %s is complete!", otherParams["backupItem"])
+		zap.S().Infof("Backup of %s is complete!", otherParams["backupItem"])
 	} else {
 		newFileName := "\\compressed_" + fileInfo.Name()
 		backup.BackFile(newFileName, otherParams["backupItem"])
-		color.Green("[INFO]	Backup of %s is complete!", otherParams["backupItem"])
+		zap.S().Infof("[INFO]	Backup of %s is complete!", otherParams["backupItem"])
 	}
 
 	os.Exit(0)
@@ -78,7 +77,6 @@ func Chainsaw(otherParams map[string]string) {
 		if otherParams["to"] != "" {
 			chainsaw.ScanTimeRange(otherParams["from"], otherParams["to"])
 		} else {
-			color.Red("[ERROR]	Missing required param: to")
 			zap.S().Fatal("Missing required param: to")
 		}
 
@@ -127,14 +125,14 @@ func DecompressMode(otherParams map[string]string) {
 
 	reader, err := os.Open(otherParams["decompressitem"])
 	if err != nil {
-		log.Fatal("Backup item file access failure! Err: %v", err)
+		zap.S().Fatal("Backup item file access failure! Err: %v", err)
 	}
 
 	file := filepath.Base(otherParams["decompressitem"])
 	newFileName := file[11:]
 	writer, err := os.Create(newFileName)
 	if err != nil {
-		log.Fatal("Backup item file access failure! Err: %v", err)
+		zap.S().Fatal("Backup item file access failure! Err: %v", err)
 	}
 	common.Decompress(reader, writer)
 	os.Exit(0)
@@ -143,7 +141,7 @@ func DecompressMode(otherParams map[string]string) {
 func ProcessExplorerMode() {
 	processes, err := processes.GetAllProcesses()
 	if err != nil {
-		color.Red("[ERROR]	WingoEDR has encountered and error: ", err)
+		zap.S().Error("WingoEDR has encountered and error: ", err)
 	}
 
 	for _, processInfo := range processes {

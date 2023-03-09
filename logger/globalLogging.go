@@ -25,7 +25,12 @@ func InitLogger() {
 	writerSync := getLogWriter()
 	encoder := getEncoder()
 
-	core := zapcore.NewCore(encoder, writerSync, zapcore.DebugLevel)
+	//core := zapcore.NewCore(encoder, writerSync, zapcore.DebugLevel)
+
+	core := zapcore.NewTee(
+		zapcore.NewCore(encoder, writerSync, zapcore.DebugLevel),
+		zapcore.NewCore(encoder, zapcore.AddSync(os.Stdout), zapcore.DebugLevel),
+	)
 	logg := zap.New(core, zap.AddCaller())
 
 	zap.ReplaceGlobals(logg)
@@ -59,6 +64,6 @@ func getEncoder() zapcore.Encoder {
 		enc.AppendString(t.UTC().Format("2006-01-02T15:04:05z0700"))
 	})
 
-	encoderConfig.EncodeLevel = zapcore.CapitalLevelEncoder
+	encoderConfig.EncodeLevel = zapcore.CapitalColorLevelEncoder
 	return zapcore.NewConsoleEncoder(encoderConfig)
 }
