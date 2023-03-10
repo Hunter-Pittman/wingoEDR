@@ -10,8 +10,8 @@ import (
 )
 
 type SMBProperties struct {
-	Description string
 	Name        string
+	Description string
 	Path        string
 	Scoped      string
 	ScopeName   string
@@ -43,8 +43,8 @@ func SmbShares() []SMBProperties {
 
 	for _, child := range parent.Children() {
 		chromosome := SMBProperties{
-			Description: child.S("CimInstanceProperties").Children()[7].String(),
 			Name:        child.S("CimInstanceProperties").Children()[15].String(),
+			Description: child.S("CimInstanceProperties").Children()[7].String(),
 			Path:        child.S("CimInstanceProperties").Children()[16].String(),
 			Scoped:      child.S("CimInstanceProperties").Children()[19].String(),
 			ScopeName:   child.S("CimInstanceProperties").Children()[20].String(),
