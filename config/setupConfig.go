@@ -3,6 +3,7 @@ package config
 import (
 	"os"
 	"path/filepath"
+	"wingoEDR/unzip"
 
 	"github.com/Jeffail/gabs"
 	"github.com/fatih/color"
@@ -33,8 +34,16 @@ func GenerateConfig() string {
 		zap.S().Info("External resources folder already exists")
 	}
 	if os.IsNotExist(err1) {
-		color.Red("[ERROR]	External resources folder does not exist, download the external resources and rexecute the program")
-		os.Exit(1)
+		zipFolder := wingoFolder + "\\externalresources.zip"
+		_, err := os.Stat(zipFolder)
+		if err == nil {
+			zap.S().Info("External resources zip file already exists, extracting...")
+			unzip.Unzip(zipFolder)
+		} else {
+			color.Red("[ERROR]	External resources folder does not exist, download the external resources and rexecute the program")
+			os.Exit(1)
+		}
+
 	}
 
 	externalresourcesPath = fullExternalResourcesPath
@@ -51,7 +60,6 @@ func GenerateConfig() string {
 	}
 
 	return configPath
-
 }
 
 func generateJSON() {

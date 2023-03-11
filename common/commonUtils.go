@@ -226,8 +226,6 @@ func UTCToLocalTime(utcTimestamp string) (string, error) {
 	return localTimeString, nil
 }
 
-
-
 func GetDiff(file1, file2 string) (string, error) {
 	// Read the contents of both files into memory
 	content1, err := ioutil.ReadFile(file1)
