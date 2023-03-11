@@ -2,10 +2,10 @@ package main
 
 import (
 	"flag"
+	"sync"
 	"time"
 	"wingoEDR/common"
 	"wingoEDR/config"
-	"wingoEDR/honeymonitor"
 	"wingoEDR/logger"
 	"wingoEDR/modes"
 	"wingoEDR/monitors"
@@ -82,23 +82,28 @@ func main() {
 	// SSH Server configuration successful setup
 	// Powershell Check
 
-	// var wg sync.WaitGroup
-	// wg.Add(1)
-	// // chainsawMonitor()
+	continousMonitoring()
 
-	// // Serial Scripter routines
-	// go heartbeatLoop()
-	// go inventoryLoop()
+}
 
-	// //Internal routines
+func continousMonitoring() {
+	var wg sync.WaitGroup
+	wg.Add(3)
+	// chainsawMonitor()
 
-	// //go objectMonitoring()
+	// Serial Scripter routines
+	go heartbeatLoop()
+	go inventoryLoop()
 
-	// wg.Wait()
+	//Internal routines
+	go userLoop()
 
-	// select {}
+	//go objectMonitoring()
 
-	monitors.MonitorUsers()
+	wg.Wait()
+
+	select {}
+
 }
 
 func inventoryLoop() {
@@ -119,16 +124,24 @@ func heartbeatLoop() {
 	}
 }
 
-func objectMonitoring(standalone bool) {
+// func objectMonitoring(standalone bool) {
+// 	ticker := time.NewTicker(10 * time.Second)
+
+// 	for _ = range ticker.C {
+// 		honeymonitor.CreateDirMonitor(config.GetHoneyPaths())
+// 	}
+
+// }
+
+func userLoop() {
 	ticker := time.NewTicker(10 * time.Second)
 
 	for _ = range ticker.C {
-		honeymonitor.CreateDirMonitor(config.GetHoneyPaths())
+		monitors.MonitorUsers()
 	}
-
 }
 
-func chainsawMonitor() {
+func chainsawLoop() {
 	// ticker := time.NewTicker(10 * time.Second)
 
 	// for _ = range ticker.C {

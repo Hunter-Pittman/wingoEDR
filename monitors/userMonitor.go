@@ -38,15 +38,27 @@ func MonitorUsers() {
 			newUserIncident([]usermanagement.User{user})
 		}
 
-		usersToDB(users)
+		usersToDB(users, false)
+	} else {
+		usersToDB(users, true)
 	}
 
 }
 
-func usersToDB(users []usermanagement.User) {
-	conn := db.DbConnect()
+func usersToDB(users []usermanagement.User, update bool) {
+	var operation string
+	if update {
+		operation = "UPDATE currentusers SET fullname = ?, enabled = ?, locked = ?, admin = ?, passwdexpired = ?, cantchangepasswd = ?, passwdage = ?, lastlogon = ?, badpasswdattempts = ?, numoflogons = ? WHERE username = ?"
+	} else {
+		operation = "INSERT INTO currentusers (username, fullname, enabled, locked, admin, passwdexpired, cantchangepasswd, passwdage, lastlogon, badpasswdattempts, numoflogons) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
+	}
 
-	stmt, _ := conn.Prepare("INSERT INTO currentusers (username, fullname, enabled, locked, admin, passwdexpired, cantchangepasswd, passwdage, lastlogon, badpasswdattempts, numoflogons) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)")
+	conn := db.DbConnect()
+	stmt, err := conn.Prepare(operation)
+	if err != nil {
+		zap.S().Error("Error inserting user into database: ", err)
+	}
+
 	for _, user := range users {
 		_, err := stmt.Exec(user.Username, user.Fullname, user.Enabled, user.Locked, user.Admin, user.PasswdExpired, user.CantChangePasswd, user.PasswdAge, user.LastLogon.String(), user.BadPasswdAttempts, user.NumOfLogons)
 		if err != nil {
@@ -55,7 +67,6 @@ func usersToDB(users []usermanagement.User) {
 	}
 
 	defer stmt.Close()
-
 }
 
 func usersFromDB() []usermanagement.User {
