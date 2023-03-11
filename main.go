@@ -29,13 +29,22 @@ func main() {
 	$$  /   \$$ |$$ |$$ |  $$ |\$$$$$$  |\$$$$$$  |$$$$$$$$\ $$$$$$$  |$$ |  $$ |
 	\__/     \__|\__|\__|  \__| \______/  \______/ \________|\_______/ \__|  \__|
 																				 
-									Version 0.1.0
+									Version 0.1.1
 									By: Hunter Pittman and the Keyboard Cowboys						 
 																				 
 	
 	`
 
 	println(headline)
+
+	// processIsAdmin, err := common.ProcessIsAdmin()
+	// if err != nil {
+	// 	zap.S().Fatal("Failed to determine if process is running as admin! Err: %v", err)
+	// }
+
+	// if !processIsAdmin {
+	// 	zap.S().Fatal("This program must be run as administrator!")
+	// }
 
 	defaultConfigPath := config.GenerateConfig()
 
@@ -52,19 +61,21 @@ func main() {
 	// Chainsaw flags
 	from := flag.String("from", "", "Enter the start timestamp in the format of YYYY-MM-DDTHH:MM:SS")
 	to := flag.String("to", "", "Enter the end timestamp in the format of YYYY-MM-DDTHH:MM:SS")
+	json := flag.Bool("json", false, "Enter true to output in json format")
 
 	flag.Parse()
 
 	common.VerifyWindowsPathFatal(*configPtr)
-	//color.Green("[INFO]	Config file loaded %s", *configPtr)
 	zap.S().Infof("Config file loaded %s", *configPtr)
 
 	config.InitializeConfigLoc(*configPtr)
 
 	// thing := "chainsaw" // TEST VALUE
 	// mode = &thing       // TEST VALUE
+	// thing2 := true      // TEST VALUE
+	// json = &thing2      // TEST VALUE
 
-	modes.ModeHandler(*mode, map[string]string{"backupDir": *backupDir, "backupItem": *backupItem, "decompressItem": *decompressItem, "from": *from, "to": *to})
+	modes.ModeHandler(*mode, map[string]modes.Params{"backupDir": *backupDir, "backupItem": *backupItem, "decompressItem": *decompressItem, "from": *from, "to": *to, "json": *json})
 
 	// Pre execution checks
 	// Check serial scripter connection
@@ -73,15 +84,15 @@ func main() {
 
 	var wg sync.WaitGroup
 	wg.Add(1)
-	chainsawMonitor()
+	// chainsawMonitor()
 
-	// // Serial Scripter routines
-	// go heartbeatLoop()
-	// go inventoryLoop()
+	// Serial Scripter routines
+	go heartbeatLoop()
+	go inventoryLoop()
 
-	// //Internal routines
+	//Internal routines
 
-	// go objectMonitoring(*isStandalone)
+	//go objectMonitoring()
 
 	wg.Wait()
 
@@ -117,9 +128,12 @@ func objectMonitoring(standalone bool) {
 }
 
 func chainsawMonitor() {
-	ticker := time.NewTicker(10 * time.Second)
+	// ticker := time.NewTicker(10 * time.Second)
 
-	for _ = range ticker.C {
-		chainsaw.FullEventCheck()
-	}
+	// for _ = range ticker.C {
+	// 	chainsaw.FullEventCheck()
+	// }
+
+	//chainsaw.RangedEventCheck("2023-03-09T00:00:00", "2023-03-09T023:59:59")
+	chainsaw.FullEventCheck()
 }

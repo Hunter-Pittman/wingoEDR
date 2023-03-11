@@ -13,7 +13,10 @@ func FullEventCheck() {
 		zap.S().Error("Chainsaw events were not scanned: ", err.Error())
 	}
 
-	println(events)
+	for _, e := range events {
+		RunEventResponse(e.ID)
+	}
+
 }
 
 func RangedEventCheck(fromTimestamp string, toTimestamp string) {
@@ -24,5 +27,8 @@ func RangedEventCheck(fromTimestamp string, toTimestamp string) {
 		zap.S().Error("Chainsaw events were not scanned: ", err.Error())
 	}
 
-	println(events)
+	for _, e := range events {
+		RunEventResponse(e.ID)
+	}
+
 }

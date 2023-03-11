@@ -16,7 +16,9 @@ import (
 	"go.uber.org/zap"
 )
 
-func ModeHandler(mode string, otherParams map[string]string) {
+type Params interface{}
+
+func ModeHandler(mode string, otherParams map[string]Params) {
 
 	switch mode {
 	case "backup":
@@ -45,11 +47,11 @@ func ModeHandler(mode string, otherParams map[string]string) {
 	os.Exit(0)
 }
 
-func BackupMode(otherParams map[string]string) {
-	common.VerifyWindowsPathFatal(otherParams["backupDir"])
-	common.VerifyWindowsPathFatal(otherParams["backupItem"])
+func BackupMode(otherParams map[string]Params) {
+	common.VerifyWindowsPathFatal(otherParams["backupDir"].(string))
+	common.VerifyWindowsPathFatal(otherParams["backupItem"].(string))
 
-	file, err := os.Open(otherParams["backupItem"])
+	file, err := os.Open(otherParams["backupItem"].(string))
 	if err != nil {
 		zap.S().Fatal("Backup item file access failure! Err: %v", err)
 	}
@@ -60,32 +62,59 @@ func BackupMode(otherParams map[string]string) {
 	}
 
 	if fileInfo.IsDir() { // Direcotry backups not quite working consult Ethan
-		backup.BackDir(otherParams["backupItem"], false)
+		backup.BackDir(otherParams["backupItem"].(string), false)
 		zap.S().Infof("Backup of %s is complete!", otherParams["backupItem"])
 	} else {
 		newFileName := "\\compressed_" + fileInfo.Name()
-		backup.BackFile(newFileName, otherParams["backupItem"])
+		backup.BackFile(newFileName, otherParams["backupItem"].(string))
 		zap.S().Infof("[INFO]	Backup of %s is complete!", otherParams["backupItem"])
 	}
 
 	os.Exit(0)
 }
 
-func Chainsaw(otherParams map[string]string) {
+func Chainsaw(otherParams map[string]Params) {
+	var events []chainsaw.Event
+	var err error
+
 	// Required params check
 	if otherParams["from"] != "" {
 		if otherParams["to"] != "" {
-			chainsaw.ScanTimeRange(otherParams["from"], otherParams["to"])
+			if !otherParams["json"].(bool) == false {
+				events, err = chainsaw.ScanTimeRange(otherParams["from"].(string), otherParams["to"].(string))
+				if err != nil {
+					zap.S().Fatal("Chainsaw events were not scanned: ", err.Error())
+				}
+			} else {
+				jsonObject, err := chainsaw.ScanTimeRangeJSON(otherParams["from"].(string), otherParams["to"].(string))
+				if err != nil {
+					zap.S().Fatal("Chainsaw events were not scanned: ", err.Error())
+				}
+
+				println(jsonObject.String())
+			}
 		} else {
 			zap.S().Fatal("Missing required param: to")
 		}
 
 	} else {
-		events, err := chainsaw.ScanAll()
-		if err != nil {
-			zap.S().Fatal("Chainsaw events were not scanned: ", err.Error())
+		if !otherParams["json"].(bool) {
+			events, err = chainsaw.ScanAll()
+			if err != nil {
+				zap.S().Fatal("Chainsaw events were not scanned: ", err.Error())
+			}
+		} else {
+			jsonObject, err := chainsaw.ScanAllJSON()
+			if err != nil {
+				zap.S().Fatal("Chainsaw events were not scanned: ", err.Error())
+			}
+
+			println(jsonObject.String())
 		}
 
+	}
+
+	if !otherParams["json"].(bool) {
 		table := tablewriter.NewWriter(os.Stdout)
 
 		table.SetHeader([]string{"Timestamp", "RuleName", "Tags", "Authors"})
@@ -99,7 +128,6 @@ func Chainsaw(otherParams map[string]string) {
 
 		table.SetRowSeparator("-")
 		table.Render()
-
 	}
 
 	os.Exit(0)
@@ -137,16 +165,16 @@ func UserEnumMode() {
 	os.Exit(0)
 }
 
-func DecompressMode(otherParams map[string]string) {
+func DecompressMode(otherParams map[string]Params) {
 	// Required params check
-	common.VerifyWindowsPathFatal(otherParams["decompressitem"])
+	common.VerifyWindowsPathFatal(otherParams["decompressitem"].(string))
 
-	reader, err := os.Open(otherParams["decompressitem"])
+	reader, err := os.Open(otherParams["decompressitem"].(string))
 	if err != nil {
 		zap.S().Fatal("Backup item file access failure! Err: %v", err)
 	}
 
-	file := filepath.Base(otherParams["decompressitem"])
+	file := filepath.Base(otherParams["decompressitem"].(string))
 	newFileName := file[11:]
 	writer, err := os.Create(newFileName)
 	if err != nil {
