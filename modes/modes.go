@@ -157,7 +157,7 @@ func UserEnumMode() {
 	table.SetHeader([]string{"Username", "Fullname", "Enabled", "Locked", "Admin", "Passwdexpired", "CantChangePasswd", "Passwdage", "Lastlogon", "BadPasswdAttemps", "NumofLogons"})
 
 	for _, u := range users {
-		row := []string{u.Username, u.Fullname, strconv.FormatBool(u.Enabled), strconv.FormatBool(u.Locked), strconv.FormatBool(u.Admin), strconv.FormatBool(u.Passwdexpired), strconv.FormatBool(u.CantChangePasswd), u.Passwdage.String(), u.Lastlogon.String(), strconv.FormatUint(uint64(u.BadPasswdAttempts), 10), strconv.FormatUint(uint64(u.NumofLogons), 10)}
+		row := []string{u.Username, u.Fullname, strconv.FormatBool(u.Enabled), strconv.FormatBool(u.Locked), strconv.FormatBool(u.Admin), strconv.FormatBool(u.PasswdExpired), strconv.FormatBool(u.CantChangePasswd), u.PasswdAge.String(), u.LastLogon.String(), strconv.FormatUint(uint64(u.BadPasswdAttempts), 10), strconv.FormatUint(uint64(u.NumOfLogons), 10)}
 		table.Append(row)
 	}
 

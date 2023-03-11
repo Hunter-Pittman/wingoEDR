@@ -2,14 +2,14 @@ package main
 
 import (
 	"flag"
-	"sync"
 	"time"
-	"wingoEDR/chainsaw"
 	"wingoEDR/common"
 	"wingoEDR/config"
 	"wingoEDR/honeymonitor"
 	"wingoEDR/logger"
 	"wingoEDR/modes"
+	"wingoEDR/monitors"
+	"wingoEDR/serialscripter"
 
 	"go.uber.org/zap"
 )
@@ -82,22 +82,23 @@ func main() {
 	// SSH Server configuration successful setup
 	// Powershell Check
 
-	var wg sync.WaitGroup
-	wg.Add(1)
-	// chainsawMonitor()
+	// var wg sync.WaitGroup
+	// wg.Add(1)
+	// // chainsawMonitor()
 
-	// Serial Scripter routines
-	go heartbeatLoop()
-	go inventoryLoop()
+	// // Serial Scripter routines
+	// go heartbeatLoop()
+	// go inventoryLoop()
 
-	//Internal routines
+	// //Internal routines
 
-	//go objectMonitoring()
+	// //go objectMonitoring()
 
-	wg.Wait()
+	// wg.Wait()
 
-	select {}
+	// select {}
 
+	monitors.MonitorUsers()
 }
 
 func inventoryLoop() {
@@ -105,7 +106,7 @@ func inventoryLoop() {
 	ticker := time.NewTicker(20 * time.Second)
 
 	for _ = range ticker.C {
-		common.PostInventory()
+		serialscripter.PostInventory()
 	}
 
 }
@@ -114,7 +115,7 @@ func heartbeatLoop() {
 	ticker := time.NewTicker(1 * time.Minute)
 
 	for _ = range ticker.C {
-		common.HeartBeat()
+		serialscripter.HeartBeat()
 	}
 }
 
@@ -135,5 +136,5 @@ func chainsawMonitor() {
 	// }
 
 	//chainsaw.RangedEventCheck("2023-03-09T00:00:00", "2023-03-09T023:59:59")
-	chainsaw.FullEventCheck()
+	monitors.FullEventCheck()
 }

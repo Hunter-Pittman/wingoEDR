@@ -8,7 +8,6 @@ import (
 	"net/http"
 	"os"
 	"time"
-	"wingoEDR/config"
 
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
@@ -59,13 +58,12 @@ func InitLogger() {
 	writerSync := getLogWriter()
 	encoder := getEncoder()
 
-	//core := zapcore.NewCore(encoder, writerSync, zapcore.DebugLevel)
-	siemUrl := config.GetSiemUrl()
+	//siemUrl := config.GetSiemUrl()
 
 	core := zapcore.NewTee(
 		zapcore.NewCore(encoder, writerSync, zapcore.DebugLevel),
 		zapcore.NewCore(encoder, zapcore.AddSync(os.Stdout), zapcore.DebugLevel),
-		zapcore.NewCore(encoder, zapcore.AddSync(&RemoteLogger{url: siemUrl}), zapcore.ErrorLevel),
+		//zapcore.NewCore(encoder, zapcore.AddSync(&RemoteLogger{url: siemUrl}), zapcore.ErrorLevel),
 	)
 	logg := zap.New(core, zap.AddCaller())
 

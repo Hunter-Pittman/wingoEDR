@@ -1,8 +1,9 @@
-package common
+package inventory
 
 import (
 	"fmt"
 	"os"
+	"wingoEDR/common"
 	"wingoEDR/firewall"
 	"wingoEDR/processes"
 	"wingoEDR/servicemanager"
@@ -19,7 +20,7 @@ type InventoryObject struct {
 	Tasks              []interface{}                   `json:"tasks"`
 	Firewall           []firewall.FirewallList         `json:"firewall"`
 	Shares             []shares.SMBProperties          `json:"shares"`
-	Users              []usermanagement.LocalUser      `json:"users"`
+	Users              []usermanagement.User           `json:"users"`
 	Processes          []processes.ProcessInfo         `json:"processes"`
 }
 
@@ -39,10 +40,10 @@ func GetInventory() InventoryObject {
 	}
 
 	inv := InventoryObject{
-		SerialScripterName: GetSerialScripterHostName(),
+		SerialScripterName: common.GetSerialScripterHostName(),
 		HostName:           hostname,
-		IP:                 GetIP(),
-		Os:                 OSversion(),
+		IP:                 common.GetIP(),
+		Os:                 common.OSversion(),
 		Services:           servicemanager.Servicelister(),
 		Tasks:              nil,
 		Firewall:           firewall.FirewallLister(),
