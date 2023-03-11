@@ -1,66 +1,77 @@
 package shares
 
 import (
-	"os/exec"
-	"strings"
+	"fmt"
+	"log"
 
-	"github.com/StackExchange/wmi"
-	"go.uber.org/zap"
+	"github.com/Jeffail/gabs/v2"
+
+	"github.com/abdfnx/gosh"
 )
 
-type Win32_Share struct {
-	Name string
-	Path string
-}
-
-type ShareAttributes struct {
+type SMBProperties struct {
 	Name        string
+	Description string
 	Path        string
-	Permissions string
+	Scoped      string
+	ScopeName   string
+	ShareState  string
+	ShareType   string
+	Special     string
+	Temporary   string
+	Namespace   string
+	ServerName  string
+	ClassName   string
 }
 
-var (
-	logger, _ = zap.NewProduction()
-)
+func SmbShares() []SMBProperties {
+	somatic := make([]SMBProperties, 0)
 
-// return string with permissions for specified share path
-func getSharePermissions(sharePath string) string {
-	// if sharePath arg is empty, we return empty string
-	if len(sharePath) != 0 {
-
-		toExecute := "Get-Acl -Path '" + sharePath + "' | Select-Object -ExpandProperty Access | Select-Object -Property FileSystemRights, AccessControlType, Identityreference | ConvertTo-CSV"
-		unformattedPerms, err := exec.Command("powershell.exe", toExecute).Output()
-		if err != nil {
-			logger.Info(err.Error())
-			//fmt.Println(err)
-		}
-		//replacing ints with respective permissions
-		formattedPerms1 := strings.Replace(string(unformattedPerms), "\"268435456\"", "\"FullControl\"", -1)
-		formattedPerms2 := strings.Replace(formattedPerms1, "\"-536805376\"", "\"Modify,Synchronize\"", -1)
-		finalFormattedPerms := strings.Replace(formattedPerms2, "\"-1610612736\"", "\"ReadAndExecute\"", -1)
-		return finalFormattedPerms
-
-	} else {
-		return ""
-	}
-}
-
-// return slice/list of share names
-func ListSharesWMI() []ShareAttributes {
-	var dst []Win32_Share
-	shares := []ShareAttributes{}
-	q := wmi.CreateQuery(&dst, "")
-	err := wmi.Query(q, &dst)
+	err, out, errout := gosh.RunOutput("Get-SmbShare | ConvertTo-JSON")
 	if err != nil {
-		logger.Error(err.Error())
-		//log.Fatal(err)
+		log.Printf("error: %v\n", err)
+		fmt.Print(errout)
 	}
-	// can get each name of a share & query for its permissions
-	for _, shareAttrib := range dst {
-		permissions := getSharePermissions(shareAttrib.Path)
-		var share = ShareAttributes{shareAttrib.Name, shareAttrib.Path, permissions}
-		shares = append(shares, share)
+
+	parent, err := gabs.ParseJSON([]byte(out))
+	if err != nil {
+		log.Printf("error: %v\n", err)
+		fmt.Print(errout)
+	}
+
+	// firstgeneration := parent.Children()
+
+	for _, child := range parent.Children() {
+		chromosome := SMBProperties{
+			Name:        child.S("CimInstanceProperties").Children()[15].String(),
+			Description: child.S("CimInstanceProperties").Children()[7].String(),
+			Path:        child.S("CimInstanceProperties").Children()[16].String(),
+			Scoped:      child.S("CimInstanceProperties").Children()[19].String(),
+			ScopeName:   child.S("CimInstanceProperties").Children()[20].String(),
+			ShareState:  child.S("CimInstanceProperties").Children()[23].String(),
+			Special:     child.S("CimInstanceProperties").Children()[26].String(),
+			Temporary:   child.S("CimInstanceProperties").Children()[27].String(),
+			Namespace:   child.Path("CimSystemProperties.Namespace").Data().(string),
+			ServerName:  child.Path("CimSystemProperties.ServerName").Data().(string),
+			ClassName:   child.Path("CimSystemProperties.ClassName").Data().(string)}
+
+		somatic = append(somatic, chromosome)
+		// for _, grandchild := range child.S("CimSystemProperties").Children() {
+		// 	fmt.Println(grandchild.S("Namespace").String())
+
+		// }
 
 	}
-	return shares
+	return (somatic)
+
 }
+
+// fmt.Println(sharess[1])
+
+// var ss SharesSt
+// err2 := json.Unmarshal([]byte(out), ss)
+// if err2 != nil {
+// 	log.Printf("error: %v\n", err2)
+// 	fmt.Print(err2)
+// }
+// fmt.Println(out)
