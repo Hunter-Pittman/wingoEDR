@@ -1,13 +1,10 @@
 package shares
 
 import (
-	"fmt"
-
 	win "github.com/gorpher/gowin32"
-	"go.uber.org/zap"
 )
 
-type SMBINFO struct {
+type SMBInfo struct {
 	Netname     string
 	Remark      string
 	Path        string
@@ -17,20 +14,15 @@ type SMBINFO struct {
 	CurrentUses int
 }
 
-func shares() []SMBINFO {
-	x, err := fmt.Println("")
-	if err != nil {
-		//log.Fatal(err)
-		zap.Error(err)
-	}
-	fmt.Println(x)
-	shareslice := make([]SMBINFO, 0)
+func GetShares() []SMBInfo {
+
+	shareslice := make([]SMBInfo, 0)
 
 	share := win.NetShareEnum()
 
 	for _, v := range share {
 
-		helium := SMBINFO{
+		helium := SMBInfo{
 			Netname:     v.Netname,
 			Remark:      v.Remark,
 			Path:        v.Path,
