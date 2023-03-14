@@ -82,23 +82,23 @@ func main() {
 	// SSH Server configuration successful setup
 	// Powershell Check
 
-	continousMonitoring()
+	// continousMonitoring()
+
+	chainsawLoop()
 
 }
 
 func continousMonitoring() {
 	var wg sync.WaitGroup
 	wg.Add(3)
-	// chainsawMonitor()
 
 	// Serial Scripter routines
 	go heartbeatLoop()
 	go inventoryLoop()
 
-	//Internal routines
+	// Internal routines
 	go userLoop()
-
-	//go objectMonitoring()
+	//go chainsawLoop()
 
 	wg.Wait()
 
@@ -107,7 +107,6 @@ func continousMonitoring() {
 }
 
 func inventoryLoop() {
-
 	ticker := time.NewTicker(20 * time.Second)
 
 	for _ = range ticker.C {
@@ -124,15 +123,6 @@ func heartbeatLoop() {
 	}
 }
 
-// func objectMonitoring(standalone bool) {
-// 	ticker := time.NewTicker(10 * time.Second)
-
-// 	for _ = range ticker.C {
-// 		honeymonitor.CreateDirMonitor(config.GetHoneyPaths())
-// 	}
-
-// }
-
 func userLoop() {
 	ticker := time.NewTicker(10 * time.Second)
 
@@ -142,12 +132,16 @@ func userLoop() {
 }
 
 func chainsawLoop() {
-	// ticker := time.NewTicker(10 * time.Second)
+	monitors.FullEventCheck()
+	// ticker := time.NewTicker(1 * time.Minute)
 
 	// for _ = range ticker.C {
 	// 	chainsaw.FullEventCheck()
 	// }
 
-	//chainsaw.RangedEventCheck("2023-03-09T00:00:00", "2023-03-09T023:59:59")
-	monitors.FullEventCheck()
+	currentTime := time.Now()
+	oneMinuteAgo := currentTime.Add(-1 * time.Minute)
+	newTimestamp := oneMinuteAgo.Format("2006-01-02T15:04:05")
+
+	monitors.RangedEventCheck(newTimestamp, currentTime.Format("2006-01-02T15:04:05"))
 }

@@ -18,5 +18,5 @@ func RunEventResponse(id string) {
 
 // RDP Connection
 func Ident78d5cab4557e454f9fb9a222bd0d5edc() {
-
+	println("Event response for 78d5cab4-557e-454f-9fb9-a222bd0d5edc")
 }
