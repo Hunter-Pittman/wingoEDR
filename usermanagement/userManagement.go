@@ -9,40 +9,40 @@ import (
 	"golang.org/x/sys/windows/registry"
 )
 
-type LocalUser struct {
+type User struct {
 	Username          string
 	Fullname          string
 	Enabled           bool
 	Locked            bool
 	Admin             bool
-	Passwdexpired     bool
+	PasswdExpired     bool
 	CantChangePasswd  bool
-	Passwdage         time.Duration
-	Lastlogon         time.Time
+	PasswdAge         time.Duration
+	LastLogon         time.Time
 	BadPasswdAttempts uint32
-	NumofLogons       uint32
+	NumOfLogons       uint32
 }
 
-func ReturnUsers() []LocalUser {
-	userslice := make([]LocalUser, 0)
+func ReturnUsers() []User {
+	userslice := make([]User, 0)
 	users1, err := wapi.ListLocalUsers()
 	if err != nil {
 		zap.S().Error("Error fetching user list, %s.\r\n", err.Error())
 
 	}
 	for _, u := range users1 {
-		userlist := LocalUser{
+		userlist := User{
 			Username:          u.Username,
 			Fullname:          u.FullName,
 			Enabled:           u.IsEnabled,
 			Locked:            u.IsLocked,
 			Admin:             u.IsAdmin,
-			Passwdexpired:     u.PasswordNeverExpires,
+			PasswdExpired:     u.PasswordNeverExpires,
 			CantChangePasswd:  u.NoChangePassword,
-			Passwdage:         u.PasswordAge,
-			Lastlogon:         u.LastLogon,
+			PasswdAge:         u.PasswordAge,
+			LastLogon:         u.LastLogon,
 			BadPasswdAttempts: u.BadPasswordCount,
-			NumofLogons:       u.NumberOfLogons}
+			NumOfLogons:       u.NumberOfLogons}
 
 		userslice = append(userslice, userlist)
 

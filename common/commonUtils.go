@@ -7,6 +7,7 @@ import (
 	"encoding/hex"
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"net"
 	"os"
 	"regexp"
@@ -176,18 +177,20 @@ func ErrorHandler(err error) {
 	}
 }
 
-func LocalTimeToUTC(timestamp string) string {
+func LocalTimeToUTC(timestamp string) (string, error) {
 	// Define the timestamp string and layout format
 	layout := "2006-01-02T15:04:05"
 
 	// Parse the timestamp string in local time zone
 	loc, err := time.LoadLocation("Local")
 	if err != nil {
-		panic(err)
+		zap.S().Error("Local time could not be identified: ", err.Error())
+		return "", err
 	}
 	t, err := time.ParseInLocation(layout, timestamp, loc)
 	if err != nil {
-		panic(err)
+		zap.S().Error("Time layout failed: ", err.Error())
+		return "", err
 	}
 	//fmt.Println("Local time:", t)
 
@@ -195,5 +198,107 @@ func LocalTimeToUTC(timestamp string) string {
 	utc := t.UTC()
 	utcString := utc.Format(layout)
 
-	return utcString
+	return utcString, nil
+}
+
+func UTCToLocalTime(utcTimestamp string) (string, error) {
+	// Define the timestamp string and layout format
+	layout := "2006-01-02T15:04:05-07:00"
+
+	// Parse the UTC timestamp
+	t, err := time.Parse(layout, utcTimestamp)
+	if err != nil {
+		zap.S().Error("Time layout failed: ", err.Error())
+		return "", err
+	}
+
+	// Load the local timezone and convert the UTC timestamp
+	loc, err := time.LoadLocation("Local")
+	if err != nil {
+		zap.S().Error("Local time could not be identified: ", err.Error())
+		return "", err
+	}
+	localTime := t.In(loc)
+
+	// Format the local timestamp string
+	localTimeString := localTime.Format(layout)
+
+	return localTimeString, nil
+}
+
+func GetDiff(file1, file2 string) (string, error) {
+	// Read the contents of both files into memory
+	content1, err := ioutil.ReadFile(file1)
+	if err != nil {
+		return "", err
+	}
+	content2, err := ioutil.ReadFile(file2)
+	if err != nil {
+		return "", err
+	}
+
+	// Split the file contents into lines
+	lines1 := splitLines(string(content1))
+	lines2 := splitLines(string(content2))
+
+	// Perform the diff
+	var output string
+	var start1, start2, length int
+	for i, j := 0, 0; i < len(lines1) || j < len(lines2); {
+		if i < len(lines1) && j < len(lines2) && lines1[i] == lines2[j] {
+			// Lines are the same
+			i++
+			j++
+		} else {
+			// Lines are different
+			start1 = i
+			start2 = j
+			for i < len(lines1) && j < len(lines2) && lines1[i] != lines2[j] {
+				i++
+				j++
+			}
+			length = i - start1
+			if i < len(lines1) || j < len(lines2) {
+				// There is another hunk after this one
+				length = min(length, min(len(lines1)-start1, len(lines2)-start2))
+			}
+			output += getHunk(lines1, lines2, start1, start2, length)
+		}
+	}
+
+	return output, nil
+}
+
+func splitLines(text string) []string {
+	var lines []string
+	start := 0
+	for i, c := range text {
+		if c == '\n' {
+			lines = append(lines, text[start:i])
+			start = i + 1
+		}
+	}
+	if start < len(text) {
+		lines = append(lines, text[start:])
+	}
+	return lines
+}
+
+func getHunk(lines1, lines2 []string, start1, start2, length int) string {
+	var output string
+	output += fmt.Sprintf("@@ -%d,%d +%d,%d @@\n", start1+1, length, start2+1, length)
+	for i := start1; i < start1+length; i++ {
+		output += fmt.Sprintf("-%s\n", lines1[i])
+	}
+	for i := start2; i < start2+length; i++ {
+		output += fmt.Sprintf("+%s\n", lines2[i])
+	}
+	return output
+}
+
+func min(a, b int) int {
+	if a < b {
+		return a
+	}
+	return b
 }

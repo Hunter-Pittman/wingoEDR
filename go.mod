@@ -4,7 +4,9 @@ go 1.19
 
 require (
 	github.com/Jeffail/gabs v1.4.0
-	github.com/StackExchange/wmi v1.2.1
+	github.com/Jeffail/gabs/v2 v2.7.0
+	github.com/abdfnx/gosh v0.4.0
+	github.com/blockloop/scan/v2 v2.0.0
 	github.com/charmbracelet/bubbletea v0.22.1
 	github.com/charmbracelet/lipgloss v0.6.0
 	github.com/djherbis/times v1.5.0
@@ -12,24 +14,21 @@ require (
 	github.com/iamacarpet/go-win64api v0.0.0-20221230174906-cb41e6e774e8
 	github.com/klauspost/compress v1.15.15
 	github.com/mackerelio/go-osstat v0.2.3
+	github.com/mattn/go-sqlite3 v1.14.16
 	github.com/olekukonko/tablewriter v0.0.5
 	github.com/schollz/closestmatch v2.1.0+incompatible
 	github.com/shirou/gopsutil/v3 v3.22.9
-	go.uber.org/zap v1.23.0
+	go.uber.org/zap v1.24.0
 	golang.org/x/sys v0.5.0
-	golang.org/x/text v0.3.7
+	golang.org/x/text v0.4.0
 )
 
 require (
-	github.com/Jeffail/gabs/v2 v2.7.0 // indirect
-	github.com/abdfnx/gosh v0.4.0 // indirect
 	github.com/containerd/console v1.0.3 // indirect
-	github.com/geoffgarside/ber v1.1.0 // indirect
 	github.com/go-ole/go-ole v1.2.6 // indirect
 	github.com/google/cabbie v1.0.2 // indirect
 	github.com/google/glazier v0.0.0-20211029225403-9f766cca891d // indirect
 	github.com/gorpher/gowin32 v0.0.9 // indirect
-	github.com/hirochachacha/go-smb2 v1.1.0 // indirect
 	github.com/lucasb-eyer/go-colorful v1.2.0 // indirect
 	github.com/lufia/plan9stats v0.0.0-20211012122336-39d0f177ccd0 // indirect
 	github.com/mattn/go-colorable v0.1.13 // indirect
@@ -43,7 +42,6 @@ require (
 	github.com/power-devops/perfstat v0.0.0-20210106213030-5aafc221ea8c // indirect
 	github.com/rivo/uniseg v0.2.0 // indirect
 	github.com/scjalliance/comshim v0.0.0-20190308082608-cf06d2532c4e // indirect
-	github.com/stretchr/testify v1.8.1 // indirect
 	github.com/tklauser/go-sysconf v0.3.10 // indirect
 	github.com/tklauser/numcpus v0.4.0 // indirect
 	github.com/yusufpapurcu/wmi v1.2.2 // indirect

@@ -17,6 +17,10 @@ type Configuration struct {
 			URL       string `json:"url"`
 			UserAgent string `json:"user_agent"`
 		} `json:"serial_scripter"`
+		Siem struct {
+			APIKey string `json:"api_key"`
+			URL    string `json:"url"`
+		} `json:"siem"`
 	} `json:"apis"`
 	Blacklist struct {
 		Ips []any `json:"ips"`
@@ -164,4 +168,28 @@ func GetChainSawRulesBad() string {
 		zap.S().Error("error:", err)
 	}
 	return configuration.Chainsaw.Rules.Path.Bad
+}
+
+func GetSiemApiKey() string {
+	file, _ := os.Open(CONFIG_LOC)
+	defer file.Close()
+	decoder := json.NewDecoder(file)
+	configuration := Configuration{}
+	err := decoder.Decode(&configuration)
+	if err != nil {
+		zap.S().Error("error:", err)
+	}
+	return configuration.Apis.Siem.APIKey
+}
+
+func GetSiemUrl() string {
+	file, _ := os.Open(CONFIG_LOC)
+	defer file.Close()
+	decoder := json.NewDecoder(file)
+	configuration := Configuration{}
+	err := decoder.Decode(&configuration)
+	if err != nil {
+		zap.S().Error("error:", err)
+	}
+	return configuration.Apis.Siem.URL
 }

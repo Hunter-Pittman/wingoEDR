@@ -3,6 +3,7 @@ package config
 import (
 	"os"
 	"path/filepath"
+	"wingoEDR/unzip"
 
 	"github.com/Jeffail/gabs"
 	"github.com/fatih/color"
@@ -18,13 +19,11 @@ func GenerateConfig() string {
 	wingoPath, err := os.Executable()
 	if err != nil {
 		zap.S().Error("Error: ", err.Error())
-		color.Red("[ERROR]	An error has been encounterd: ", err.Error())
 	}
 
 	wingoFolder := filepath.Dir(wingoPath)
 	if err != nil {
 		zap.S().Error("Error: ", err.Error())
-		color.Red("[ERROR]	An error has been encounterd: ", err.Error())
 	}
 
 	fullExternalResourcesPath := wingoFolder + externalresourcesPath
@@ -32,11 +31,19 @@ func GenerateConfig() string {
 
 	_, err1 := os.Stat(fullExternalResourcesPath)
 	if err1 == nil {
-		color.Green("[INFO]	External resources folder already exists")
+		zap.S().Info("External resources folder already exists")
 	}
 	if os.IsNotExist(err1) {
-		color.Red("[ERROR]	External resources folder does not exist, download the external resources and rexecute the program")
-		os.Exit(1)
+		zipFolder := wingoFolder + "\\externalresources.zip"
+		_, err := os.Stat(zipFolder)
+		if err == nil {
+			zap.S().Info("External resources zip file already exists, extracting...")
+			unzip.Unzip(zipFolder)
+		} else {
+			color.Red("[ERROR]	External resources folder does not exist, download the external resources and rexecute the program")
+			os.Exit(1)
+		}
+
 	}
 
 	externalresourcesPath = fullExternalResourcesPath
@@ -44,16 +51,15 @@ func GenerateConfig() string {
 
 	_, err2 := os.Stat(fullConfigPath)
 	if err2 == nil {
-		color.Green("[INFO]	Config.json already exists, continuing execution...")
+		zap.S().Info("Config.json already exists, continuing execution...")
 		return configPath
 	}
 	if os.IsNotExist(err2) {
-		color.Red("[INFO]	config.json does not exist, generating new one...")
+		zap.S().Info("config.json does not exist, generating new one...")
 		generateJSON()
 	}
 
 	return configPath
-
 }
 
 func generateJSON() {
@@ -64,6 +70,8 @@ func generateJSON() {
 	jsonOBJ.Set("random_placeholder", "apis", "serial_scripter", "api_key")
 	jsonOBJ.Set("secret", "apis", "serial_scripter", "user_agent")
 	jsonOBJ.Set("no_url", "apis", "serial_scripter", "url")
+	jsonOBJ.Set("no_key", "apis", "siem", "api_key")
+	jsonOBJ.Set("no_url", "apis", "siem", "url")
 
 	// EXE Paths
 	jsonOBJ.Set(externalresourcesPath+"yara\\yara.exe", "exe_paths", "yara")

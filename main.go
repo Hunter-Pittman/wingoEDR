@@ -1,19 +1,16 @@
 package main
 
 import (
-	"encoding/json"
 	"flag"
-	"os"
-	"strconv"
 	"sync"
 	"time"
 	"wingoEDR/common"
 	"wingoEDR/config"
-	"wingoEDR/honeymonitor"
 	"wingoEDR/logger"
 	"wingoEDR/modes"
+	"wingoEDR/monitors"
+	"wingoEDR/serialscripter"
 
-	"github.com/fatih/color"
 	"go.uber.org/zap"
 )
 
@@ -21,10 +18,37 @@ func main() {
 	logger.InitLogger()
 	// Command line args
 
+	headline := `
+
+	$$\      $$\ $$\            $$$$$$\            $$$$$$$$\ $$$$$$$\  $$$$$$$\  
+	$$ | $\  $$ |\__|          $$  __$$\           $$  _____|$$  __$$\ $$  __$$\ 
+	$$ |$$$\ $$ |$$\ $$$$$$$\  $$ /  \__| $$$$$$\  $$ |      $$ |  $$ |$$ |  $$ |
+	$$ $$ $$\$$ |$$ |$$  __$$\ $$ |$$$$\ $$  __$$\ $$$$$\    $$ |  $$ |$$$$$$$  |
+	$$$$  _$$$$ |$$ |$$ |  $$ |$$ |\_$$ |$$ /  $$ |$$  __|   $$ |  $$ |$$  __$$< 
+	$$$  / \$$$ |$$ |$$ |  $$ |$$ |  $$ |$$ |  $$ |$$ |      $$ |  $$ |$$ |  $$ |
+	$$  /   \$$ |$$ |$$ |  $$ |\$$$$$$  |\$$$$$$  |$$$$$$$$\ $$$$$$$  |$$ |  $$ |
+	\__/     \__|\__|\__|  \__| \______/  \______/ \________|\_______/ \__|  \__|
+																				 
+									Version 0.1.1
+									By: Hunter Pittman and the Keyboard Cowboys						 
+																				 
+	
+	`
+
+	println(headline)
+
+	// processIsAdmin, err := common.ProcessIsAdmin()
+	// if err != nil {
+	// 	zap.S().Fatal("Failed to determine if process is running as admin! Err: %v", err)
+	// }
+
+	// if !processIsAdmin {
+	// 	zap.S().Fatal("This program must be run as administrator!")
+	// }
+
 	defaultConfigPath := config.GenerateConfig()
 
 	configPtr := flag.String("config", defaultConfigPath, "Provide path to the config file")
-	isStandalone := flag.Bool("standalone", false, "If serial scripter is not available then it outputs datga in local csv")
 	mode := flag.String("mode", "default", "List what mode you would like wingoEDR to execute in. The default is to enable continous monitoring.")
 
 	// Backup flags
@@ -37,36 +61,44 @@ func main() {
 	// Chainsaw flags
 	from := flag.String("from", "", "Enter the start timestamp in the format of YYYY-MM-DDTHH:MM:SS")
 	to := flag.String("to", "", "Enter the end timestamp in the format of YYYY-MM-DDTHH:MM:SS")
+	json := flag.Bool("json", false, "Enter true to output in json format")
 
 	flag.Parse()
 
 	common.VerifyWindowsPathFatal(*configPtr)
-	color.Green("[INFO]	Config file loaded %s", *configPtr)
+	zap.S().Infof("Config file loaded %s", *configPtr)
 
 	config.InitializeConfigLoc(*configPtr)
 
-	color.Yellow("[WARN]	Standalone mode is %t", *isStandalone)
+	// thing := "chainsaw" // TEST VALUE
+	// mode = &thing       // TEST VALUE
+	// thing2 := true      // TEST VALUE
+	// json = &thing2      // TEST VALUE
 
-	thing := "chainsaw" // TEST VALUE
-	mode = &thing       // TEST VALUE
-
-	modes.ModeHandler(*mode, map[string]string{"backupDir": *backupDir, "backupItem": *backupItem, "decompressItem": *decompressItem, "from": *from, "to": *to})
+	modes.ModeHandler(*mode, map[string]modes.Params{"backupDir": *backupDir, "backupItem": *backupItem, "decompressItem": *decompressItem, "from": *from, "to": *to, "json": *json})
 
 	// Pre execution checks
 	// Check serial scripter connection
 	// SSH Server configuration successful setup
 	// Powershell Check
 
+	continousMonitoring()
+
+}
+
+func continousMonitoring() {
 	var wg sync.WaitGroup
 	wg.Add(3)
+	// chainsawMonitor()
 
 	// Serial Scripter routines
-	go heartbeatLoop(*isStandalone)
-	go inventoryLoop(*isStandalone)
+	go heartbeatLoop()
+	go inventoryLoop()
 
-	// Internal routines
+	//Internal routines
+	go userLoop()
 
-	//go objectMonitoring(*isStandalone)
+	//go objectMonitoring()
 
 	wg.Wait()
 
@@ -74,69 +106,48 @@ func main() {
 
 }
 
-func inventoryLoop(standalone bool) {
+func inventoryLoop() {
 
-	if !standalone {
-		ticker := time.NewTicker(20 * time.Second)
+	ticker := time.NewTicker(20 * time.Second)
 
-		for _ = range ticker.C {
-			common.PostInventory()
-		}
-	} else {
-		outputName := strconv.FormatInt(time.Now().Unix(), 10) + "_inventory.json"
-
-		inventoryItems := common.GetInventory()
-
-		jsonStr, err := json.Marshal(inventoryItems)
-		if err != nil {
-			zap.S().Error(err)
-			color.Red("JSON marshall error: %v", err)
-			os.Exit(0)
-		}
-
-		file, err := os.Create(outputName)
-		if err != nil {
-			zap.S().Error(err)
-			color.Red("File creation error: %v", err)
-			os.Exit(0)
-		}
-
-		_, err = file.WriteString(string(jsonStr))
-		if err != nil {
-			zap.S().Error(err)
-			color.Red("File write Error: %v", err)
-			os.Exit(0)
-		}
-
-		color.Green("INFO Inventory executed successfully! Output file: %s", outputName)
+	for _ = range ticker.C {
+		serialscripter.PostInventory()
 	}
 
 }
 
-func heartbeatLoop(standalone bool) {
+func heartbeatLoop() {
+	ticker := time.NewTicker(1 * time.Minute)
 
-	if !standalone {
-		ticker := time.NewTicker(1 * time.Minute)
-
-		for _ = range ticker.C {
-			common.HeartBeat()
-		}
-	} else {
-		color.Yellow("INFO	Object Monitoring is not supported in stanalone mode ")
+	for _ = range ticker.C {
+		serialscripter.HeartBeat()
 	}
-
 }
 
-func objectMonitoring(standalone bool) {
+// func objectMonitoring(standalone bool) {
+// 	ticker := time.NewTicker(10 * time.Second)
 
-	if !standalone {
-		ticker := time.NewTicker(10 * time.Second)
+// 	for _ = range ticker.C {
+// 		honeymonitor.CreateDirMonitor(config.GetHoneyPaths())
+// 	}
 
-		for _ = range ticker.C {
-			honeymonitor.CreateDirMonitor(config.GetHoneyPaths())
-		}
-	} else {
-		color.Yellow("INFO	Object Monitoring is not supported in stanalone mode ")
+// }
+
+func userLoop() {
+	ticker := time.NewTicker(10 * time.Second)
+
+	for _ = range ticker.C {
+		monitors.MonitorUsers()
 	}
+}
 
+func chainsawLoop() {
+	// ticker := time.NewTicker(10 * time.Second)
+
+	// for _ = range ticker.C {
+	// 	chainsaw.FullEventCheck()
+	// }
+
+	//chainsaw.RangedEventCheck("2023-03-09T00:00:00", "2023-03-09T023:59:59")
+	monitors.FullEventCheck()
 }

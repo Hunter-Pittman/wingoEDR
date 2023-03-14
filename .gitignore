@@ -22,3 +22,4 @@ logs
 externalbinaries
 
 externalresources
+*.db

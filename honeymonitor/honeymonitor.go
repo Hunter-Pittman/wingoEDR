@@ -4,6 +4,7 @@ import (
 	"strings"
 	"time"
 	"wingoEDR/common"
+	"wingoEDR/serialscripter"
 	"wingoEDR/usermanagement"
 
 	//"wingoEDR/common"
@@ -125,20 +126,17 @@ func CreateDirMonitor(directories []string) {
 			zap.S().Info("Honeypot files untouched.")
 		} else {
 			zap.S().Info("Honeypot files touched! Potential intrusion! ")
-			incident := common.Incident{
-				Name:     "Honey monitor access violation",
-				User:     usermanagement.GetLastLoggenOnUser(),
-				Process:  "",
-				RemoteIP: common.GetIP(),
-				Cmd:      "",
+			incident := serialscripter.Incident{
+				Name: "Honey monitor access violation",
+				User: usermanagement.GetLastLoggenOnUser(),
 			}
 
-			alert := common.Alert{
+			alert := serialscripter.Alert{
 				Host:     common.GetSerialScripterHostName(),
 				Incident: incident,
 			}
 
-			common.IncidentAlert(alert)
+			serialscripter.IncidentAlert(alert)
 		}
 	}
 }
