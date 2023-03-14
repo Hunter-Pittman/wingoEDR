@@ -85,7 +85,6 @@ func usersFromDB() []usermanagement.User {
 	defer rows.Close()
 
 	return queriedUsers
-
 }
 
 func newUserIncident(newUsers []usermanagement.User) {

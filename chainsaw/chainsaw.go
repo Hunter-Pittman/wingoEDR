@@ -108,6 +108,7 @@ func ScanTimeRange(fromTimestamp string, toTimestamp string) ([]Event, error) {
 		zap.S().Error("Error converting fromTimestamp to UTC: ", err.Error())
 		return nil, err
 	}
+
 	toTimestamp, err1 := common.LocalTimeToUTC(toTimestamp)
 	if err1 != nil {
 		zap.S().Error("Error converting toTimestamp to UTC: ", err1.Error())
