@@ -19,7 +19,7 @@ type InventoryObject struct {
 	Services           []servicemanager.WindowsService `json:"services"`
 	Tasks              []interface{}                   `json:"tasks"`
 	Firewall           []firewall.FirewallList         `json:"firewall"`
-	Shares             []shares.SMBProperties          `json:"shares"`
+	Shares             []shares.SMBInfo                `json:"shares"`
 	Users              []usermanagement.User           `json:"users"`
 	Processes          []processes.ProcessInfo         `json:"processes"`
 }
@@ -47,7 +47,7 @@ func GetInventory() InventoryObject {
 		Services:           servicemanager.Servicelister(),
 		Tasks:              nil,
 		Firewall:           firewall.FirewallLister(),
-		Shares:             nil,
+		Shares:             shares.GetShares(),
 		Users:              usermanagement.ReturnUsers(),
 		Processes:          processes,
 	}
