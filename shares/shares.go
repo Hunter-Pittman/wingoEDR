@@ -2,76 +2,45 @@ package shares
 
 import (
 	"fmt"
-	"log"
 
-	"github.com/Jeffail/gabs/v2"
-
-	"github.com/abdfnx/gosh"
+	win "github.com/gorpher/gowin32"
+	"go.uber.org/zap"
 )
 
-type SMBProperties struct {
-	Name        string
-	Description string
+type SMBINFO struct {
+	Netname     string
+	Remark      string
 	Path        string
-	Scoped      string
-	ScopeName   string
-	ShareState  string
-	ShareType   string
-	Special     string
-	Temporary   string
-	Namespace   string
-	ServerName  string
-	ClassName   string
+	Type        int
+	Permissions int
+	MaxUses     int
+	CurrentUses int
 }
 
-func SmbShares() []SMBProperties {
-	somatic := make([]SMBProperties, 0)
-
-	err, out, errout := gosh.RunOutput("Get-SmbShare | ConvertTo-JSON")
+func shares() []SMBINFO {
+	x, err := fmt.Println("")
 	if err != nil {
-		log.Printf("error: %v\n", err)
-		fmt.Print(errout)
+		//log.Fatal(err)
+		zap.Error(err)
 	}
+	fmt.Println(x)
+	shareslice := make([]SMBINFO, 0)
 
-	parent, err := gabs.ParseJSON([]byte(out))
-	if err != nil {
-		log.Printf("error: %v\n", err)
-		fmt.Print(errout)
-	}
+	share := win.NetShareEnum()
 
-	// firstgeneration := parent.Children()
+	for _, v := range share {
 
-	for _, child := range parent.Children() {
-		chromosome := SMBProperties{
-			Name:        child.S("CimInstanceProperties").Children()[15].String(),
-			Description: child.S("CimInstanceProperties").Children()[7].String(),
-			Path:        child.S("CimInstanceProperties").Children()[16].String(),
-			Scoped:      child.S("CimInstanceProperties").Children()[19].String(),
-			ScopeName:   child.S("CimInstanceProperties").Children()[20].String(),
-			ShareState:  child.S("CimInstanceProperties").Children()[23].String(),
-			Special:     child.S("CimInstanceProperties").Children()[26].String(),
-			Temporary:   child.S("CimInstanceProperties").Children()[27].String(),
-			Namespace:   child.Path("CimSystemProperties.Namespace").Data().(string),
-			ServerName:  child.Path("CimSystemProperties.ServerName").Data().(string),
-			ClassName:   child.Path("CimSystemProperties.ClassName").Data().(string)}
+		helium := SMBINFO{
+			Netname:     v.Netname,
+			Remark:      v.Remark,
+			Path:        v.Path,
+			Type:        v.Permissions,
+			MaxUses:     v.MaxUses,
+			CurrentUses: v.CurrentUses}
 
-		somatic = append(somatic, chromosome)
-		// for _, grandchild := range child.S("CimSystemProperties").Children() {
-		// 	fmt.Println(grandchild.S("Namespace").String())
-
-		// }
+		shareslice = append(shareslice, helium)
 
 	}
-	return (somatic)
+	return (shareslice)
 
 }
-
-// fmt.Println(sharess[1])
-
-// var ss SharesSt
-// err2 := json.Unmarshal([]byte(out), ss)
-// if err2 != nil {
-// 	log.Printf("error: %v\n", err2)
-// 	fmt.Print(err2)
-// }
-// fmt.Println(out)
