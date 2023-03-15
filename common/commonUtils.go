@@ -168,15 +168,6 @@ func CsvToJsonSysInternals(csvFile string) (string, error) {
 	return string(jsonData), nil
 }
 
-func ErrorHandler(err error) {
-	if err != nil {
-		zap.S().Error("Error: ", err.Error())
-		color.Red("[ERROR]	An error has been encounterd: ", err.Error())
-	} else {
-		return
-	}
-}
-
 func LocalTimeToUTC(timestamp string) (string, error) {
 	// Define the timestamp string and layout format
 	layout := "2006-01-02T15:04:05"

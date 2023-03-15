@@ -35,7 +35,7 @@ func ScanAll() ([]Event, error) {
 			color.Red("[ERROR]	Failed opening evtx log files: ", err.Error())
 			return nil, err
 		} else {
-			common.ErrorHandler(err)
+			zap.S().Error("Error running chainsaw: ", err.Error())
 		}
 	}
 
@@ -122,7 +122,7 @@ func ScanTimeRange(fromTimestamp string, toTimestamp string) ([]Event, error) {
 			color.Red("[ERROR]	Failed opening evtx log files: ", err.Error())
 			return nil, err
 		} else {
-			common.ErrorHandler(err)
+			zap.S().Error("Error encountered with chainsaw.exe: ", err.Error())
 		}
 	}
 
@@ -182,7 +182,7 @@ func ScanTimeRangeJSON(fromTimestamp string, toTimestamp string) (*gabs.Containe
 			color.Red("[ERROR]	Failed opening evtx log files: ", err.Error())
 			return nil, err
 		} else {
-			common.ErrorHandler(err)
+			zap.S().Error("Error encountered with chainsaw.exe: ", err.Error())
 		}
 	}
 

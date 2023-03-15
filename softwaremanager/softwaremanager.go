@@ -1,19 +1,19 @@
 package softwaremanager
 
 import (
-    "fmt"
-    wapi "github.com/iamacarpet/go-win64api"
+	wapi "github.com/iamacarpet/go-win64api"
+	"go.uber.org/zap"
 )
 
 type Software struct {
-	Name	string
-	Version	string
+	Name    string
+	Version string
 }
 
 func GetSoftware() []Software {
-    sw, err := wapi.InstalledSoftwareList()
-    if err != nil {
-        common.ErrorHandler(err)
+	sw, err := wapi.InstalledSoftwareList()
+	if err != nil {
+		zap.S().Error("Error getting software list: ", err)
 	}
 
 	softwareList := []Software{}
@@ -23,4 +23,3 @@ func GetSoftware() []Software {
 	}
 	return softwareList
 }
-
