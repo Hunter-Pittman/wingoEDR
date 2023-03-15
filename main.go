@@ -38,17 +38,10 @@ func main() {
 
 	println(headline)
 
-	// processIsAdmin, err := common.ProcessIsAdmin()
-	// if err != nil {
-	// 	zap.S().Fatal("Failed to determine if process is running as admin! Err: %v", err)
-	// }
-
-	// if !processIsAdmin {
-	// 	zap.S().Fatal("This program must be run as administrator!")
-	// }
-
+	// Initializations
 	db.DbInit()
 	defaultConfigPath := config.GenerateConfig()
+	config.GetSerialScripterURL()
 
 	configPtr := flag.String("config", defaultConfigPath, "Provide path to the config file")
 	mode := flag.String("mode", "default", "List what mode you would like wingoEDR to execute in. The default is to enable continous monitoring.")

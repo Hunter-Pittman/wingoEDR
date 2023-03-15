@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"strings"
 	"wingoEDR/common"
 	"wingoEDR/config"
 	"wingoEDR/inventory"
@@ -32,6 +33,11 @@ type Alert struct {
 }
 
 func HeartBeat() (err error) {
+	runRequest := CheckEndpoint()
+	if runRequest == false {
+		return nil
+	}
+
 	ssUserAgent := config.GetSerialScripterUserAgent()
 	//ssUserAgent := "nestler-code"
 
@@ -70,6 +76,10 @@ func HeartBeat() (err error) {
 }
 
 func PostInventory() (err error) {
+	runRequest := CheckEndpoint()
+	if runRequest == false {
+		return nil
+	}
 	ssUserAgent := config.GetSerialScripterUserAgent()
 
 	// Payload
@@ -110,6 +120,11 @@ func PostInventory() (err error) {
 }
 
 func IncidentAlert(alert Alert) (err error) {
+	runRequest := CheckEndpoint()
+	if runRequest == false {
+		return nil
+	}
+
 	ssUserAgent := config.GetSerialScripterUserAgent()
 
 	jsonStr, err := json.Marshal(alert)
@@ -142,4 +157,31 @@ func IncidentAlert(alert Alert) (err error) {
 
 	defer resp.Body.Close()
 	return nil
+}
+
+func CheckEndpoint() bool {
+	client := http.Client{
+		Timeout: 5,
+	}
+
+	url := config.GetSerialScripterURL()
+
+	if !strings.Contains(url, "http") {
+		return false
+	}
+
+	fullUrl := fmt.Sprintf("%v/api/v1/common/heartbeat", config.GetSerialScripterURL())
+	resp, err := client.Get(fullUrl)
+	if err != nil {
+		zap.S().Error("Error checking endpoint:", err)
+		return false
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		zap.S().Error("Unexpected status code %d\n", resp.StatusCode)
+		return false
+	}
+
+	return true
 }

@@ -48,7 +48,7 @@ func ReturnUsers() []User {
 
 	}
 
-	//fmt.Printf("%v", userslice[0]) // Add api call to serial scripter api to compare original user list with current user list
+	//fmt.Printf("Userslice: %v", userslice)
 	return userslice
 
 }

@@ -48,6 +48,17 @@ func MonitorUsers() {
 		}
 
 		usersToDB(users, false)
+	} else if len(users) < len(queriedUsers) {
+		for _, user := range users {
+			for i, queriedUser := range queriedUsers {
+				if user.Username == queriedUser.Username {
+					queriedUsers[i] = queriedUsers[len(queriedUsers)-1]
+					queriedUsers = queriedUsers[:len(queriedUsers)-1]
+				}
+			}
+		}
+
+		deleteUserFromDB(queriedUsers)
 	} else {
 		usersToDB(users, true)
 	}
@@ -94,6 +105,26 @@ func usersFromDB() []usermanagement.User {
 	defer rows.Close()
 
 	return queriedUsers
+}
+
+func deleteUserFromDB(user []usermanagement.User) {
+	for _, user := range user {
+		zap.S().Info("User deleted: ", user.Username)
+
+		conn := db.DbConnect()
+		stmt, err := conn.Prepare("DELETE FROM currentusers WHERE username = ?")
+		if err != nil {
+			zap.S().Error("Error deleting user from database: ", err)
+		}
+
+		_, err = stmt.Exec(user.Username)
+		if err != nil {
+			zap.S().Error("Error deleting user from database: ", err)
+		}
+
+		defer stmt.Close()
+	}
+
 }
 
 func newUserIncident(newUsers []usermanagement.User) {
