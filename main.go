@@ -84,7 +84,7 @@ func main() {
 
 	// continousMonitoring()
 
-	chainsawLoop()
+	continousMonitoring()
 
 }
 
@@ -97,7 +97,7 @@ func continousMonitoring() {
 	go inventoryLoop()
 
 	// Internal routines
-	go userLoop()
+	//go userLoop()
 	//go chainsawLoop()
 
 	wg.Wait()

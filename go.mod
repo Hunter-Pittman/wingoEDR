@@ -24,6 +24,9 @@ require (
 )
 
 require (
+	github.com/botherder/go-autoruns v1.1.0 // indirect
+	github.com/botherder/go-files v0.0.0-20180205213231-2246e61e05ec // indirect
+	github.com/capnspacehook/taskmaster v0.0.0-20210519235353-1629df7c85e9 // indirect
 	github.com/containerd/console v1.0.3 // indirect
 	github.com/go-ole/go-ole v1.2.6 // indirect
 	github.com/google/cabbie v1.0.2 // indirect
@@ -35,11 +38,14 @@ require (
 	github.com/mattn/go-isatty v0.0.17 // indirect
 	github.com/mattn/go-localereader v0.0.1 // indirect
 	github.com/mattn/go-runewidth v0.0.13 // indirect
+	github.com/mattn/go-shellwords v1.0.10 // indirect
 	github.com/muesli/ansi v0.0.0-20211018074035-2e021307bc4b // indirect
 	github.com/muesli/cancelreader v0.2.2 // indirect
 	github.com/muesli/reflow v0.3.0 // indirect
 	github.com/muesli/termenv v0.11.1-0.20220212125758-44cd13922739 // indirect
 	github.com/power-devops/perfstat v0.0.0-20210106213030-5aafc221ea8c // indirect
+	github.com/rickb777/date v1.14.2 // indirect
+	github.com/rickb777/plural v1.2.2 // indirect
 	github.com/rivo/uniseg v0.2.0 // indirect
 	github.com/scjalliance/comshim v0.0.0-20190308082608-cf06d2532c4e // indirect
 	github.com/tklauser/go-sysconf v0.3.10 // indirect
@@ -49,4 +55,5 @@ require (
 	go.uber.org/multierr v1.6.0 // indirect
 	golang.org/x/crypto v0.0.0-20201012173705-84dcc777aaee // indirect
 	golang.org/x/term v0.0.0-20210927222741-03fcf44c2211 // indirect
+	howett.net/plist v0.0.0-20200419221736-3b63eb3a43b5 // indirect
 )

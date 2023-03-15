@@ -1,64 +1,37 @@
 package autoruns
 
 import (
-	"fmt"
-	"log"
-	"os"
-	"os/exec"
-	"strconv"
-	"time"
-	"wingoEDR/common"
+	"github.com/botherder/go-autoruns"
 )
 
-type Start struct {
-	Autoruns Autoruns `json:"autoruns"`
+type AutorunsInfo struct {
+	Type      string `json:"type"`
+	Location  string `json:"location"`
+	ImagePath string `json:"image_path"`
+	ImageName string `json:"image_name"`
+	Arguments string `json:"arguments"`
+	MD5       string `json:"md5"`
+	SHA1      string `json:"sha1"`
+	SHA256    string `json:"sha256"`
 }
 
-type Autoruns struct {
-	Item AutorunsEntry `json:"item"`
-}
+func GetAutoruns() []AutorunsInfo {
 
-type AutorunsEntry struct {
-	Location     string `json:"location"`
-	Itemname     string `json:"itemname"`
-	Enabled      string `json:"enabled"`
-	Profile      string `json:"profile"`
-	Launchstring string `json:"launchstring"`
-	Description  string `json:"description"`
-	Company      string `json:"company"`
-	Version      string `json:"version"`
-	Imagepath    string `json:"imagepath"`
-	Time         string `json:"time"`
-}
+	autoruns := autoruns.Autoruns()
+	autoslice := make([]AutorunsInfo, 0)
 
-const AUTORUNS_LOC = "C:\\Users\\FORENSICS\\Documents\\Hunter's Repos\\wingoEDR\\externalresources\\autorunsc.exe"
+	for _, autorun := range autoruns {
+		helium := AutorunsInfo{
+			Type:      autorun.Type,
+			Location:  autorun.Location,
+			ImagePath: autorun.ImagePath,
+			ImageName: autorun.ImageName,
+			Arguments: autorun.Arguments,
+			MD5:       autorun.MD5,
+			SHA1:      autorun.SHA1,
+			SHA256:    autorun.SHA256}
+		autoslice = append(autoslice, helium)
 
-func FullAutorunsDump() {
-
-	csvName := strconv.FormatInt(time.Now().Unix(), 10) + "_autoruns.csv"
-	fmt.Println(csvName)
-
-	cmdOutput, err := exec.Command(AUTORUNS_LOC, "-nobanner", "-a", "*", "-c").Output()
-	if err != nil {
-		log.Fatal(err)
 	}
-
-	file, e := os.Create(csvName)
-	if e != nil {
-		log.Fatal(err)
-	}
-
-	stringifiedCmdOutput := string(cmdOutput)
-
-	_, err2 := file.WriteString(string(stringifiedCmdOutput))
-	if err2 != nil {
-		log.Fatal(err)
-	}
-
-	json, err := common.CsvToJsonSysInternals(csvName)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	fmt.Println(json)
+	return (autoslice)
 }
