@@ -41,7 +41,10 @@ func main() {
 	// Initializations
 	db.DbInit()
 	defaultConfigPath := config.GenerateConfig()
-	config.GetSerialScripterURL()
+	runRequest := serialscripter.CheckEndpoint()
+	if !runRequest {
+		zap.S().Warn("Serial Scripter is not running. WingoEDR will continue to run in offline mode.")
+	}
 
 	configPtr := flag.String("config", defaultConfigPath, "Provide path to the config file")
 	mode := flag.String("mode", "default", "List what mode you would like wingoEDR to execute in. The default is to enable continous monitoring.")
