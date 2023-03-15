@@ -91,12 +91,12 @@ func continousMonitoring() {
 	wg.Add(3)
 
 	// Serial Scripter routines
-	go heartbeatLoop()
-	go inventoryLoop()
+	// go heartbeatLoop()
+	// go inventoryLoop()
 
 	// Internal routines
-	go userLoop()
-	// go smbShareLoop()
+	//go userLoop()
+	go smbShareLoop()
 	// go serviceLoop()
 	// go chainsawLoop()
 
@@ -104,6 +104,14 @@ func continousMonitoring() {
 
 	select {}
 
+}
+
+func smbShareLoop() {
+	ticker := time.NewTicker(10 * time.Second)
+
+	for _ = range ticker.C {
+		monitors.SharesMonitor()
+	}
 }
 
 func inventoryLoop() {
@@ -125,7 +133,7 @@ func heartbeatLoop() {
 
 func userLoop() {
 	monitors.InitUsers()
-	ticker := time.NewTicker(10 * time.Second)
+	ticker := time.NewTicker(1 * time.Minute)
 
 	for _ = range ticker.C {
 		monitors.MonitorUsers()

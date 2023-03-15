@@ -5,7 +5,7 @@ import (
 )
 
 type SMBInfo struct {
-	Netname     string
+	NetName     string
 	Remark      string
 	Path        string
 	Type        int
@@ -23,7 +23,7 @@ func GetShares() []SMBInfo {
 	for _, v := range share {
 
 		helium := SMBInfo{
-			Netname:     v.Netname,
+			NetName:     v.Netname,
 			Remark:      v.Remark,
 			Path:        v.Path,
 			Type:        v.Permissions,

@@ -32,6 +32,7 @@ func DbInit() {
 
 	sqlStmt := `
 	create table if not exists currentusers (username text not null primary key, fullname text, enabled integer, locked integer, admin integer, passwdexpired integer, cantchangepasswd integer, passwdage integer, lastlogon text, badpasswdattempts numeric, numoflogons numeric);
+	create table if not exists currentshares (netname text not null primary key, path text, type text, comment text, maxusers integer, currentusers integer);
 	`
 	_, err1 := conn.Exec(sqlStmt)
 	if err1 != nil {

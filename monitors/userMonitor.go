@@ -62,7 +62,6 @@ func MonitorUsers() {
 	} else {
 		usersToDB(users, true)
 	}
-
 }
 
 func usersToDB(users []usermanagement.User, update bool) {

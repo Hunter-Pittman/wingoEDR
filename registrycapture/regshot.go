@@ -1,4 +1,4 @@
-package registrysnapshot
+package registrycapture
 
 import (
 	"time"
