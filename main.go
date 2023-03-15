@@ -107,6 +107,7 @@ func continousMonitoring() {
 }
 
 func smbShareLoop() {
+	monitors.InitShares()
 	ticker := time.NewTicker(10 * time.Second)
 
 	for _ = range ticker.C {
