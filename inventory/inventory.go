@@ -1,7 +1,6 @@
 package inventory
 
 import (
-	"fmt"
 	"os"
 	"wingoEDR/common"
 	"wingoEDR/firewall"
@@ -9,6 +8,8 @@ import (
 	"wingoEDR/servicemanager"
 	"wingoEDR/shares"
 	"wingoEDR/usermanagement"
+
+	"go.uber.org/zap"
 )
 
 type InventoryObject struct {
@@ -36,7 +37,7 @@ func GetInventory() InventoryObject {
 
 	hostname, err := os.Hostname()
 	if err != nil {
-		fmt.Println(err)
+		zap.S().Error(err)
 	}
 
 	inv := InventoryObject{

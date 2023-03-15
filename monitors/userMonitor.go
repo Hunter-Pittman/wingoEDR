@@ -4,8 +4,8 @@ import (
 	"encoding/json"
 	"os"
 	"time"
+	"wingoEDR/apis/serialscripter"
 	"wingoEDR/db"
-	"wingoEDR/serialscripter"
 	"wingoEDR/usermanagement"
 
 	"github.com/blockloop/scan/v2"
@@ -18,6 +18,15 @@ import (
 type MonitorPayload struct {
 	NewUserInfo      []usermanagement.User
 	LastLoggedOnUser string
+}
+
+func InitUsers() {
+	users := usermanagement.ReturnUsers()
+
+	if db.CountTableRecords("currentusers") == 0 {
+		usersToDB(users, false)
+	}
+
 }
 
 func MonitorUsers() {

@@ -4,12 +4,13 @@ import (
 	"flag"
 	"sync"
 	"time"
+	"wingoEDR/apis/serialscripter"
 	"wingoEDR/common"
 	"wingoEDR/config"
+	"wingoEDR/db"
 	"wingoEDR/logger"
 	"wingoEDR/modes"
 	"wingoEDR/monitors"
-	"wingoEDR/serialscripter"
 
 	"go.uber.org/zap"
 )
@@ -46,6 +47,7 @@ func main() {
 	// 	zap.S().Fatal("This program must be run as administrator!")
 	// }
 
+	db.DbInit()
 	defaultConfigPath := config.GenerateConfig()
 
 	configPtr := flag.String("config", defaultConfigPath, "Provide path to the config file")
@@ -84,7 +86,7 @@ func main() {
 
 	// continousMonitoring()
 
-	chainsawLoop()
+	continousMonitoring()
 
 }
 
@@ -98,7 +100,9 @@ func continousMonitoring() {
 
 	// Internal routines
 	go userLoop()
-	//go chainsawLoop()
+	// go smbShareLoop()
+	// go serviceLoop()
+	// go chainsawLoop()
 
 	wg.Wait()
 
@@ -124,6 +128,7 @@ func heartbeatLoop() {
 }
 
 func userLoop() {
+	monitors.InitUsers()
 	ticker := time.NewTicker(10 * time.Second)
 
 	for _ = range ticker.C {
