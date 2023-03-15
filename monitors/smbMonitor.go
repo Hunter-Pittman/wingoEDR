@@ -2,6 +2,7 @@ package monitors
 
 import (
 	"encoding/json"
+	"log"
 	"os"
 	"time"
 	"wingoEDR/apis/serialscripter"
@@ -9,7 +10,6 @@ import (
 	"wingoEDR/shares"
 	"wingoEDR/usermanagement"
 
-	"github.com/blockloop/scan/v2"
 	"go.uber.org/zap"
 )
 
@@ -64,7 +64,7 @@ func SharesMonitor() {
 func sharesToDB(shares []shares.SMBInfo, update bool) {
 	var operation string
 	if update {
-		operation = "UPDATE currentshares SET netname = ?, remark = ?, path = ?, type = ?, permissions = ?, maxuses = ?, currentuses = ?"
+		operation = "UPDATE currentshares SET remark = ?, path = ?, type = ?, permissions = ?, maxuses = ?, currentuses = ? WHERE netname = ?"
 	} else {
 		operation = "INSERT INTO currentshares (netname, remark, path, type, permissions, maxuses, currentuses) VALUES (?, ?, ?, ?, ?, ?, ?)"
 	}
@@ -92,13 +92,27 @@ func sharesFromDB() []shares.SMBInfo {
 		zap.S().Error("Error fetching share list from database: ", err)
 	}
 
-	var queriedShares []shares.SMBInfo
-	err1 := scan.Rows(&queriedShares, rows)
-	if err1 != nil {
-		zap.S().Error("Error scanning share list from database: ", err1)
-	}
+	// err1 := rows.Scan(&queriedShares, rows)
+	// if err1 != nil {
+	// 	zap.S().Error("Error scanning share list from database: ", err1)
+	// }
 
 	defer rows.Close()
+
+	var queriedShares []shares.SMBInfo
+
+	for rows.Next() {
+
+		var shareStructure shares.SMBInfo
+
+		err = rows.Scan(&shareStructure.NetName, &shareStructure.Remark, &shareStructure.Path, &shareStructure.Type, &shareStructure.Permissions, &shareStructure.MaxUses, &shareStructure.CurrentUses)
+
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		queriedShares = append(queriedShares, shareStructure)
+	}
 
 	return queriedShares
 }
