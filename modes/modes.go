@@ -11,9 +11,10 @@ import (
 	"wingoEDR/common"
 	"wingoEDR/processes"
 	"wingoEDR/usermanagement"
-
+	"wingoEDR/registrycapture"
 	"github.com/olekukonko/tablewriter"
 	"go.uber.org/zap"
+	
 )
 
 type Params interface{}
@@ -39,6 +40,10 @@ func ModeHandler(mode string, otherParams map[string]Params) {
 	case "decompress":
 		zap.S().Infof("Mode is %s", mode)
 		DecompressMode(otherParams)
+	case "software":
+		zap.S().Infof("Mode is %s", mode)
+		SoftwareMode()
+
 	default:
 		zap.S().Infof("No mode selected defaulting to continious monitoring")
 		return
@@ -145,6 +150,20 @@ func SessionsMode() {
 		table.Append(row)
 	}
 
+	table.Render()
+	os.Exit(0)
+}
+
+func SoftwareMode() {
+	installedSoftware := registrycapture.GetSoftwareSubkeys(`SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall`)
+	
+	table := tablewriter.NewWriter(os.Stdout)
+	table.SetHeader([]string{"Name", "Version", "InstallPath", "Publisher", "UninstallString"})
+	
+	for _, software := range installedSoftware {
+		row := []string{software.Name, software.Version, software.InstallPath, software.Publisher, software.UninstallString}
+		table.Append(row)
+	}
 	table.Render()
 	os.Exit(0)
 }
