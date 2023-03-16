@@ -12,7 +12,6 @@ type RegistryValues struct {
 	registryValue    string
 }
 
-
 // supply registry path & the keys you want from those paths
 // slices must be of equal length
 // EX: GetRegistryValues([]string{"SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion"}, []string{"SystemRoot"})
@@ -43,11 +42,11 @@ func GetRegistryValue(registryPathSlice []string, registryKeySlice []string) []R
 }
 
 type InstalledSoftware struct {
-	Name    string
-	Version string
-	InstallPath	string
-	Publisher	string
-	UninstallString	string
+	Name            string
+	Version         string
+	InstallPath     string
+	Publisher       string
+	UninstallString string
 }
 
 // Return subkey values for installed software
@@ -55,38 +54,38 @@ func GetSoftwareSubkeys(registryPath string) []InstalledSoftware {
 
 	keyHandle, err := registry.OpenKey(registry.LOCAL_MACHINE, registryPath, registry.QUERY_VALUE|registry.ENUMERATE_SUB_KEYS)
 	if err != nil {
-		zap.S().Error(err)
+		zap.S().Error("Error getting key handle: ", err)
 	}
 	subkeys, err := keyHandle.ReadSubKeyNames(-1)
 	if err != nil {
-		zap.S().Error(err)
+		zap.S().Error("Erro reading sub key names", err)
 	}
-	
+
 	softwareList := []InstalledSoftware{}
 	for _, subkey := range subkeys {
-		subKeyHandle, err := registry.OpenKey(registry.LOCAL_MACHINE, registryPath +`\`+subkey, registry.QUERY_VALUE)
+		subKeyHandle, err := registry.OpenKey(registry.LOCAL_MACHINE, registryPath+`\`+subkey, registry.QUERY_VALUE)
 		if err != nil {
-			zap.S().Error(err)
+			zap.S().Error("Error opening key: ", err)
 		}
 		publisher, _, err := subKeyHandle.GetStringValue("Publisher")
 		if err != nil {
-			zap.S().Error(err)
+			zap.S().Error("Could not get publiher infomation", err)
 		}
 		installLocation, _, err := subKeyHandle.GetStringValue("InstallLocation")
 		if err != nil {
-			zap.S().Error(err)
+			zap.S().Error("Could not get install location infomation", err)
 		}
 		uninstallString, _, err := subKeyHandle.GetStringValue("UninstallString")
 		if err != nil {
-			zap.S().Error(err)
+			zap.S().Error("Could not get uninstall string infomation", err)
 		}
 		displayName, _, err := subKeyHandle.GetStringValue("DisplayName")
 		if err != nil {
-			zap.S().Error(err)
+			zap.S().Error("Could not get display name infomation", err)
 		}
 		version, _, err := subKeyHandle.GetStringValue("DisplayVersion")
 		if err != nil {
-			zap.S().Error(err)
+			zap.S().Error("Could not get version infomation", err)
 		}
 		softwareInfo := InstalledSoftware{displayName, version, installLocation, publisher, uninstallString}
 		softwareList = append(softwareList, softwareInfo)

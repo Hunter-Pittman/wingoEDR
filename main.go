@@ -99,7 +99,7 @@ func continousMonitoring() {
 	//go smbShareLoop()
 	// go serviceLoop()
 	// go chainsawLoop()
-	processLoop()
+	// go processLoop()
 
 	wg.Wait()
 
@@ -115,7 +115,7 @@ func processLoop() {
 	// 	monitors.ProcessMonitor()
 	// }
 
-	monitors.ProcessMonitor()
+	//monitors.ProcessMonitor()
 }
 
 func smbShareLoop() {

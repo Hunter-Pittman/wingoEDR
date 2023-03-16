@@ -10,11 +10,11 @@ import (
 	"wingoEDR/chainsaw"
 	"wingoEDR/common"
 	"wingoEDR/processes"
-	"wingoEDR/usermanagement"
 	"wingoEDR/registrycapture"
+	"wingoEDR/usermanagement"
+
 	"github.com/olekukonko/tablewriter"
 	"go.uber.org/zap"
-	
 )
 
 type Params interface{}
@@ -156,14 +156,18 @@ func SessionsMode() {
 
 func SoftwareMode() {
 	installedSoftware := registrycapture.GetSoftwareSubkeys(`SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall`)
-	
+
 	table := tablewriter.NewWriter(os.Stdout)
 	table.SetHeader([]string{"Name", "Version", "InstallPath", "Publisher", "UninstallString"})
-	
+
 	for _, software := range installedSoftware {
 		row := []string{software.Name, software.Version, software.InstallPath, software.Publisher, software.UninstallString}
 		table.Append(row)
 	}
+
+	table.SetRowLine(true)
+
+	table.SetRowSeparator("-")
 	table.Render()
 	os.Exit(0)
 }
