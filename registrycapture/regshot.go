@@ -69,23 +69,23 @@ func GetSoftwareSubkeys(registryPath string) []InstalledSoftware {
 		}
 		publisher, _, err := subKeyHandle.GetStringValue("Publisher")
 		if err != nil {
-			zap.S().Error("Could not get publiher infomation", err)
+			zap.S().Error("Could not get publiher infomation: ", err)
 		}
 		installLocation, _, err := subKeyHandle.GetStringValue("InstallLocation")
 		if err != nil {
-			zap.S().Error("Could not get install location infomation", err)
+			zap.S().Error("Could not get install location infomation: ", err)
 		}
 		uninstallString, _, err := subKeyHandle.GetStringValue("UninstallString")
 		if err != nil {
-			zap.S().Error("Could not get uninstall string infomation", err)
+			zap.S().Error("Could not get uninstall string infomation: ", err)
 		}
 		displayName, _, err := subKeyHandle.GetStringValue("DisplayName")
 		if err != nil {
-			zap.S().Error("Could not get display name infomation", err)
+			zap.S().Error("Could not get display name infomation: ", err)
 		}
 		version, _, err := subKeyHandle.GetStringValue("DisplayVersion")
 		if err != nil {
-			zap.S().Error("Could not get version infomation", err)
+			zap.S().Error("Could not get version infomation: ", err)
 		}
 		softwareInfo := InstalledSoftware{displayName, version, installLocation, publisher, uninstallString}
 		softwareList = append(softwareList, softwareInfo)
