@@ -12,8 +12,8 @@ import (
 // 2. Get PID via name
 
 type ProcessInfo struct {
-	Name               string `default:"no name"`
-	Ppid               *process.Process
+	Name               string           `default:"no name"`
+	Ppid               *process.Process `default:"no parent"`
 	Pid                int32
 	Exe                []string
 	Cwd                string

@@ -96,14 +96,26 @@ func continousMonitoring() {
 
 	// Internal routines
 	//go userLoop()
-	go smbShareLoop()
+	//go smbShareLoop()
 	// go serviceLoop()
 	// go chainsawLoop()
+	processLoop()
 
 	wg.Wait()
 
 	select {}
 
+}
+
+func processLoop() {
+	// monitors.InitProcesses()
+	// ticker := time.NewTicker(1 * time.Minute)
+
+	// for _ = range ticker.C {
+	// 	monitors.ProcessMonitor()
+	// }
+
+	monitors.ProcessMonitor()
 }
 
 func smbShareLoop() {
