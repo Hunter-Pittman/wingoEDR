@@ -11,12 +11,11 @@ type EnrichedProcess struct {
 }
 
 // func InitProcesses() {
-// 	procs, err := processes.GetAllProcesses()
-// 	if err != nil {
-// 		zap.S().Error("Error getting processes: ", err)
-// 	}
-
 // 	if db.CountTableRecords("currentprocesses") == 0 {
+// 		procs, err := processes.GetAllProcesses()
+// 		if err != nil {
+// 			zap.S().Error("Error getting processes: ", err)
+// 		}
 // 		processesToDB(procs, false)
 // 	}
 // }

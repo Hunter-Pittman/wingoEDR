@@ -24,6 +24,8 @@ require (
 )
 
 require (
+	github.com/cavaliercoder/grab v3.0.1+incompatible // indirect
+	github.com/cavaliergopher/grab/v3 v3.0.1 // indirect
 	github.com/containerd/console v1.0.3 // indirect
 	github.com/go-ole/go-ole v1.2.6 // indirect
 	github.com/google/cabbie v1.0.2 // indirect

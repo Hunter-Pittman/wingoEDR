@@ -1,12 +1,13 @@
 package config
 
 import (
+	"fmt"
 	"os"
 	"path/filepath"
 	"wingoEDR/unzip"
 
 	"github.com/Jeffail/gabs"
-	"github.com/fatih/color"
+	"github.com/cavaliergopher/grab/v3"
 	"go.uber.org/zap"
 )
 
@@ -40,8 +41,16 @@ func GenerateConfig() string {
 			zap.S().Info("External resources zip file already exists, extracting...")
 			unzip.Unzip(zipFolder)
 		} else {
-			color.Red("[ERROR]	External resources folder does not exist, download the external resources and rexecute the program")
-			os.Exit(1)
+			zap.S().Warn("External resources folder does not exist")
+			releaseVersion := "v0.1.2-alpha"
+			zap.S().Warnf("Attempting download of external resources %s...", releaseVersion)
+			fullUrl := fmt.Sprintf("https://github.com/Hunter-Pittman/wingoEDR/releases/download/%s/externalresources.zip", releaseVersion)
+			_, err := grab.Get(".", fullUrl)
+			if err != nil {
+				zap.S().Fatal("Unable to download external resources: ", err)
+			}
+			unzip.Unzip(zipFolder)
+			//os.Exit(1)
 		}
 
 	}
@@ -85,26 +94,37 @@ func generateJSON() {
 	// Honeypaths
 	jsonOBJ.Array("honeypaths", "paths")
 
-	// Whitelist
-	jsonOBJ.Array("whitelist", "ips")
-	jsonOBJ.Array("whitelist", "sessions")
-	jsonOBJ.Array("whitelist", "users")
-
 	// Blacklist
-	jsonOBJ.Array("blacklist", "ips")
+	jsonOBJ.Array("lists", "blacklist", "ips")
+	jsonOBJ.Array("lists", "blacklist", "sessions")
+	jsonOBJ.Array("lists", "blacklist", "users")
+	jsonOBJ.Array("lists", "blacklist", "publishers")
+	jsonOBJ.Array("lists", "blacklist", "processes")
+
+	// Graylist
+	jsonOBJ.Array("lists", "graylist", "ips")
+	jsonOBJ.Array("lists", "graylist", "sessions")
+	jsonOBJ.Array("lists", "graylist", "users")
+	jsonOBJ.Array("lists", "graylist", "publishers")
+	jsonOBJ.Array("lists", "graylist", "processes")
+
+	// Whitelist
+	jsonOBJ.Array("lists", "whitelist", "ips")
+	jsonOBJ.Array("lists", "whitelist", "sessions")
+	jsonOBJ.Array("lists", "whitelist", "users")
+	jsonOBJ.Array("lists", "whitelist", "publishers")
+	jsonOBJ.Array("lists", "whitelist", "processes")
 
 	finalJSONObj := jsonOBJ.String()
 
 	file, err := os.Create(configPath)
 	if err != nil {
 		zap.S().Error("Error: ", err.Error())
-		color.Red("[ERROR]	An error has been encounterd: ", err.Error())
 	}
 
 	_, err = file.WriteString(finalJSONObj)
 	if err != nil {
 		zap.S().Error("Error: ", err.Error())
-		color.Red("[ERROR]	An error has been encounterd: ", err.Error())
 	}
 
 }
