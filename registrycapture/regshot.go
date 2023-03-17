@@ -67,25 +67,34 @@ func GetSoftwareSubkeys(registryPath string) []InstalledSoftware {
 		if err != nil {
 			zap.S().Error("Error opening key: ", err)
 		}
-		publisher, _, err := subKeyHandle.GetStringValue("Publisher")
-		if err != nil {
-			zap.S().Error("Could not get publiher infomation: ", err)
+		// every registry key should have a display name, so if it doesn't we skip it
+		displayName, _, _ := subKeyHandle.GetStringValue("DisplayName")
+		if len(displayName) == 0 {
+			//zap.S().Error("Could not get display name infomation: ", err)
+			continue
 		}
-		installLocation, _, err := subKeyHandle.GetStringValue("InstallLocation")
-		if err != nil {
-			zap.S().Error("Could not get install location infomation: ", err)
+
+		publisher, _, _ := subKeyHandle.GetStringValue("Publisher")
+		if len(publisher) == 0 {
+			publisher = "N/A"
 		}
-		uninstallString, _, err := subKeyHandle.GetStringValue("UninstallString")
-		if err != nil {
-			zap.S().Error("Could not get uninstall string infomation: ", err)
+
+		installLocation, _, _ := subKeyHandle.GetStringValue("InstallLocation")
+		if len(installLocation) == 0 {
+			installLocation = "N/A"
+			//zap.S().Error("Could not get install location infomation: ", err)
 		}
-		displayName, _, err := subKeyHandle.GetStringValue("DisplayName")
-		if err != nil {
-			zap.S().Error("Could not get display name infomation: ", err)
+		
+		uninstallString, _, _ := subKeyHandle.GetStringValue("UninstallString")
+		if len(uninstallString) == 0 {
+			uninstallString = "N/A"
+			//zap.S().Error("Could not get uninstall string infomation: ", err)
 		}
-		version, _, err := subKeyHandle.GetStringValue("DisplayVersion")
-		if err != nil {
-			zap.S().Error("Could not get version infomation: ", err)
+		
+		version, _, _ := subKeyHandle.GetStringValue("DisplayVersion")
+		if len(version) == 0 {
+			version = "N/A"
+			//zap.S().Error("Could not get version infomation: ", err)
 		}
 		softwareInfo := InstalledSoftware{displayName, version, installLocation, publisher, uninstallString}
 		softwareList = append(softwareList, softwareInfo)
