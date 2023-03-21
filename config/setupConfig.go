@@ -42,7 +42,7 @@ func GenerateConfig() string {
 			unzip.Unzip(zipFolder)
 		} else {
 			zap.S().Warn("External resources folder does not exist")
-			releaseVersion := "v0.1.2-alpha"
+			releaseVersion := "v0.1.3-alpha"
 			zap.S().Warnf("Attempting download of external resources %s...", releaseVersion)
 			fullUrl := fmt.Sprintf("https://github.com/Hunter-Pittman/wingoEDR/releases/download/%s/externalresources.zip", releaseVersion)
 			_, err := grab.Get(".", fullUrl)

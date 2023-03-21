@@ -14,17 +14,14 @@ type Configuration struct {
 		} `json:"kaspersky"`
 		SerialScripter struct {
 			APIKey    string `json:"api_key"`
-			URL       string `json:"url"`
+			Url       string `json:"url"`
 			UserAgent string `json:"user_agent"`
 		} `json:"serial_scripter"`
 		Siem struct {
 			APIKey string `json:"api_key"`
-			URL    string `json:"url"`
+			Url    string `json:"url"`
 		} `json:"siem"`
 	} `json:"apis"`
-	Blacklist struct {
-		Ips []any `json:"ips"`
-	} `json:"blacklist"`
 	Chainsaw struct {
 		Mapping struct {
 			Path string `json:"path"`
@@ -41,13 +38,31 @@ type Configuration struct {
 		Yara     string `json:"yara"`
 	} `json:"exe_paths"`
 	Honeypaths struct {
-		Paths []string `json:"paths"`
+		Paths []any `json:"paths"`
 	} `json:"honeypaths"`
-	Whitelist struct {
-		Ips      []string `json:"ips"`
-		Sessions []string `json:"sessions"`
-		Users    []string `json:"users"`
-	} `json:"whitelist"`
+	Lists struct {
+		Blacklist struct {
+			Ips        []any `json:"ips"`
+			Processes  []any `json:"processes"`
+			Publishers []any `json:"publishers"`
+			Sessions   []any `json:"sessions"`
+			Users      []any `json:"users"`
+		} `json:"blacklist"`
+		Graylist struct {
+			Ips        []any `json:"ips"`
+			Processes  []any `json:"processes"`
+			Publishers []any `json:"publishers"`
+			Sessions   []any `json:"sessions"`
+			Users      []any `json:"users"`
+		} `json:"graylist"`
+		Whitelist struct {
+			Ips        []any `json:"ips"`
+			Processes  []any `json:"processes"`
+			Publishers []any `json:"publishers"`
+			Sessions   []any `json:"sessions"`
+			Users      []any `json:"users"`
+		} `json:"whitelist"`
+	} `json:"lists"`
 }
 
 //const CONFIG_LOC string = "C:\\Users\\hunte\\Documents\\repos\\wingoEDR\\config.json"
@@ -98,7 +113,7 @@ func GetYaraExePath() string {
 	return configuration.ExePaths.Yara
 }
 
-func GetHoneyPaths() []string {
+func GetHoneyPaths() []any {
 	file, _ := os.Open(CONFIG_LOC)
 	defer file.Close()
 	decoder := json.NewDecoder(file)
@@ -110,6 +125,28 @@ func GetHoneyPaths() []string {
 	return configuration.Honeypaths.Paths
 }
 
+// func GetSerialScripterURL() string {
+
+// 	// Read the JSON data from the file
+// 	data, err := ioutil.ReadFile(CONFIG_LOC)
+// 	if err != nil {
+// 		zap.S().Error("error:", CONFIG_LOC)
+// 		zap.S().Error("error:", err)
+// 	}
+
+// 	jsonParsed, err := gabs.ParseJSON(data)
+// 	if err != nil {
+// 		zap.S().Error("error:", err)
+// 	}
+
+// 	url, ok := jsonParsed.Path("apis.serial_scripter.url").Data().(string)
+// 	if ok == false {
+// 		zap.S().Error("key not find:", err)
+// 	}
+
+// 	return url
+// }
+
 func GetSerialScripterURL() string {
 	file, _ := os.Open(CONFIG_LOC)
 	defer file.Close()
@@ -119,10 +156,10 @@ func GetSerialScripterURL() string {
 	if err != nil {
 		zap.S().Error("error:", err)
 	}
-	return configuration.Apis.SerialScripter.URL
+	return configuration.Apis.SerialScripter.Url
 }
 
-func GetWhitelistedUsers() []string {
+func GetWhitelistedUsers() []any {
 	file, _ := os.Open(CONFIG_LOC)
 	defer file.Close()
 	decoder := json.NewDecoder(file)
@@ -131,7 +168,19 @@ func GetWhitelistedUsers() []string {
 	if err != nil {
 		zap.S().Error("error:", err)
 	}
-	return configuration.Whitelist.Users
+	return configuration.Lists.Whitelist.Users
+}
+
+func GetGraylistedProcesses() []any {
+	file, _ := os.Open(CONFIG_LOC)
+	defer file.Close()
+	decoder := json.NewDecoder(file)
+	configuration := Configuration{}
+	err := decoder.Decode(&configuration)
+	if err != nil {
+		zap.S().Error("error:", err)
+	}
+	return configuration.Lists.Graylist.Processes
 }
 
 func GetChainsawPath() string {
@@ -191,5 +240,5 @@ func GetSiemUrl() string {
 	if err != nil {
 		zap.S().Error("error:", err)
 	}
-	return configuration.Apis.Siem.URL
+	return configuration.Apis.Siem.Url
 }

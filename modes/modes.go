@@ -85,7 +85,7 @@ func Chainsaw(otherParams map[string]Params) {
 	// Required params check
 	if otherParams["from"] != "" {
 		if otherParams["to"] != "" {
-			if !otherParams["json"].(bool) == false {
+			if otherParams["json"].(bool) == false {
 				events, err = chainsaw.ScanTimeRange(otherParams["from"].(string), otherParams["to"].(string))
 				if err != nil {
 					zap.S().Fatal("Chainsaw events were not scanned: ", err.Error())

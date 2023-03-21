@@ -30,7 +30,7 @@ func main() {
 	$$  /   \$$ |$$ |$$ |  $$ |\$$$$$$  |\$$$$$$  |$$$$$$$$\ $$$$$$$  |$$ |  $$ |
 	\__/     \__|\__|\__|  \__| \______/  \______/ \________|\_______/ \__|  \__|
 																				 
-									Version v0.1.2-alpha
+									Version v0.1.3-alpha
 									By: Hunter Pittman and the Keyboard Cowboys						 
 																				 
 	
@@ -41,10 +41,6 @@ func main() {
 	// Initializations
 	db.DbInit()
 	defaultConfigPath := config.GenerateConfig()
-	runRequest := serialscripter.CheckEndpoint()
-	if !runRequest {
-		zap.S().Warn("Serial Scripter is not running. WingoEDR will continue to run in offline mode.")
-	}
 
 	configPtr := flag.String("config", defaultConfigPath, "Provide path to the config file")
 	mode := flag.String("mode", "default", "List what mode you would like wingoEDR to execute in. The default is to enable continous monitoring.")
@@ -67,6 +63,10 @@ func main() {
 	zap.S().Infof("Config file loaded %s", *configPtr)
 
 	config.InitializeConfigLoc(*configPtr)
+	runRequest := serialscripter.CheckEndpoint()
+	if !runRequest {
+		zap.S().Warn("Serial Scripter is not running. WingoEDR will continue to run in offline mode.")
+	}
 
 	// thing := "chainsaw" // TEST VALUE
 	// mode = &thing       // TEST VALUE
@@ -88,18 +88,18 @@ func main() {
 
 func continousMonitoring() {
 	var wg sync.WaitGroup
-	wg.Add(3)
+	wg.Add(5)
 
 	// Serial Scripter routines
-	// go heartbeatLoop()
-	// go inventoryLoop()
+	go heartbeatLoop()
+	go inventoryLoop()
 
 	// Internal routines
-	//go userLoop()
-	//go smbShareLoop()
-	// go serviceLoop()
-	// go chainsawLoop()
-	// go processLoop()
+	go userLoop()
+	go smbShareLoop()
+	//go serviceLoop()
+	//go chainsawLoop()
+	//go processLoop()
 
 	wg.Wait()
 
