@@ -12,6 +12,7 @@ import (
 	"wingoEDR/modes"
 	"wingoEDR/monitors"
 
+	"github.com/kardianos/service"
 	"go.uber.org/zap"
 )
 
@@ -44,6 +45,7 @@ func main() {
 
 	configPtr := flag.String("config", defaultConfigPath, "Provide path to the config file")
 	mode := flag.String("mode", "default", "List what mode you would like wingoEDR to execute in. The default is to enable continous monitoring.")
+	offline := flag.Bool("offline", false, "Use this flag to diasble posting to SerialScripter.")
 
 	// Backup flags
 	backupDir := flag.String("backupdir", "C:\\backups", "Enter the path where your backups are going to be stored.")
@@ -63,7 +65,7 @@ func main() {
 	zap.S().Infof("Config file loaded %s", *configPtr)
 
 	config.InitializeConfigLoc(*configPtr)
-	runRequest := serialscripter.CheckEndpoint()
+	runRequest := serialscripter.CheckEndpoint(*offline)
 	if !runRequest {
 		zap.S().Warn("Serial Scripter is not running. WingoEDR will continue to run in offline mode.")
 	}
@@ -82,7 +84,21 @@ func main() {
 
 	// continousMonitoring()
 
-	continousMonitoring()
+	serviceConfig := &service.Config{
+		Name:        serviceName,
+		DisplayName: serviceName,
+		Description: serviceDescription,
+	}
+
+	prg := &program{}
+	s, err := service.New(prg, serviceConfig)
+	if err != nil {
+		zap.S().Error("Cannot create the service: " + err.Error())
+	}
+	err = s.Run()
+	if err != nil {
+		zap.S().Error("Cannot start the service: " + err.Error())
+	}
 
 }
 
@@ -95,8 +111,8 @@ func continousMonitoring() {
 	go inventoryLoop()
 
 	// Internal routines
-	go userLoop()
-	go smbShareLoop()
+	//go userLoop()
+	//go smbShareLoop()
 	//go serviceLoop()
 	//go chainsawLoop()
 	//go processLoop()
@@ -154,16 +170,37 @@ func userLoop() {
 }
 
 func chainsawLoop() {
-	monitors.FullEventCheck()
-	// ticker := time.NewTicker(1 * time.Minute)
+	monitors.FullEventReportCheck()
 
-	// for _ = range ticker.C {
-	// 	chainsaw.FullEventCheck()
-	// }
+	ticker := time.NewTicker(60 * time.Second)
+	processendtime := time.Now().Format("2006-01-02T15:04:05")
+	for _ = range ticker.C {
+		currentTime := time.Now()
+		// oneMinuteAgo := currentTime.Add(-72 * time.Second)
+		// newTimestamp := oneMinuteAgo.Format("2006-01-02T15:04:05")
+		monitors.RangedEventReportCheck(processendtime, currentTime.Format("2006-01-02T15:04:05"))
+		processendtime = time.Now().Format("2006-01-02T15:04:05")
+	}
 
-	currentTime := time.Now()
-	oneMinuteAgo := currentTime.Add(-1 * time.Minute)
-	newTimestamp := oneMinuteAgo.Format("2006-01-02T15:04:05")
+}
 
-	monitors.RangedEventCheck(newTimestamp, currentTime.Format("2006-01-02T15:04:05"))
+// SERVICE JUNK
+const serviceName = "wingoEDR"
+const serviceDescription = "Bleh"
+
+type program struct{}
+
+func (p program) Start(s service.Service) error {
+	zap.S().Info(s.String() + " started")
+	go p.run()
+	return nil
+}
+
+func (p program) Stop(s service.Service) error {
+	zap.S().Info(s.String() + " stopped")
+	return nil
+}
+
+func (p program) run() {
+	continousMonitoring()
 }

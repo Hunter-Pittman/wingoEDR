@@ -31,6 +31,7 @@ require (
 	github.com/google/cabbie v1.0.2 // indirect
 	github.com/google/glazier v0.0.0-20211029225403-9f766cca891d // indirect
 	github.com/gorpher/gowin32 v0.0.9 // indirect
+	github.com/kardianos/service v1.2.2 // indirect
 	github.com/lucasb-eyer/go-colorful v1.2.0 // indirect
 	github.com/lufia/plan9stats v0.0.0-20211012122336-39d0f177ccd0 // indirect
 	github.com/mattn/go-colorable v0.1.13 // indirect

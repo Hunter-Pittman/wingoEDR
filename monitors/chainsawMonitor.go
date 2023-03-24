@@ -3,12 +3,10 @@ package monitors
 import (
 	"wingoEDR/chainsaw"
 
-	"github.com/Jeffail/gabs"
 	"go.uber.org/zap"
 )
 
-func FullEventCheck() {
-	_ = gabs.New()
+func FullEventReportCheck() {
 
 	events, err := chainsaw.ScanAll()
 	if err != nil {
@@ -16,13 +14,12 @@ func FullEventCheck() {
 	}
 
 	for _, e := range events {
-		chainsaw.RunEventResponse(e.ID)
+		chainsaw.RunReportEventResponse(e)
 	}
 
 }
 
-func RangedEventCheck(fromTimestamp string, toTimestamp string) {
-	_ = gabs.New()
+func RangedEventReportCheck(fromTimestamp string, toTimestamp string) {
 
 	events, err := chainsaw.ScanTimeRange(fromTimestamp, toTimestamp)
 	if err != nil {
@@ -30,7 +27,33 @@ func RangedEventCheck(fromTimestamp string, toTimestamp string) {
 	}
 
 	for _, e := range events {
-		chainsaw.RunEventResponse(e.ID)
+		chainsaw.RunReportEventResponse(e)
+	}
+
+}
+
+func FullEventActionCheck() {
+
+	events, err := chainsaw.ScanAll()
+	if err != nil {
+		zap.S().Error("Chainsaw events were not scanned: ", err.Error())
+	}
+
+	for _, e := range events {
+		chainsaw.RunActionEventResponse(e.ID)
+	}
+
+}
+
+func RangedEventActionCheck(fromTimestamp string, toTimestamp string) {
+
+	events, err := chainsaw.ScanTimeRange(fromTimestamp, toTimestamp)
+	if err != nil {
+		zap.S().Error("Chainsaw events were not scanned: ", err.Error())
+	}
+
+	for _, e := range events {
+		chainsaw.RunActionEventResponse(e.ID)
 	}
 
 }

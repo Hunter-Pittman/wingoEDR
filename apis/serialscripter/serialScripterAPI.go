@@ -8,7 +8,6 @@ import (
 	"fmt"
 	"net/http"
 	"strings"
-	"wingoEDR/common"
 	"wingoEDR/config"
 	"wingoEDR/inventory"
 
@@ -34,16 +33,14 @@ type Alert struct {
 }
 
 func HeartBeat() (err error) {
-	runRequest := CheckEndpoint()
-	if runRequest == false {
+	runRequest := CheckEndpoint(false)
+	if !runRequest {
 		return nil
 	}
 
 	ssUserAgent := config.GetSerialScripterUserAgent()
 	//ssUserAgent := "nestler-code"
 
-	m := Beat{IP: common.GetIP()}
-	jsonStr, err := json.Marshal(m)
 	if err != nil {
 		zap.S().Warn(err)
 	}
@@ -53,10 +50,8 @@ func HeartBeat() (err error) {
 	}
 	client := &http.Client{Transport: tr}
 
-	bodyReader := bytes.NewReader(jsonStr)
-
 	requestURL := fmt.Sprintf("%v/api/v1/common/heartbeat", config.GetSerialScripterURL())
-	req, err := http.NewRequest(http.MethodPost, requestURL, bodyReader)
+	req, err := http.NewRequest(http.MethodPost, requestURL, nil)
 	if err != nil {
 		zap.S().Warn(err)
 	}
@@ -77,8 +72,8 @@ func HeartBeat() (err error) {
 }
 
 func PostInventory() (err error) {
-	runRequest := CheckEndpoint()
-	if runRequest == false {
+	runRequest := CheckEndpoint(false)
+	if !runRequest {
 		return nil
 	}
 	ssUserAgent := config.GetSerialScripterUserAgent()
@@ -91,7 +86,7 @@ func PostInventory() (err error) {
 		zap.S().Warn(err)
 	}
 
-	fmt.Println(string(jsonStr))
+	//fmt.Println(string(jsonStr))
 
 	tr := &http.Transport{
 		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
@@ -121,8 +116,8 @@ func PostInventory() (err error) {
 }
 
 func IncidentAlert(alert Alert) (err error) {
-	runRequest := CheckEndpoint()
-	if runRequest == false {
+	runRequest := CheckEndpoint(false)
+	if !runRequest {
 		return nil
 	}
 
@@ -160,21 +155,17 @@ func IncidentAlert(alert Alert) (err error) {
 	return nil
 }
 
-func CheckEndpoint() bool {
+func CheckEndpoint(flag bool) bool {
 	url := config.GetSerialScripterURL()
-
-	if !strings.Contains(url, "http") {
-		zap.S().Warn("No http in URL, skipping posts: ", url)
+	if flag {
 		return false
-	}
-
-	err := TestHeartBeat()
-	if err != nil {
-		zap.S().Error("Error checking heartbeat:", err)
+	} else if !strings.Contains(url, "http") {
 		return false
+	} else if TestHeartBeat() != nil {
+		return false
+	} else {
+		return true
 	}
-
-	return true
 }
 
 func TestHeartBeat() (err error) {
@@ -182,8 +173,6 @@ func TestHeartBeat() (err error) {
 	ssUserAgent := config.GetSerialScripterUserAgent()
 	//ssUserAgent := "nestler-code"
 
-	m := Beat{IP: common.GetIP()}
-	jsonStr, err := json.Marshal(m)
 	if err != nil {
 		zap.S().Warn(err)
 	}
@@ -193,10 +182,8 @@ func TestHeartBeat() (err error) {
 	}
 	client := &http.Client{Transport: tr}
 
-	bodyReader := bytes.NewReader(jsonStr)
-
 	requestURL := fmt.Sprintf("%v/api/v1/common/heartbeat", config.GetSerialScripterURL())
-	req, err := http.NewRequest(http.MethodPost, requestURL, bodyReader)
+	req, err := http.NewRequest(http.MethodPost, requestURL, nil)
 	if err != nil {
 		zap.S().Warn(err)
 	}
@@ -208,7 +195,7 @@ func TestHeartBeat() (err error) {
 		return err
 	} else {
 		if resp.StatusCode != http.StatusOK {
-			zap.S().Error("Unexpected status code %d\n", resp.StatusCode)
+			zap.S().Errorf("Unexpected status code %d\n", resp.StatusCode)
 			return errors.New("Unexpected status code")
 		}
 	}

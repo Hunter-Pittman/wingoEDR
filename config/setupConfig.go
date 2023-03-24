@@ -45,7 +45,7 @@ func GenerateConfig() string {
 			releaseVersion := "v0.1.3-alpha"
 			zap.S().Warnf("Attempting download of external resources %s...", releaseVersion)
 			fullUrl := fmt.Sprintf("https://github.com/Hunter-Pittman/wingoEDR/releases/download/%s/externalresources.zip", releaseVersion)
-			_, err := grab.Get(".", fullUrl)
+			_, err := grab.Get(wingoFolder, fullUrl)
 			if err != nil {
 				zap.S().Fatal("Unable to download external resources: ", err)
 			}

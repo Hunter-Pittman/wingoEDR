@@ -79,7 +79,7 @@ func BackupMode(otherParams map[string]Params) {
 }
 
 func Chainsaw(otherParams map[string]Params) {
-	var events []chainsaw.Event
+	var events []chainsaw.ChainsawEvent
 	var err error
 
 	// Required params check

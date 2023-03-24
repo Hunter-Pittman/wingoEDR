@@ -65,10 +65,6 @@ type Configuration struct {
 	} `json:"lists"`
 }
 
-//const CONFIG_LOC string = "C:\\Users\\hunte\\Documents\\repos\\wingoEDR\\config.json"
-
-//const CONFIG_LOC string = "C:\\Users\\Administrator\\Downloads\\config.json"
-
 var (
 	CONFIG_LOC string
 )

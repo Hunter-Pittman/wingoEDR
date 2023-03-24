@@ -2,6 +2,7 @@ package inventory
 
 import (
 	"os"
+	"time"
 	"wingoEDR/common"
 	"wingoEDR/firewall"
 	"wingoEDR/processes"
@@ -23,6 +24,7 @@ type InventoryObject struct {
 	Shares             []shares.SMBInfo                `json:"shares"`
 	Users              []usermanagement.User           `json:"users"`
 	Processes          []processes.ProcessInfo         `json:"processes"`
+	TimeConnected      string                          `json:"timeConnected"`
 }
 
 type InventorySummary struct {
@@ -51,6 +53,7 @@ func GetInventory() InventoryObject {
 		Shares:             shares.GetShares(),
 		Users:              usermanagement.ReturnUsers(),
 		Processes:          processes,
+		TimeConnected:      time.Now().Format("03:04:05 PM"),
 	}
 
 	return inv

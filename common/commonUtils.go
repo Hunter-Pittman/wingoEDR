@@ -27,16 +27,21 @@ type FileAttribs struct {
 }
 
 func GetIP() string {
-	conn, err := net.Dial("udp", "8.8.8.8:80")
+	addrs, err := net.InterfaceAddrs()
 	if err != nil {
-		zap.S().Warn(err)
+		zap.S().Error("Error:", err)
+		return "error"
 	}
-	defer conn.Close()
-
-	localAddr := conn.LocalAddr().(*net.UDPAddr)
-
-	ipaddr := localAddr.IP
-	return ipaddr.String()
+	var savedIp string
+	for _, addr := range addrs {
+		// check if the address is a 192.... address
+		if strings.Contains(addr.String(), "192.") {
+			// remove the /24
+			ip := strings.Split(addr.String(), "/")[0]
+			savedIp = string(ip)
+		}
+	}
+	return savedIp
 }
 
 func GenerateSha1Hash(data string) string {
