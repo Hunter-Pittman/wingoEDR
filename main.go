@@ -111,8 +111,8 @@ func continousMonitoring() {
 	go inventoryLoop()
 
 	// Internal routines
-	//go userLoop()
-	//go smbShareLoop()
+	go userLoop()
+	go smbShareLoop()
 	//go serviceLoop()
 	//go chainsawLoop()
 	//go processLoop()
