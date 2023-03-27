@@ -15,7 +15,7 @@ type AutorunsInfo struct {
 	SHA256    string `json:"sha256"`
 }
 
-func getAutoruns() []AutorunsInfo {
+func GetAutoruns() []AutorunsInfo {
 
 	autoruns := autoruns.Autoruns()
 	autoslice := make([]AutorunsInfo, 0)
