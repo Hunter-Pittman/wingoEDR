@@ -153,6 +153,15 @@ func smbShareLoop() {
 	}
 }
 
+ func softwareLoop() {
+	monitors.InitSoftware()
+	ticker := time.NewTicker(30 * time.Second)
+
+	for _ = range ticker.C {
+		monitors.SoftwareMonitor()
+	}
+}
+
 func inventoryLoop() {
 	ticker := time.NewTicker(20 * time.Second)
 

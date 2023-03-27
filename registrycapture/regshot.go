@@ -50,6 +50,7 @@ type InstalledSoftware struct {
 }
 
 // Return subkey values for installed software
+//HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\Current Version\Uninstall
 func GetSoftwareSubkeys(registryPath string) []InstalledSoftware {
 
 	keyHandle, err := registry.OpenKey(registry.LOCAL_MACHINE, registryPath, registry.QUERY_VALUE|registry.ENUMERATE_SUB_KEYS)
@@ -58,7 +59,7 @@ func GetSoftwareSubkeys(registryPath string) []InstalledSoftware {
 	}
 	subkeys, err := keyHandle.ReadSubKeyNames(-1)
 	if err != nil {
-		zap.S().Error("Erro reading sub key names", err)
+		zap.S().Error("Error reading sub key names", err)
 	}
 
 	softwareList := []InstalledSoftware{}
