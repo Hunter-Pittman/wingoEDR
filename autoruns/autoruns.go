@@ -21,6 +21,7 @@ func GetAutoruns() []AutorunsInfo {
 	autoslice := make([]AutorunsInfo, 0)
 
 	for _, autorun := range autoruns {
+
 		helium := AutorunsInfo{
 			Type:      autorun.Type,
 			Location:  autorun.Location,
@@ -33,5 +34,16 @@ func GetAutoruns() []AutorunsInfo {
 		autoslice = append(autoslice, helium)
 
 	}
-	return (autoslice)
+
+	uniqueslice := make(map[string]bool)
+	var finalslice []AutorunsInfo
+	for _, instance := range autoslice {
+		if _, exists := uniqueslice[instance.ImagePath]; !exists {
+
+			finalslice = append(finalslice, instance)
+		}
+
+	}
+
+	return (finalslice)
 }
