@@ -4,14 +4,16 @@ go 1.19
 
 require (
 	github.com/Jeffail/gabs v1.4.0
-	github.com/Jeffail/gabs/v2 v2.7.0
-	github.com/abdfnx/gosh v0.4.0
 	github.com/blockloop/scan/v2 v2.0.0
+	github.com/botherder/go-autoruns v1.1.0
+	github.com/cavaliergopher/grab/v3 v3.0.1
 	github.com/charmbracelet/bubbletea v0.22.1
 	github.com/charmbracelet/lipgloss v0.6.0
 	github.com/djherbis/times v1.5.0
 	github.com/fatih/color v1.14.1
+	github.com/gorpher/gowin32 v0.0.9
 	github.com/iamacarpet/go-win64api v0.0.0-20221230174906-cb41e6e774e8
+	github.com/kardianos/service v1.2.2
 	github.com/klauspost/compress v1.15.15
 	github.com/mackerelio/go-osstat v0.2.3
 	github.com/mattn/go-sqlite3 v1.14.16
@@ -24,17 +26,12 @@ require (
 )
 
 require (
-	github.com/botherder/go-autoruns v1.1.0 // indirect
 	github.com/botherder/go-files v0.0.0-20180205213231-2246e61e05ec // indirect
 	github.com/capnspacehook/taskmaster v0.0.0-20210519235353-1629df7c85e9 // indirect
-	github.com/cavaliercoder/grab v3.0.1+incompatible // indirect
-	github.com/cavaliergopher/grab/v3 v3.0.1 // indirect
 	github.com/containerd/console v1.0.3 // indirect
 	github.com/go-ole/go-ole v1.2.6 // indirect
 	github.com/google/cabbie v1.0.2 // indirect
 	github.com/google/glazier v0.0.0-20211029225403-9f766cca891d // indirect
-	github.com/gorpher/gowin32 v0.0.9 // indirect
-	github.com/kardianos/service v1.2.2 // indirect
 	github.com/lucasb-eyer/go-colorful v1.2.0 // indirect
 	github.com/lufia/plan9stats v0.0.0-20211012122336-39d0f177ccd0 // indirect
 	github.com/mattn/go-colorable v0.1.13 // indirect
@@ -56,7 +53,6 @@ require (
 	github.com/yusufpapurcu/wmi v1.2.2 // indirect
 	go.uber.org/atomic v1.7.0 // indirect
 	go.uber.org/multierr v1.6.0 // indirect
-	golang.org/x/crypto v0.0.0-20201012173705-84dcc777aaee // indirect
 	golang.org/x/term v0.0.0-20210927222741-03fcf44c2211 // indirect
 	howett.net/plist v0.0.0-20200419221736-3b63eb3a43b5 // indirect
 )
