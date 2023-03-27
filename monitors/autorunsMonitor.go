@@ -80,7 +80,7 @@ func autorunsToDB(autoruns []autoruns.AutorunsInfo, update bool) {
 	}
 
 	for _, autoruns := range autoruns {
-		_, err := stmt.Exec(autoruns.Type)
+		_, err := stmt.Exec(autoruns.Type, autoruns.Location, autoruns.ImagePath, autoruns.ImageName, autoruns.Arguments, autoruns.MD5, autoruns.SHA1, autoruns.SHA256)
 		if err != nil {
 			zap.S().Error("Error inserting autorun into database: ", err)
 		}
