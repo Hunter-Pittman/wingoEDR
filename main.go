@@ -70,12 +70,13 @@ func main() {
 		zap.S().Warn("Serial Scripter is not running. WingoEDR will continue to run in offline mode.")
 	}
 
-	// thing := "chainsaw" // TEST VALUE
-	// mode = &thing       // TEST VALUE
-	// thing2 := true      // TEST VALUE
-	// json = &thing2      // TEST VALUE
+	// thing := "decompress"                         // TEST VALUE
+	// mode = &thing                                 // TEST VALUE
+	// thing2 := `C:\backups\compressed_procexp.exe` // TEST VALUE
+	// decompressItem = &thing2                      // TEST VALUE
 
-	modes.ModeHandler(*mode, map[string]modes.Params{"backupDir": *backupDir, "backupItem": *backupItem, "decompressItem": *decompressItem, "from": *from, "to": *to, "json": *json})
+	paramItems := map[string]modes.Params{"backupDir": *backupDir, "backupItem": *backupItem, "decompressItem": *decompressItem, "from": *from, "to": *to, "json": *json}
+	modes.ModeHandler(*mode, paramItems)
 
 	// Pre execution checks
 	// Check serial scripter connection
@@ -117,6 +118,7 @@ func continousMonitoring() {
 	//go chainsawLoop()
 	//go processLoop()
 	//go autorunsLoop()
+	//go softwareLoop()
 
 	wg.Wait()
 
@@ -153,7 +155,7 @@ func smbShareLoop() {
 	}
 }
 
- func softwareLoop() {
+func softwareLoop() {
 	monitors.InitSoftware()
 	ticker := time.NewTicker(30 * time.Second)
 

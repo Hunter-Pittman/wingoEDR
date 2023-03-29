@@ -35,15 +35,22 @@ func GetAutoruns() []AutorunsInfo {
 
 	}
 
-	uniqueslice := make(map[string]bool)
-	var finalslice []AutorunsInfo
-	for _, instance := range autoslice {
-		if _, exists := uniqueslice[instance.ImagePath]; !exists {
+	// define a map to keep track of seen image paths
+	seenPaths := make(map[string]bool)
 
-			finalslice = append(finalslice, instance)
+	// define a new array to store unique items
+	uniqueItems := []AutorunsInfo{}
+
+	// iterate over the original array
+	for _, item := range autoslice {
+		// check if the image path has already been seen
+		if !seenPaths[item.ImagePath] {
+			// add the item to the new array
+			uniqueItems = append(uniqueItems, item)
 		}
-
+		// mark the image path as seen
+		seenPaths[item.ImagePath] = true
 	}
 
-	return (finalslice)
+	return (uniqueItems)
 }

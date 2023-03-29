@@ -15,7 +15,6 @@ import (
 	"time"
 
 	"github.com/djherbis/times"
-	"github.com/fatih/color"
 	"go.uber.org/zap"
 	"golang.org/x/text/encoding/unicode"
 )
@@ -81,11 +80,11 @@ func VerifyWindowsPathFatal(path string) {
 	match, _ := regexp.MatchString(`[a-zA-Z]:[\\\/](?:[a-zA-Z0-9]+[\\\/])*([a-zA-Z0-9]+\.*)`, path)
 
 	if !match { // Errors out on a "C:\" path needs to be fixed
-		color.Red("[ERROR]	The entered output is not a Windows path!")
+		zap.S().Fatal("The entered path is not a valid Windows path!")
 		os.Exit(1)
 	} else {
 		if _, err := os.Stat(path); os.IsNotExist(err) {
-			color.Red("[ERROR]	Windows path does not exist!")
+			zap.S().Fatal("Windows path does not exist!")
 			os.Exit(1)
 		}
 	}

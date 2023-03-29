@@ -43,7 +43,6 @@ func ModeHandler(mode string, otherParams map[string]Params) {
 	case "software":
 		zap.S().Infof("Mode is %s", mode)
 		SoftwareMode()
-
 	default:
 		zap.S().Infof("No mode selected defaulting to continious monitoring")
 		return
@@ -72,7 +71,7 @@ func BackupMode(otherParams map[string]Params) {
 	} else {
 		newFileName := "\\compressed_" + fileInfo.Name()
 		backup.BackFile(newFileName, otherParams["backupItem"].(string))
-		zap.S().Infof("[INFO]	Backup of %s is complete!", otherParams["backupItem"])
+		zap.S().Infof("Backup of %s is complete!", otherParams["backupItem"])
 	}
 
 	os.Exit(0)
@@ -190,14 +189,14 @@ func UserEnumMode() {
 
 func DecompressMode(otherParams map[string]Params) {
 	// Required params check
-	common.VerifyWindowsPathFatal(otherParams["decompressitem"].(string))
+	common.VerifyWindowsPathFatal(otherParams["decompressItem"].(string))
 
-	reader, err := os.Open(otherParams["decompressitem"].(string))
+	reader, err := os.Open(otherParams["decompressItem"].(string))
 	if err != nil {
 		zap.S().Fatal("Backup item file access failure! Err: %v", err)
 	}
 
-	file := filepath.Base(otherParams["decompressitem"].(string))
+	file := filepath.Base(otherParams["decompressItem"].(string))
 	newFileName := file[11:]
 	writer, err := os.Create(newFileName)
 	if err != nil {
