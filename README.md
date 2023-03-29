@@ -1,6 +1,6 @@
 # WingoEDR
 
-![[Pasted image 20230328154739.png]]
+![[./readme_images/Pasted image 20230328154739.png]]
 
 ## What is WingoEDR
 WingoEDR is a multifaceted tool used as both a utility to get key Windows information in a quick and easy to read format, and as a continuous monitoring agent that integrates with another homegrown project, Serial Scripter, all written in Go. The features of WingoEDR are outlined below in multiple sections.
