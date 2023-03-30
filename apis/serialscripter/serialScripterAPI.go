@@ -19,12 +19,13 @@ import (
 type Beat struct {
 	IP string
 }
+
 type Incident struct {
 	Name        string
 	CurrentTime string
 	User        string
 	Severity    string
-	Payload     string
+	Payload     interface{}
 }
 
 type Alert struct {
