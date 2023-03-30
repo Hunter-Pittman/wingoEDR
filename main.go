@@ -119,6 +119,8 @@ func continousMonitoring() {
 	//go processLoop()
 	//go autorunsLoop()
 	//go softwareLoop()
+	//go monitors.InitSoftware()
+	//go monitors.SoftwareMonitor()
 
 	wg.Wait()
 

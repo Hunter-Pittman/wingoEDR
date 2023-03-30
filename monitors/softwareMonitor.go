@@ -1,26 +1,27 @@
 package monitors
 
 import (
-	"log"
 	"wingoEDR/db"
-	"wingoEDR/registrycapture"
+	"wingoEDR/software"
 
+	"github.com/blockloop/scan/v2"
 	"go.uber.org/zap"
 )
 
 func InitSoftware() {
+	softwareList := software.GetInstalledSofware()
 	if db.CountTableRecords("currentsoftware") == 0 {
-		softwareList := registrycapture.GetSoftwareSubkeys(`HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\Current Version\Uninstall\`)
+		//softwareList := registrycapture.GetSoftwareSubkeys(`HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\Current Version\Uninstall`)
 		softwareToDB(softwareList, false)
 	}
 }
 
-func softwareToDB(softwareList []registrycapture.InstalledSoftware, update bool) {
+func softwareToDB(softwareList []software.Software, update bool) {
 	var operation string
 	if update {
-		operation = "UPDATE currentsoftware SET name = ?, version = ?, installpath = ?, publisher = ?, uninstallstring = ?"
+		operation = "UPDATE currentsoftware SET name = ?, version = ?, vendor = ?"
 	} else {
-		operation = "INSERT INTO currentsoftware (name, version, installpath, publisher, uninstallstring) VALUES (?, ?, ?, ?, ?)"
+		operation = "INSERT INTO currentsoftware (name, version, vendor) VALUES (?, ?, ?)"
 	}
 
 	conn := db.DbConnect()
@@ -30,7 +31,7 @@ func softwareToDB(softwareList []registrycapture.InstalledSoftware, update bool)
 	}
 
 	for _, software := range softwareList {
-		_, err := stmt.Exec(software.Name, software.Version, software.InstallPath, software.Publisher, software.UninstallString)
+		_, err := stmt.Exec(software.Name, software.Version, software.Vendor)
 		if err != nil {
 			zap.S().Error("Error inserting software into database: ", err)
 		}
@@ -39,7 +40,7 @@ func softwareToDB(softwareList []registrycapture.InstalledSoftware, update bool)
 	defer stmt.Close()
 }
 
-func deleteSoftwareFromDB(softwareList []registrycapture.InstalledSoftware) {
+func deleteSoftwareFromDB(softwareList []software.Software) {
 	for _, software := range softwareList {
 		zap.S().Info("Software deleted from database: ", software.Name)
 
@@ -59,7 +60,7 @@ func deleteSoftwareFromDB(softwareList []registrycapture.InstalledSoftware) {
 	}
 }
 
-func softwareFromDB() []registrycapture.InstalledSoftware {
+func softwareFromDB() []software.Software {
 	conn := db.DbConnect()
 	rows, err := conn.Query("SELECT * FROM currentsoftware")
 	if err != nil {
@@ -68,23 +69,28 @@ func softwareFromDB() []registrycapture.InstalledSoftware {
 
 	defer rows.Close()
 
-	var queriedSoftware []registrycapture.InstalledSoftware
+	var queriedSoftware []software.Software
+	err1 := scan.Rows(&queriedSoftware, rows)
+	if err1 != nil {
+		zap.S().Error("Error scanning software list from database")
+	}
 
-	for rows.Next() {
-		var softwareStruct registrycapture.InstalledSoftware
-		err = rows.Scan(&softwareStruct.Name, &softwareStruct.Version, &softwareStruct.InstallPath, &softwareStruct.Publisher, &softwareStruct.UninstallString)
+	/*for rows.Next() {
+		var softwareStruct software.Software
+		err = rows.Scan(&softwareStruct.Name, &softwareStruct.Version, &softwareStruct.Vendor)
 
 		if err != nil {
 			log.Fatal(err)
 		}
 
 		queriedSoftware = append(queriedSoftware, softwareStruct)
-	}
+	}*/
 	return queriedSoftware
 }
 
 func SoftwareMonitor() {
-	softwareList := registrycapture.GetSoftwareSubkeys(`HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\Current Version\Uninstall`)
+	//softwareList := registrycapture.GetSoftwareSubkeys(`HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\Current Version\Uninstall`)
+	softwareList := software.GetInstalledSofware()
 	queriedSoftwareList := softwareFromDB()
 
 	if len(softwareList) > len(queriedSoftwareList) {
