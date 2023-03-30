@@ -10,7 +10,7 @@ import (
 	"wingoEDR/chainsaw"
 	"wingoEDR/common"
 	"wingoEDR/processes"
-	"wingoEDR/registrycapture"
+	"wingoEDR/software"
 	"wingoEDR/usermanagement"
 
 	"github.com/olekukonko/tablewriter"
@@ -154,15 +154,17 @@ func SessionsMode() {
 }
 
 func SoftwareMode() {
-	installedSoftware := registrycapture.GetSoftwareSubkeys(`SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall`)
-
+	//installedSoftware := registrycapture.GetSoftwareSubkeys(`SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall`)
+	installedSoftware := software.GetInstalledSofware()
 	table := tablewriter.NewWriter(os.Stdout)
-	table.SetHeader([]string{"Name", "Version", "InstallPath", "Publisher", "UninstallString"})
-
+	//table.SetHeader([]string{"Name", "Version", "InstallPath", "Publisher", "UninstallString"})
+	table.SetHeader([]string{"Name", "Version", "Vendor"})
 	for _, software := range installedSoftware {
-		row := []string{software.Name, software.Version, software.InstallPath, software.Publisher, software.UninstallString}
+		row := []string{software.Name, software.Version, software.Vendor}
 		table.Append(row)
 	}
+
+	//return installedSoftware
 
 	table.SetRowLine(true)
 
