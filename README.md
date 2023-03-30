@@ -211,6 +211,7 @@ Phase 1: (WE ARE HERE)
 	* System Health ✅
 	* Autoruns ⏳
 * Implement key monitors
+	* Add whitelist/blacklist integration 🛑
 	* Autoruns Monitor⏳
 	* Chainsaw Monitor⏳
 	* SMB Monitor ✅
