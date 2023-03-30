@@ -118,6 +118,8 @@ func continousMonitoring() {
 	//go chainsawLoop()
 	//go processLoop()
 	//go autorunsLoop()
+	go monitors.InitServices()
+	go monitors.MonitorServices()
 	//go softwareLoop()
 
 	wg.Wait()
@@ -161,6 +163,15 @@ func softwareLoop() {
 
 	for _ = range ticker.C {
 		monitors.SoftwareMonitor()
+	}
+}
+
+func serviceLoop() {
+	monitors.InitServices()
+	ticker := time.NewTicker(30 * time.Second)
+
+	for _ = range ticker.C {
+		monitors.MonitorServices()
 	}
 }
 

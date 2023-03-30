@@ -1,6 +1,6 @@
 # WingoEDR
 
-![[./readme_images/Pasted image 20230328154739.png]]
+![alt text](https://github.com/Hunter-Pittman/wingoEDR/blob/main/readme_images/Pasted%20image%2020230328154739.png?raw=true)
 
 ## What is WingoEDR
 WingoEDR is a multifaceted tool used as both a utility to get key Windows information in a quick and easy to read format, and as a continuous monitoring agent that integrates with another homegrown project, Serial Scripter, all written in Go. The features of WingoEDR are outlined below in multiple sections.
@@ -98,7 +98,8 @@ Finally you can get output in a JSON format if you simply add the `--json` flag 
 This works for the base command as well as the time ranged one.
 
 Example output:
-![[Pasted image 20230328180654.png]]
+![alt text](https://github.com/Hunter-Pittman/wingoEDR/blob/main/readme_images/Pasted%20image%2020230328180634.png?raw=true)
+
 
 ### Userenum
 `Note: This mode needs a strictrer validation (espeically in regards to Acive Directory users).`
@@ -110,7 +111,7 @@ Running this one is simple:
 ```
 
 Example Output:
-![[Pasted image 20230328181506.png]]
+![alt text](https://github.com/Hunter-Pittman/wingoEDR/blob/main/readme_images/Pasted%20image%2020230328181506.png?raw=true)
 
 ### Software
 This mode returns the installed software for a system.
@@ -121,7 +122,7 @@ To run it:
 ```
 
 Example output:
-![[Pasted image 20230328181737.png]]
+![alt text](https://github.com/Hunter-Pittman/wingoEDR/blob/main/readme_images/Pasted%20image%2020230328181737.png?raw=true)
 
 ## Continuous Monitoring
 Continuous monitoring is the other way WingoEDR can be run. This mode has several functions.
