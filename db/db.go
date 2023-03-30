@@ -35,6 +35,8 @@ func DbInit() {
 	create table if not exists currentshares (netname text not null primary key, remark text, path text, type text, permissions integer, maxuses integer, currentuses integer);
 	create table if not exists currentautoruns (type text , location text, image_path text not null primary key, image_name text, arguments text, md5 text, sha1 text, sha256 text);
 	create table if not exists currentsoftware (name text, version text, installpath text, publisher text, uninstallstring text);
+	create table if not exists currentservices (scname text, displayname text, statustext text, acceptstop integer, runningpid integer, port integer);
+
 	`
 	_, err1 := conn.Exec(sqlStmt)
 	if err1 != nil {

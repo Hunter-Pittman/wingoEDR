@@ -37,14 +37,14 @@ func MonitorAutoruns() {
 	if len(monitoredAutoruns) > len(queriedAutoruns) {
 		for _, queriedAutoruns := range queriedAutoruns {
 			for i, autorun := range monitoredAutoruns {
-				if autorun.Type == queriedAutoruns.Type {
+				if autorun.ImagePath == queriedAutoruns.ImagePath {
 					monitoredAutoruns[i] = monitoredAutoruns[len(monitoredAutoruns)-1]
 					monitoredAutoruns = monitoredAutoruns[:len(monitoredAutoruns)-1]
 				}
 			}
 		}
 		for _, autorun := range monitoredAutoruns {
-			zap.S().Info("New autorun detected: ", autorun.Type)
+			zap.S().Info("New autorun detected: ", autorun.ImagePath)
 			newAutorunIncident([]autoruns.AutorunsInfo{autorun})
 		}
 
@@ -52,7 +52,7 @@ func MonitorAutoruns() {
 	} else if len(monitoredAutoruns) < len(queriedAutoruns) {
 		for _, autorun := range monitoredAutoruns {
 			for i, queriedAutorun := range queriedAutoruns {
-				if autorun.Type == queriedAutorun.Type {
+				if autorun.ImagePath == queriedAutorun.ImagePath {
 					queriedAutoruns[i] = queriedAutoruns[len(queriedAutoruns)-1]
 					queriedAutoruns = queriedAutoruns[:len(queriedAutoruns)-1]
 				}
@@ -82,7 +82,11 @@ func autorunsToDB(autoruns []autoruns.AutorunsInfo, update bool) {
 	for _, autoruns := range autoruns {
 		_, err := stmt.Exec(autoruns.Type, autoruns.Location, autoruns.ImagePath, autoruns.ImageName, autoruns.Arguments, autoruns.MD5, autoruns.SHA1, autoruns.SHA256)
 		if err != nil {
-			zap.S().Error("Error inserting autorun into database: ", err)
+			if err.Error() == "UNIQUE constraint failed: currentautoruns.image_path" {
+
+			} else {
+				zap.S().Error("Error inserting autorun into database: ", err)
+			}
 		}
 	}
 
@@ -109,7 +113,7 @@ func autorunsFromDB() []autoruns.AutorunsInfo {
 
 func deleteAutorunFromDB(autorun []autoruns.AutorunsInfo) {
 	for _, autorun := range autorun {
-		zap.S().Info("User deleted: ", autorun.Type)
+		zap.S().Info("User deleted: ", autorun.ImagePath)
 
 		conn := db.DbConnect()
 		stmt, err := conn.Prepare("DELETE FROM currentautoruns WHERE type = ?")
