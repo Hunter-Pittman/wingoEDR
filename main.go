@@ -108,18 +108,16 @@ func continousMonitoring() {
 	wg.Add(5)
 
 	// Serial Scripter routines
-	go heartbeatLoop()
-	go inventoryLoop()
+	//go heartbeatLoop()
+	//go inventoryLoop()
 
 	// Internal routines
 	//go userLoop()
-	//go smbShareLoop()
+	go smbShareLoop()
 	//go serviceLoop()
 	//go chainsawLoop()
 	//go processLoop()
 	//go autorunsLoop()
-	go monitors.InitServices()
-	go monitors.MonitorServices()
 	//go softwareLoop()
 
 	wg.Wait()

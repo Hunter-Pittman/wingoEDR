@@ -1,7 +1,6 @@
 package monitors
 
 import (
-	"encoding/json"
 	"log"
 	"os"
 	"time"
@@ -144,17 +143,17 @@ func newShareIncident(newShare []shares.SMBInfo) {
 		LastLoggedOnUser: usermanagement.GetLastLoggenOnUser(),
 	}
 
-	jsonPayload, err := json.Marshal(payload)
-	if err != nil {
-		zap.S().Error("Error marshalling payload: ", err)
-	}
+	// jsonPayload, err := json.Marshal(payload)
+	// if err != nil {
+	// 	zap.S().Error("Error marshalling payload: ", err)
+	// }
 
 	newIncident := serialscripter.Incident{
 		Name:        "New share Created",
 		CurrentTime: time.Now().String(),
-		User:        "New share detected",
+		User:        usermanagement.GetLastLoggenOnUser(),
 		Severity:    "High",
-		Payload:     string(jsonPayload),
+		Payload:     payload,
 	}
 
 	hostname, err := os.Hostname()

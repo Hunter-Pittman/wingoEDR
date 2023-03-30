@@ -1,7 +1,6 @@
 package monitors
 
 import (
-	"encoding/json"
 	"os"
 	"time"
 	"wingoEDR/apis/serialscripter"
@@ -142,17 +141,12 @@ func newServiceIncident(newServices []servicemanager.WindowsService) {
 		LastLoggedOnUser: usermanagement.GetLastLoggenOnUser(),
 	}
 
-	jsonPayload, err := json.Marshal(payload)
-	if err != nil {
-		zap.S().Error("Error marshalling payload: ", err)
-	}
-
 	newIncident := serialscripter.Incident{
 		Name:        "New Service Created",
 		CurrentTime: time.Now().String(),
 		User:        "New Service detected",
 		Severity:    "High",
-		Payload:     string(jsonPayload),
+		Payload:     payload,
 	}
 
 	hostname, err := os.Hostname()
