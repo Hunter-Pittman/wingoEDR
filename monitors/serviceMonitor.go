@@ -43,7 +43,7 @@ func MonitorServices() {
 			}
 		}
 		for _, service := range services {
-			zap.S().Info("New user detected: ", service.SCname)
+			zap.S().Info("New service detected: ", service.SCname)
 			newServiceIncident([]servicemanager.WindowsService{service})
 		}
 
