@@ -108,8 +108,8 @@ func continousMonitoring() {
 	wg.Add(5)
 
 	// Serial Scripter routines
-	//go heartbeatLoop()
-	//go inventoryLoop()
+	go heartbeatLoop()
+	go inventoryLoop()
 
 	// Internal routines
 	//go userLoop()
