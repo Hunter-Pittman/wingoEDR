@@ -214,8 +214,7 @@ All of the modules listed report back to Serial Scripter, but they also write to
 			- [x] File backup
 			- [ ] Directory Backup
 		- [ ] Unconventional shell access (secured reverse shell?)
-		- [ ] Maybe we build this into the API GOTTY style?
-		- [ ] Need an Active Directory module
+			- [ ] Maybe we build this into the API GOTTY style?
 		- [ ] Use database for persistent logging of processes, hashes of the executable of the process, and the Kaspersky status
 	- [ ] Interface
 		- [ ] Optimize standalone interactivity and usefulness
@@ -241,6 +240,7 @@ All of the modules listed report back to Serial Scripter, but they also write to
 	- [ ] Autoruns returns too much input to serial scripter
 	- [ ] Software monitoring failing to get a handle to retrieve registry values (mode still works)
 	- [ ] Need to encrypt the database
+	- [ ] Log all incidents in the log file
 - [ ] WingoEDR API
 	- [ ] Needs authentication (Maybe JWT? Need to prevent replay attacks)
 	- [ ] Setup on port 6720
@@ -329,7 +329,6 @@ All of the modules listed report back to Serial Scripter, but they also write to
 				- [ ] POST Makes wingoEDR destroy itself (/{ip+hostname})
 - [ ] Windows API Tasks
 	- [ ] Get Sessions using custom C lib or go windows api interaction
-
 
 
 
