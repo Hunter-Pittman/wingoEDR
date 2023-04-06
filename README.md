@@ -2,11 +2,13 @@
 
 ![alt text](https://github.com/Hunter-Pittman/wingoEDR/blob/main/readme_images/Pasted%20image%2020230328154739.png?raw=true)
 
+Note: This tool is still under heavy development and is not ready for use. This tool is currently under pre-relaese status.
+
 ## What is WingoEDR
 WingoEDR is a multifaceted tool used as both a utility to get key Windows information in a quick and easy to read format, and as a continuous monitoring agent that integrates with another homegrown project, Serial Scripter, all written in Go. The features of WingoEDR are outlined below in multiple sections.
 1. Modes
 2. Continuous Monitoring
-3. Road Map
+3. Current To-Do
 
 ## Help
 This is the help section WingoEDR spits out.
@@ -192,56 +194,6 @@ WingoEDR has a few main components of continuous monitoring listed below:
 	6. User Monitor
 
 All of the modules listed report back to Serial Scripter, but they also write to the WingoEDR log and console (if run in one). Details about what each of these modules return can be found in code and will not be detailed here. Alternatively, run the program yourself and find out!
-
-## Future Road map
-This is only the first stage in a long development cycle. The full road map below should explain future improvements.
-
-Phase 1: (WE ARE HERE)
-* Implement key OS modules and libraries
-	* Network Monitoring 🛑
-	* Firewall ✅
-	* Shares ✅
-	* Processes ✅
-	* Registry ✅
-	* User Management ⏳
-		* User retrieval  ✅
-		* Account Manipulation ✅
-		* Sessions ⏳
-	* Service Management ✅
-	* System Health ✅
-	* Autoruns ⏳
-* Implement key monitors
-	* Add whitelist/blacklist integration 🛑
-	* Autoruns Monitor⏳
-	* Chainsaw Monitor⏳
-	* SMB Monitor ✅
-	* Software Monitor ⏳
-	* User Monitor ✅
-	* Process Monitor ⏳
-	* System Health Monitor 🛑
-* Implement global logging ✅
-* Create a modes parameter ✅
-* Serial Scripter API ✅
-* Implement Windows service integration ⏳ (Needs param switch and code cleanup) 
-* Integrate with Kaspersky ✅
-* Integrate with Chainsaw ⏳ 
-	* Non time ranged analysis ✅
-	* Time ranged analysis ⏳
-	* Output refinement ⏳
-* Integrate with ELK ⏳ (Needs testing) 
-* Utilize an application DB for persistent and programmatic storage ✅
-* Create an auto generated configuration system ✅
-
-Phase 2:
-* Create an API for the agent (for use with continuous monitoring and Serial Scripter)
-* Integrate with Yara-Storm (separate project for remote Yara rule processing)
-* Utilize Windows API/syscalls for more operations (phase out as many third party Windows golang libraries as possible)
-* Implement better malicious activity algorithms
-* Improve action based chainsaw response (Sigma rule trigger response)
-
-Phase 3:
-* Improve malicious activity response routes
-* Add interactive prompts to certain modes as appropriate (Interactive menus and/or table pagination)
 
 ## Current To-Do
 - [ ] Core
