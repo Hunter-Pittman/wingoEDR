@@ -284,7 +284,6 @@ Phase 3:
 				- [x] decompress
 				- [ ] dnsaudit
 				- [ ] systemreport
-	- [ ] 
 - [ ] Bug Fixes
 	- [ ] Fix IP (Not nearly specific enough, may specify communication subnet at execute?)
 	- [ ] Autoruns returns too much input to serial scripter
@@ -376,7 +375,6 @@ Phase 3:
 					- [ ] to timestamp
 			- [ ] boom
 				- [ ] POST Makes wingoEDR destroy itself (/{ip+hostname})
-	- [ ] 
 - [ ] Windows API Tasks
 	- [ ] Get Sessions using custom C lib or go windows api interaction
 
