@@ -243,6 +243,142 @@ Phase 3:
 * Improve malicious activity response routes
 * Add interactive prompts to certain modes as appropriate (Interactive menus and/or table pagination)
 
+## Current To-Do
+- [ ] Core
+	- [ ] Features
+		- [ ] Need a Active Directory Managment system
+		- [ ] Need a DNS management system
+		- [ ] Determine whether systems is a DNS server or not
+		- [ ] Breakdown of routes (Domain names, IPs)
+		- [ ] Detect other DNS servers configured to either forward or be forwarded too
+		- [ ] See what the DNS server of the current machine is set to
+		- [ ] Chainsaw integration
+			- [x] Add new chainsaw WinGoEDR module
+			- [x] Add continuous chainsaw monitoring for different sigma rulesets
+			- [ ] Link certain attacks to user destruction, session correlation
+			- [x] Add time instancing 
+			- [ ] Maybe create a incident map in memory or db that prevents retriggering of remediation actions
+		- [ ] Backup system from gomemento
+			- [x] File backup
+			- [ ] Directory Backup
+		- [ ] Unconventional shell access (secured reverse shell?)
+		- [ ] Maybe we build this into the API GOTTY style?
+		- [ ] Need an Active Directory module
+		- [ ] Use database for persistent logging of processes, hashes of the executable of the process, and the Kaspersky status
+	- [ ] Interface
+		- [ ] Optimize standalone interactivity and usefulness
+		- [ ] Web management mode (--web-manage)
+			- [ ] Make a front end for the WingoEDR API
+		- [ ] TUI mode
+			- [ ] Add table pagination for multiple values
+			- [ ] Add export options
+		- [ ] Tool mode (default)
+			- [ ] Params added
+				- [x] backup
+				- [x] chainsaw
+				- [ ] processexplorer
+				- [x] useraudit
+				- [ ] softwareaudit
+				- [ ] portaudit
+				- [ ] sessionaudit
+				- [x] decompress
+				- [ ] dnsaudit
+				- [ ] systemreport
+	- [ ] 
+- [ ] Bug Fixes
+	- [ ] Fix IP (Not nearly specific enough, may specify communication subnet at execute?)
+	- [ ] Autoruns returns too much input to serial scripter
+	- [ ] Software monitoring failing to get a handle to retrieve registry values (mode still works)
+	- [ ] Need to encrypt the database
+- [ ] WingoEDR API
+	- [ ] Needs authentication (Maybe JWT? Need to prevent replay attacks)
+	- [ ] Setup on port 6720
+	- [ ] Whitelist the control server
+	- [ ] Call endpoints as: https://localhost:6720/getlog
+	- [ ] To run wingoEDR with an API available must call a flag
+	- [ ] Need to evade red teamers
+	- [ ] Need to grab from database not actual sources for performance reasons
+		- [ ] Have database store refresh times for info, if time is greater than 1 minute, refresh the database else return stored info
+	- [ ] Endpoints
+		- [ ] Endpoints
+			- [ ] ping
+			- [ ] management
+				- [ ] wingo-managment
+					- [ ] GET wingoEDR's log (/getlog)
+					- [ ] GET wingoEDR's database (/getdb)
+					- [ ] GET wingoEDR's config (/getconfig)
+					- [ ] config
+						- [ ] serial-scripter
+							- [ ] POST Set the Serial Scripter URL (/url/{url})
+							- [ ] POST Set the Serial Scripter user-agent (/user-agent/{useragent})
+						- [ ] ELK
+							- [ ] POST Set the ELK URL (/url/{url})
+							- [ ] POST Set the ELK API key (/api-key/{apikey})
+						- [ ] service-checks
+							- [ ] POST Add a new service to monitor (/{type}&{name})
+								- [ ] type = process, service, etc
+								- [ ] name = id of some sort 
+				- [ ] user-management
+					- [ ] GET Users (/users)
+					- [ ] GET Specific user info (/users/{username})
+					- [ ] POST Delete a user (/delete/{username})
+					- [ ] POST Disable a user (/disable/{username})
+					- [ ] POST Enable a user (/enable/{username})
+					- [ ] POST Create a user (/create/{?})
+						- [ ] Username
+						- [ ] Password
+						- [ ] Groups
+				- [ ] share-management
+					- [ ] GET Shares (/shares)
+					- [ ] GET Specific share info (/shares/{sharename})
+					- [ ] POST Delete a share (/delete/{sharename})
+				- [ ] service-management
+					- [ ] GET Services (/services)
+					- [ ] GET Specific service info (/services/{servicename})
+					- [ ] POST Delete a service (/delete/{servicename})
+					- [ ] POST Disable a service (/disable/{servicename})
+					- [ ] POST Enable a servicename (/enable/{servicename})
+				- [ ] session-management
+					- [ ] GET Sessions (/sessions)
+					- [ ] POST Kill a session (/kill/{sessionid})
+				- [ ] network-management
+					- [ ] GET Open ports (/ports)
+					- [ ] GET Specific port info (/ports/{portnumber})
+					- [ ] POST Close a port (/close/{portnumber})
+					- [ ] firewall
+						- [ ] GET Firewall rules (/rules)
+						- [ ] GET Specific firewall rule info (/rules/{rulename})
+						- [ ] POST Delete a firewall rule (/delete/{firewallrulename})
+				- [ ] software-management
+					- [ ] GET Installed Software (/software)
+					- [ ] GET Specific software info (/software/{softwarename})
+					- [ ] POST Uninstall specified software (/uninstall/{softwarename})
+			- [ ] utils
+				- [ ] backup
+					- [ ] POST Backup a specific file to to the backup directory (/{Path to file})
+				- [ ] file
+					- [ ] GET Specific file from target (/get/{pathtofile})
+					- [ ] POST Delete specific file from target (/delete/{pathtofile})
+					- [ ] POST Hash a specific file and check against kaspersky (/kaspersky/check/{filehash})
+				- [ ] shortcuts
+					- [ ] GET Grab the evtx files from the system (/eventlog)
+					- [ ] GET comprehensive report
+			- [ ] systeminfo
+				- [ ] GET Hostname (/hostname)
+				- [ ] GET Domain status (/domain)
+				- [ ] GET OS version (/osversion)
+				- [ ] GET Key services (/importante)
+				- [ ] GET Update status (/updatestatus)
+			- [ ] chainsaw
+				- [ ] GET Complete chainsaw output
+				- [ ] GET Ranged chainsaw output ({from}&{to})
+					- [ ] from timestamp
+					- [ ] to timestamp
+			- [ ] boom
+				- [ ] POST Makes wingoEDR destroy itself (/{ip+hostname})
+	- [ ] 
+- [ ] Windows API Tasks
+	- [ ] Get Sessions using custom C lib or go windows api interaction
 
 
 
