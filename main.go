@@ -11,12 +11,33 @@ import (
 	"wingoEDR/logger"
 	"wingoEDR/modes"
 	"wingoEDR/monitors"
+	"wingoEDR/webserver/server"
 
 	"github.com/kardianos/service"
 	"go.uber.org/zap"
 )
 
 func main() {
+	// initialize the service
+	serviceConfig := &service.Config{
+		Name:        serviceName,
+		DisplayName: serviceName,
+		Description: serviceDescription,
+	}
+
+	prg := &program{}
+	s, err := service.New(prg, serviceConfig)
+	if err != nil {
+		zap.S().Error("Cannot create the service: " + err.Error())
+	}
+	err = s.Run()
+	if err != nil {
+		zap.S().Error("Cannot start the service: " + err.Error())
+	}
+
+}
+
+func (p program) run() {
 	logger.InitLogger()
 	// Command line args
 
@@ -59,6 +80,9 @@ func main() {
 	to := flag.String("to", "", "Enter the end timestamp in the format of YYYY-MM-DDTHH:MM:SS")
 	json := flag.Bool("json", false, "Enter true to output in json format")
 
+	// webserver flags
+	api := flag.Bool("api", false, "Enter true to run wingoEDR as a webserver")
+
 	flag.Parse()
 
 	common.VerifyWindowsPathFatal(*configPtr)
@@ -78,32 +102,11 @@ func main() {
 	paramItems := map[string]modes.Params{"backupDir": *backupDir, "backupItem": *backupItem, "decompressItem": *decompressItem, "from": *from, "to": *to, "json": *json}
 	modes.ModeHandler(*mode, paramItems)
 
-	// Pre execution checks
-	// Check serial scripter connection
-	// SSH Server configuration successful setup
-	// Powershell Check
-
-	// continousMonitoring()
-
-	serviceConfig := &service.Config{
-		Name:        serviceName,
-		DisplayName: serviceName,
-		Description: serviceDescription,
-	}
-
-	prg := &program{}
-	s, err := service.New(prg, serviceConfig)
-	if err != nil {
-		zap.S().Error("Cannot create the service: " + err.Error())
-	}
-	err = s.Run()
-	if err != nil {
-		zap.S().Error("Cannot start the service: " + err.Error())
-	}
-
+	continousMonitoring(*api)
 }
 
-func continousMonitoring() {
+func continousMonitoring(api bool) {
+
 	var wg sync.WaitGroup
 	wg.Add(5)
 
@@ -111,9 +114,15 @@ func continousMonitoring() {
 	//go heartbeatLoop()
 	//go inventoryLoop()
 
+	//webserver
+	if api {
+		go server.Init()
+		zap.S().Info("Webserver started on port 6270")
+	}
+
 	// Internal routines
 	//go userLoop()
-	go smbShareLoop()
+	//go smbShareLoop()
 	//go serviceLoop()
 	//go chainsawLoop()
 	//go processLoop()
@@ -231,8 +240,4 @@ func (p program) Start(s service.Service) error {
 func (p program) Stop(s service.Service) error {
 	zap.S().Info(s.String() + " stopped")
 	return nil
-}
-
-func (p program) run() {
-	continousMonitoring()
 }

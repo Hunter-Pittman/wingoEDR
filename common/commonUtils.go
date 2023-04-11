@@ -31,16 +31,20 @@ func GetIP() string {
 		zap.S().Error("Error:", err)
 		return "error"
 	}
-	var savedIp string
+
 	for _, addr := range addrs {
 		// check if the address is a 192.... address
 		if strings.Contains(addr.String(), "192.") {
 			// remove the /24
 			ip := strings.Split(addr.String(), "/")[0]
-			savedIp = string(ip)
+			return string(ip)
+		} else if strings.Contains(addr.String(), "10.") {
+			// remove the /24
+			ip := strings.Split(addr.String(), "/")[0]
+			return string(ip)
 		}
 	}
-	return savedIp
+	return ""
 }
 
 func GenerateSha1Hash(data string) string {
