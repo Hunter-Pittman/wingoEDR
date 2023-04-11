@@ -121,9 +121,9 @@ func continousMonitoring(api bool) {
 	}
 
 	// Internal routines
-	//go userLoop()
-	//go smbShareLoop()
-	//go serviceLoop()
+	go userLoop()
+	go smbShareLoop()
+	go serviceLoop()
 	//go chainsawLoop()
 	//go processLoop()
 	//go autorunsLoop()

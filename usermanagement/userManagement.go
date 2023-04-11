@@ -92,7 +92,7 @@ func disableUser(user string) {
 
 }
 
-func enableUser(user string) {
+func EnableUser(user string) {
 	u := false
 	_, err := wapi.UserDisabled(user, u)
 	if err != nil {
@@ -101,21 +101,24 @@ func enableUser(user string) {
 
 }
 
-func delUser(user string) {
+func DelUser(user string) {
 	_, err := wapi.UserDelete(user)
 	if err != nil {
 		zap.S().Error(err)
 	}
 }
 
-func addUser(username, fullname, password string) {
+func AddUser(username, fullname, password string) error {
 	_, err := wapi.UserAdd(username, fullname, password)
 	if err != nil {
-		zap.S().Error(err)
+		zap.S().Error("Error adding user: ", err)
+		return err
 	}
+
+	return nil
 }
 
-func usrNochangepw(user string) {
+func UsrNochangepw(user string) {
 	c := true // password doesnt expire
 	_, err := wapi.UserPasswordNoExpires(user, c)
 	if err != nil {
@@ -131,14 +134,14 @@ func usrChangepw(user string) {
 	}
 }
 
-func forcePasswdchange(user, newpasswd string) {
+func ForcePasswdchange(user, newpasswd string) {
 	_, err := wapi.ChangePassword(user, newpasswd)
 	if err != nil {
 		zap.S().Error(err)
 	}
 }
 
-func setFullNameAttribute(user, fullname string) {
+func SetFullNameAttribute(user, fullname string) {
 	_, err := wapi.UserUpdateFullname(user, fullname)
 	if err != nil {
 		zap.S().Error(err)
