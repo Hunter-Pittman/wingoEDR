@@ -27,6 +27,7 @@ require (
 )
 
 require (
+	github.com/StackExchange/wmi v1.2.1 // indirect
 	github.com/botherder/go-files v0.0.0-20180205213231-2246e61e05ec // indirect
 	github.com/bytedance/sonic v1.8.0 // indirect
 	github.com/capnspacehook/taskmaster v0.0.0-20210519235353-1629df7c85e9 // indirect

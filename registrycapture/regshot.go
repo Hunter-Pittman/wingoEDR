@@ -50,7 +50,8 @@ type InstalledSoftware struct {
 }
 
 // Return subkey values for installed software
-//HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\Current Version\Uninstall
+// HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\Current Version\Uninstall
+// THIS FUNCTION IS DEPRECATED, USE WMI IMPLEMENTATION INSTEAD
 func GetSoftwareSubkeys(registryPath string) []InstalledSoftware {
 
 	keyHandle, err := registry.OpenKey(registry.LOCAL_MACHINE, registryPath, registry.QUERY_VALUE|registry.ENUMERATE_SUB_KEYS)
@@ -85,13 +86,13 @@ func GetSoftwareSubkeys(registryPath string) []InstalledSoftware {
 			installLocation = "N/A"
 			//zap.S().Error("Could not get install location infomation: ", err)
 		}
-		
+
 		uninstallString, _, _ := subKeyHandle.GetStringValue("UninstallString")
 		if len(uninstallString) == 0 {
 			uninstallString = "N/A"
 			//zap.S().Error("Could not get uninstall string infomation: ", err)
 		}
-		
+
 		version, _, _ := subKeyHandle.GetStringValue("DisplayVersion")
 		if len(version) == 0 {
 			version = "N/A"
